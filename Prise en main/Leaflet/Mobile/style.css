@@ -1,0 +1,13 @@
+/* Suppression des marges par défaut du navigateur */
+body {
+    padding: 0;
+    margin: 0;
+}
+
+/* On force le HTML, le BODY et la DIV #map à prendre toute la hauteur.
+   Note : Le guide recommande % plutôt que vh à cause de bugs sur Chrome Mobile.
+*/
+html, body, #map {
+    height: 100%;
+    width: 100vw;
+}

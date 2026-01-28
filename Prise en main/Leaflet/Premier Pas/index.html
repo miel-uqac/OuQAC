@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Premier Pas</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <script>
+        // 1. Initialisation de la carte (coordonnées de Londres, zoom 13)
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        // 2. Ajout de la couche de tuiles (Tile Layer) - OpenStreetMap
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // 3. Ajout d'un marqueur (Marker)
+        var marker = L.marker([51.5, -0.09]).addTo(map);
+        marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+
+        // 4. Ajout d'un cercle (Circle)
+        var circle = L.circle([51.508, -0.11], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 500
+        }).addTo(map);
+        circle.bindPopup("I am a circle.");
+
+        // 5. Ajout d'un polygone (Polygon)
+        var polygon = L.polygon([
+            [51.509, -0.08],
+            [51.503, -0.06],
+            [51.51, -0.047]
+        ]).addTo(map);
+        polygon.bindPopup("I am a polygon.");
+
+        // 6. Ajout d'un popup autonome (Standalone Popup)
+        var popup = L.popup()
+            .setLatLng([51.513, -0.09])
+            .setContent("I am a standalone popup.")
+            .openOn(map);
+
+        // 7. Gestion des événements (Clic sur la carte)
+        // Affiche les coordonnées là où l'utilisateur clique
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
+
+    </script>
+</body>
+</html>

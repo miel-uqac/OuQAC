@@ -1,0 +1,11 @@
+/* Définir une hauteur est obligatoire pour que la carte s'affiche */
+#map { 
+    height: 380px; 
+}
+
+/* Optionnel */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}

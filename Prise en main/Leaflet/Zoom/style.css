@@ -1,0 +1,28 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+#map {
+    height: 100vh;
+    width: 100%;
+    background: #f0f0f0;
+}
+
+/* Style pour la boîte d'instructions flottante */
+#instructions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000; /* Au-dessus de la carte */
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    max-width: 300px;
+}
+
+#instructions h3 {
+    margin-top: 0;
+}
