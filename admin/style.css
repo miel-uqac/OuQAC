@@ -12,7 +12,7 @@ body, html {
 /* Sidebar */
 #sidebar {
     width: 350px;
-    background: #f4f4f4;
+    background: #fff;
     border-right: 1px solid #ccc;
     display: flex;
     flex-direction: column;
@@ -25,9 +25,9 @@ body, html {
 #sidebar-header h2 { margin: 0; font-size: 1.2rem; }
 
 /* Selecteur - Sidebar */
-#selector { padding: 10px; border-bottom: 1px solid #ddd; background: white; }
+#selector { padding: 10px; border-bottom: 1px solid #ddd; background: #1d1d1b; }
 #selector select { width: 100%; padding: 5px; }
-
+    
 /* Outils Modes - Sidebar */
 #tools { padding: 10px; display: flex; gap: 5px; background: #e0e0e0; }
 .btn-mode { flex: 1; padding: 8px; border: none; cursor: pointer; background: #fff; border-radius: 4px; }
@@ -36,6 +36,11 @@ body, html {
 
 /* Zone de contenu dynamique - Sidebar */
 #sidebar-content { flex: 1; overflow-y: auto; padding: 15px; }
+/* Recherche salle */
+#search-room { width: 95%; margin-bottom:10px; padding:5px; }
+/* Liste des salles */
+.room-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; }
+.room-item:hover { background: #f3f3f3; }
 
 /* Actions Bas - Sidebar */
 #actions { padding: 15px; border-top: 1px solid #ddd; background: white; display: flex; gap: 10px; }
