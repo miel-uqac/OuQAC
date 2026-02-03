@@ -25,9 +25,12 @@ const TYPE_COLORS = {
 
 // État de l'application
 let currentMode = 'view'; // 'view', 'node', 'path'
-let nodes = []; // Stockage des objets marqueurs
+let nodes = []; // Stockage des objets marqueurs (noeuds)
 let selectedNode = null; // Le nœud actuellement affiché dans le formulaire
 let isNodeValidated = true; // Flag pour savoir si le nœud en cours est validé
+let paths = []; // Stockage des lignes L.polyline (chemins)
+let pathStartNode = null; // Premier nœud cliqué pour un nouveau chemin
+let selectedPath = null; // Le chemin actuellement affiché dans le formulaire
 
 // ==========================================
 // GESTION DES MODES (SIDEBAR)
@@ -95,15 +98,39 @@ function createNode(lat, lng) {
         type: defaultType
     };
 
-    // Événement : Clic sur le marker pour l'éditer
+    // Événement : Clic sur le marker pour l'éditer / Pour créer un chemin
     nodeMarker.on('click', (e) => {
-        L.DomEvent.stopPropagation(e); // Empêche de créer un nouveau point par dessus
-        selectNode(nodeMarker);
+        L.DomEvent.stopPropagation(e);
+        
+        // On test dans quel mode on est :
+        // node -> édition du marker
+        // path -> création du chemin
+        if (currentMode === 'node') {
+            selectNode(nodeMarker);
+        } else if (currentMode === 'path') {
+            handleNodeClickForPath(nodeMarker);
+        }
     });
 
     // Événement : Drag & Drop
     nodeMarker.on('dragend', () => {
         updateNodeInputs(nodeMarker);
+    });
+
+    // Événement : Mise à jour des chemins quand on déplace un nœud (dans le dragend)
+    nodeMarker.on('drag', () => {
+        // Si on déplace le nœud, on recalcule les chemins qui y sont rattachées
+        paths.forEach(path => {
+            if (path.userData.startId === nodeMarker.userData.id || path.userData.endId === nodeMarker.userData.id) {
+                // On retrouve les deux nœuds pour mettre à jour les positions
+                const nStart = nodes.find(n => n.userData.id === path.userData.startId);
+                const nEnd = nodes.find(n => n.userData.id === path.userData.endId);
+                path.setLatLngs([nStart.getLatLng(), nEnd.getLatLng()]);
+                
+                // Mise à jour distance auto
+                path.userData.distAuto = map.distance(nStart.getLatLng(), nEnd.getLatLng()).toFixed(2);
+            }
+        });
     });
 
     nodes.push(nodeMarker);
@@ -168,6 +195,110 @@ function deleteCurrentNode() {
 function removeNode(node) {
     map.removeLayer(node);
     nodes = nodes.filter(n => n !== node);
+}
+
+// ==========================================
+// LOGIQUE DES CHEMINS (ÉDITION)
+// ==========================================
+
+// Cette fonction sera appelée quand on clique sur un nœud en mode chemin
+function handleNodeClickForPath(node) {
+    if (currentMode !== 'path') return;
+
+    if (!pathStartNode) {
+        // Premier clic : on sélectionne le point de départ
+        pathStartNode = node;
+        // On donne un petit effet visuel au nœud sélectionné
+        node.getElement().querySelector('div').style.border = "3px solid white";
+    } else {
+        // Deuxième clic : on vérifie que ce n'est pas le même nœud
+        if (pathStartNode === node) {
+            resetPathSelection();
+            return;
+        }
+
+        // Création du chemin
+        createPath(pathStartNode, node);
+        resetPathSelection();
+    }
+}
+
+function createPath(nodeA, nodeB) {
+    const id = "path_" + Date.now();
+    const latlngs = [nodeA.getLatLng(), nodeB.getLatLng()];
+    
+    // Calcul de la distance réelle en mètres
+    const distanceMeters = map.distance(nodeA.getLatLng(), nodeB.getLatLng());
+
+    // Création d'un polyline pour le chemin
+    const polyline = L.polyline(latlngs, {
+        color: '#2c3e50',
+        weight: 5,
+        opacity: 0.7
+    }).addTo(map);
+
+    // Stockage des données personnalisées dans l'objet polyline
+    polyline.userData = {
+        id: id,
+        startId: nodeA.userData.id,
+        endId: nodeB.userData.id,
+        type: "indoor",
+        distAuto: distanceMeters.toFixed(2),
+        distManual: "",
+        pmr: true
+    };
+
+    // Événement : Clic sur le polyline pour l'éditer
+    polyline.on('click', (e) => {
+        if (currentMode === 'path') {
+            L.DomEvent.stopPropagation(e);
+            selectPath(polyline);
+        }
+    });
+
+    paths.push(polyline);
+    selectPath(polyline);
+}
+
+function selectPath(path) {
+    selectedPath = path;
+    // Affichage du formulaire latéral
+    document.getElementById('path-form').classList.remove('hidden');
+    
+    // Remplissage du formulaire latéral
+    document.getElementById('path-id').value = path.userData.id;
+    document.getElementById('path-type').value = path.userData.type;
+    document.getElementById('path-dist-auto').value = path.userData.distAuto + " m";
+    document.getElementById('path-dist-manual').value = path.userData.distManual;
+    document.getElementById('path-pmr').checked = path.userData.pmr;
+}
+
+// Validation des modifications
+function validatePath() {
+    if (selectedPath) {
+        selectedPath.userData.type = document.getElementById('path-type').value;
+        selectedPath.userData.distManual = document.getElementById('path-dist-manual').value;
+        selectedPath.userData.pmr = document.getElementById('path-pmr').checked;
+        alert("Chemin validé !");
+    }
+}
+
+// Suppression du chemin séléctionné
+function deleteCurrentPath() {
+    if (selectedPath) {
+        map.removeLayer(selectedPath);
+        paths = paths.filter(p => p !== selectedPath);
+        selectedPath = null;
+        document.getElementById('path-form').classList.add('hidden');
+    }
+}
+
+// Reset le style du noeud séléctionné
+function resetPathSelection() {
+    if (pathStartNode) {
+        pathStartNode.getElement().querySelector('div').style.border = "2px solid black";
+    }
+    pathStartNode = null;
 }
 
 // ==========================================
