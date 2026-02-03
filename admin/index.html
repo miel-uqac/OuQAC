@@ -12,8 +12,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="app">
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h2>Éditeur Map - OùQAC</h2>
+            </div>
 
-    <div id="map"></div>
+            <div id="selector">
+                <select name="layers" id="sel-layer">
+                    <option value="0">Rez-de-chaussée (0)</option>
+                    <option value="1">Étage 1</option>
+                    <option value="2">Étage 2</option>
+                </select>
+            </div>
+
+            <div id="tools">
+                <button class="btn-mode">Vue</button>
+                <button class="btn-mode">Nœuds</button>
+                <button class="btn-mode">Chemins</button>
+            </div>
+
+            <div id="sidebar-content">
+                <div id="panel-view"></div>
+
+                <div id="panel-node"></div>
+
+                <div id="panel-path"></div>
+            </div>
+
+            <div id="actions">
+                <button class="btn-action btn-save">Sauvegarder</button>
+                <button class="btn-action btn-import">Importer</button>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
