@@ -23,6 +23,12 @@ const TYPE_COLORS = {
     "wc": "#2ecc71"          // Vert
 };
 
+// Couleurs par type de chemin
+const PATH_COLORS = {
+    "indoor": "#3498db",  // Bleu
+    "outdoor": "#2ecc71"  // Vert
+};
+
 // État de l'application
 let currentMode = 'view'; // 'view', 'node', 'path'
 let nodes = []; // Stockage des objets marqueurs (noeuds)
@@ -230,15 +236,8 @@ function createPath(nodeA, nodeB) {
     // Calcul de la distance réelle en mètres
     const distanceMeters = map.distance(nodeA.getLatLng(), nodeB.getLatLng());
 
-    // Création d'un polyline pour le chemin
-    const polyline = L.polyline(latlngs, {
-        color: '#2c3e50',
-        weight: 5,
-        opacity: 0.7
-    }).addTo(map);
-
-    // Stockage des données personnalisées dans l'objet polyline
-    polyline.userData = {
+    // Stockage des données personnalisées dans un objet
+    const initialData = {
         id: id,
         startId: nodeA.userData.id,
         endId: nodeB.userData.id,
@@ -247,6 +246,11 @@ function createPath(nodeA, nodeB) {
         distManual: "",
         pmr: true
     };
+    
+    // On applique le style dynamiquement
+    const polyline = L.polyline(latlngs, getPathStyle(initialData)).addTo(map);
+    // Stockage des données personnalisées dans le chemin
+    polyline.userData = initialData;
 
     // Événement : Clic sur le polyline pour l'éditer
     polyline.on('click', (e) => {
@@ -279,6 +283,10 @@ function validatePath() {
         selectedPath.userData.type = document.getElementById('path-type').value;
         selectedPath.userData.distManual = document.getElementById('path-dist-manual').value;
         selectedPath.userData.pmr = document.getElementById('path-pmr').checked;
+
+        // Appliquer le nouveau style
+        selectedPath.setStyle(getPathStyle(selectedPath.userData));
+
         alert("Chemin validé !");
     }
 }
@@ -300,6 +308,33 @@ function resetPathSelection() {
     }
     pathStartNode = null;
 }
+
+// Récupérer style du chemin
+function getPathStyle(userData) {
+    return {
+        color: PATH_COLORS[userData.type] || "#2c3e50",
+        weight: 5,
+        opacity: 0.8,
+        // Si pmr est vrai (coché), on met du plein (null), sinon des pointillés ('10, 10')
+        dashArray: userData.pmr ? null : '10, 15' 
+    };
+}
+
+// Mise à jour dynamique du style du chemin lors du changement de type
+document.getElementById('path-type').addEventListener('change', (e) => {
+    if (selectedPath) {
+        selectedPath.userData.type = e.target.value;
+        selectedPath.setStyle(getPathStyle(selectedPath.userData));
+    }
+});
+
+// Mise à jour dynamique du style du chemin lors du changement PMR
+document.getElementById('path-pmr').addEventListener('change', (e) => {
+    if (selectedPath) {
+        selectedPath.userData.pmr = e.target.checked;
+        selectedPath.setStyle(getPathStyle(selectedPath.userData));
+    }
+});
 
 // ==========================================
 // LOGIQUE FONCTIONNEL
