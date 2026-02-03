@@ -27,13 +27,13 @@
             </div>
 
             <div id="tools">
-                <button class="btn-mode active">Vue</button>
-                <button class="btn-mode">Nœuds</button>
-                <button class="btn-mode">Chemins</button>
+                <button class="btn-mode active" onclick="changeMode('view', this)">Vue</button>
+                <button class="btn-mode" onclick="changeMode('node', this)">Nœuds</button>
+                <button class="btn-mode" onclick="changeMode('path', this)">Chemins</button>
             </div>
 
             <div id="sidebar-content">
-                <div id="panel-view" class="hidden">
+                <div id="panel-view">
                     <input type="text" id="search-room" placeholder="Rechercher une salle...">
                     <div id="room-list">
                         <div class="room-item"><b>P1-1020</b> <small>(Salle)</small></div>
@@ -56,12 +56,12 @@
                             <option value="wc">Toilettes</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>Coordonnées (X, Y)</label><input type="text" id="node-coords" readonly></div>
-                    <button class="btn-action btn-delete" >Supprimer ce nœud</button>
-                    <button class="btn-action btn-validate">Valider</button>
+                    <div class="form-group"><label>Coordonnées</label><input type="text" id="node-coords" readonly></div>
+                    <button class="btn-action btn-delete" onclick="deleteCurrentNode()">Supprimer ce nœud</button>
+                    <button class="btn-action btn-validate" onclick="validateNode()">Valider</button>
                 </div>
 
-                <div id="panel-path">
+                <div id="panel-path" class="hidden">
                     <h3>Édition Chemin</h3>
                     <p>Sélectionnez deux nœuds pour créer un lien.</p>
                     <div id="path-form">
