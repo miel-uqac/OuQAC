@@ -42,18 +42,18 @@
                     </div>
                 </div>
 
-                <div id="panel-node">
+                <div id="panel-node" class="hidden">
                     <h3>Édition Nœud</h3>
                     <div class="form-group"><label>ID</label><input type="text" id="node-id" readonly></div>
                     <div class="form-group"><label>Nom / Numéro</label><input type="text" id="node-name"></div>
                     <div class="form-group">
                         <label>Type</label>
                         <select id="node-type">
-                            <option value="Salle">Salle de cours</option>
-                            <option value="Couloir">Couloir</option>
-                            <option value="Escalier">Escalier</option>
-                            <option value="Ascenseur">Ascenseur</option>
-                            <option value="WC">Toilettes</option>
+                            <option value="salle">Salle de cours</option>
+                            <option value="couloir">Couloir</option>
+                            <option value="escalier">Escalier</option>
+                            <option value="ascenseur">Ascenseur</option>
+                            <option value="wc">Toilettes</option>
                         </select>
                     </div>
                     <div class="form-group"><label>Coordonnées (X, Y)</label><input type="text" id="node-coords" readonly></div>
@@ -61,7 +61,30 @@
                     <button class="btn-action btn-validate">Valider</button>
                 </div>
 
-                <div id="panel-path" class="hidden"></div>
+                <div id="panel-path">
+                    <h3>Édition Chemin</h3>
+                    <p>Sélectionnez deux nœuds pour créer un lien.</p>
+                    <div id="path-form">
+                        <div class="form-group"><label>ID Chemin</label><input type="text" id="path-id" readonly></div>
+                        <div class="form-group"><label>Type</label>
+                            <select id="path-type">
+                                <option value="indoor">Intérieur</option>
+                                <option value="outdoor">Extérieur</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Distance</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="text" id="path-dist-auto" disabled style="background:#eee;">
+                                <input type="text" id="path-dist-manual" placeholder="Override">
+                            </div>
+                        </div>
+                        <label><input type="checkbox" id="path-pmr"> Accessible PMR</label>
+                        <br><br>
+                        <button class="btn-action btn-delete">Supprimer Chemin</button>
+                        <button class="btn-action btn-validate">Valider</button>
+                    </div>
+                </div>
             </div>
 
             <div id="actions">

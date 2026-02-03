@@ -53,15 +53,19 @@ body, html {
 .btn-delete { --btn-color: #f44336; width:100% }
 .btn-validate { --btn-color: #4CAF50; width:100%; margin-top:5px; }
 
-/* Actions Bas - Sidebar */
+/* --- Actions Bas --- */
 #actions { padding: 15px; border-top: 1px solid #ddd; background: white; display: flex; gap: 10px; }
 .btn-action { flex: 1; padding: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; background-color: var(--btn-color); }
 .btn-save { --btn-color: #2196F3; }
 .btn-import { --btn-color: #FF9800; }
 .btn-action:hover { background-color: color-mix(in srgb, var(--btn-color), black 10%); }
 
-/* Carte */
+/*------------------------*/
+/*---------Carte----------*/
+/*------------------------*/
 #map { flex: 1; height: 100%; cursor: crosshair; background-color: #ddd; }
 
-/* Utility */
+/*------------------------*/
+/*--------Utility---------*/
+/*------------------------*/
 .hidden { display: none; }
