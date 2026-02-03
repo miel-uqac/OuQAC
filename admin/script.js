@@ -337,5 +337,71 @@ document.getElementById('path-pmr').addEventListener('change', (e) => {
 });
 
 // ==========================================
+// RECHERCHE ET LISTE DES SALLES
+// ==========================================
+
+const searchInput = document.getElementById('search-room');
+const roomListContainer = document.getElementById('room-list');
+
+// Écouteur sur la barre de recherche
+searchInput.addEventListener('input', () => {
+    updateRoomList(searchInput.value.toLowerCase());
+});
+
+/**
+ * Met à jour la liste des salles dans la sidebar
+ * @param {string} filter - Le texte recherché
+ */
+function updateRoomList(filter = "") {
+    roomListContainer.innerHTML = ""; // On vide la liste actuelle
+
+    // On ne liste que les nœuds validés qui ont un nom
+    const salles = nodes.filter(node => {
+        const name = node.userData.name.toLowerCase();
+        const matchesSearch = name.includes(filter);
+        const isSalle = node.userData.type === 'salle';
+        return matchesSearch && isSalle && node.userData.name !== "";
+    });
+
+    if (salles.length === 0) {
+        roomListContainer.innerHTML = '<div class="room-item">Aucune salle trouvée</div>';
+        return;
+    }
+
+    salles.forEach(node => {
+        const item = document.createElement('div');
+        item.className = 'room-item';
+        item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type})</small>`;
+        
+        // Au clic sur un item de la liste, on centre la carte sur le nœud et on l'édite
+        item.onclick = () => {
+            map.flyTo(node.getLatLng(), 19);
+            changeMode('node', document.querySelectorAll('.btn-mode')[1]); // Basculer en mode Nœud
+            selectNode(node);
+        };
+
+        roomListContainer.appendChild(item);
+    });
+}
+
+// Appeler la mise à jour quand on valide un nœud pour rafraîchir la liste
+const originalValidateNode = validateNode;
+validateNode = function() {
+    originalValidateNode();
+    updateRoomList(searchInput.value.toLowerCase());
+};
+
+// Appeler aussi lors de la suppression
+const originalDeleteNode = deleteCurrentNode;
+deleteCurrentNode = function() {
+    originalDeleteNode();
+    updateRoomList(searchInput.value.toLowerCase());
+};
+
+// ==========================================
 // LOGIQUE FONCTIONNEL
 // ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateRoomList(); // Initialise la liste vide ou avec les nœuds existants
+});
