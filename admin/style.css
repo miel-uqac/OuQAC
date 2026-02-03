@@ -6,10 +6,14 @@ body, html {
     overflow: hidden;
 }
 
-/* Layout principal */
+/*------------------------*/
+/*----Layout principa ----*/
+/*------------------------*/
 #app  {display: flex; height: 100vh; }
 
-/* Sidebar */
+/*------------------------*/
+/*--------Sidebar---------*/
+/*------------------------*/
 #sidebar {
     width: 350px;
     background: #fff;
@@ -20,27 +24,34 @@ body, html {
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-/* Header - Sidebar */
+/* --- Header --- */
 #sidebar-header { padding: 15px; background: #1d1d1b; color: white; }
 #sidebar-header h2 { margin: 0; font-size: 1.2rem; }
 
-/* Selecteur - Sidebar */
+/* --- Selecteur --- */
 #selector { padding: 10px; border-bottom: 1px solid #ddd; background: #1d1d1b; }
 #selector select { width: 100%; padding: 5px; }
     
-/* Outils Modes - Sidebar */
+/* --- Outils Modes --- */
 #tools { padding: 10px; display: flex; gap: 5px; background: #e0e0e0; }
 .btn-mode { flex: 1; padding: 8px; border: none; cursor: pointer; background: #fff; border-radius: 4px; }
 .btn-mode:hover {background: #f3f3f3;}
 .btn-mode.active { background: #1d1d1b; color: white; font-weight: bold; }
 
-/* Zone de contenu dynamique - Sidebar */
+/* --- Zone de contenu dynamique --- */
 #sidebar-content { flex: 1; overflow-y: auto; padding: 15px; }
-/* Recherche salle */
+
+/* --- Recherche salle --- */
 #search-room { width: 95%; margin-bottom:10px; padding:5px; }
-/* Liste des salles */
+/* --- Liste des salles --- */
 .room-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; }
 .room-item:hover { background: #f3f3f3; }
+/* --- Formualaire --- */
+.form-group { margin-bottom: 10px; }
+.form-group label { display: block; font-size: 0.85rem; color: #666; }
+.form-group input, .form-group select { width: 100%; padding: 5px; box-sizing: border-box; }
+.btn-delete { --btn-color: #f44336; width:100% }
+.btn-validate { --btn-color: #4CAF50; width:100%; margin-top:5px; }
 
 /* Actions Bas - Sidebar */
 #actions { padding: 15px; border-top: 1px solid #ddd; background: white; display: flex; gap: 10px; }

@@ -33,7 +33,7 @@
             </div>
 
             <div id="sidebar-content">
-                <div id="panel-view">
+                <div id="panel-view" class="hidden">
                     <input type="text" id="search-room" placeholder="Rechercher une salle...">
                     <div id="room-list">
                         <div class="room-item"><b>P1-1020</b> <small>(Salle)</small></div>
@@ -42,7 +42,24 @@
                     </div>
                 </div>
 
-                <div id="panel-node" class="hidden"></div>
+                <div id="panel-node">
+                    <h3>Édition Nœud</h3>
+                    <div class="form-group"><label>ID</label><input type="text" id="node-id" readonly></div>
+                    <div class="form-group"><label>Nom / Numéro</label><input type="text" id="node-name"></div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="node-type">
+                            <option value="Salle">Salle de cours</option>
+                            <option value="Couloir">Couloir</option>
+                            <option value="Escalier">Escalier</option>
+                            <option value="Ascenseur">Ascenseur</option>
+                            <option value="WC">Toilettes</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Coordonnées (X, Y)</label><input type="text" id="node-coords" readonly></div>
+                    <button class="btn-action btn-delete" >Supprimer ce nœud</button>
+                    <button class="btn-action btn-validate">Valider</button>
+                </div>
 
                 <div id="panel-path" class="hidden"></div>
             </div>
