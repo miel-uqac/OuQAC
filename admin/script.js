@@ -9,9 +9,3 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
-
-// Petit test : marqueur sur l'entrée principal
-// (Voir si ça fonctionne - à retirer)
-L.marker(UQAC_COORDS).addTo(map)
-    .bindPopup('UQAC - Pavillon Principal')
-    .openPopup();
