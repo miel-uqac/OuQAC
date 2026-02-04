@@ -29,6 +29,9 @@ const PATH_COLORS = {
     "outdoor": "#2ecc71"  // Vert
 };
 
+// Version par défaut de l'application
+const APP_VERSION = "1.0.0";
+
 // État de l'application
 let currentMode = 'view'; // 'view', 'node', 'path'
 let nodes = []; // Stockage des objets marqueurs (noeuds)
@@ -397,6 +400,118 @@ deleteCurrentNode = function() {
     originalDeleteNode();
     updateRoomList(searchInput.value.toLowerCase());
 };
+
+// ==========================================
+// LOGIQUE IMPORT / EXPORT (JSON)
+// ==========================================
+
+let currentVersion = 1.0;
+
+/**
+ * Exporte les données actuelles dans un fichier graph.json
+ */
+function exportGraph() {
+    const graphData = {
+        metadata: {
+            name: "OùQAC - Map Data",
+            date: new Date().toLocaleString('fr-CA'),
+            version: (currentVersion += 0.1).toFixed(1),
+            university: "UQAC"
+        },
+        nodes: nodes.map(node => ({
+            id: node.userData.id,
+            name: node.userData.name,
+            type: node.userData.type,
+            lat: node.getLatLng().lat,
+            lng: node.getLatLng().lng
+        })),
+        paths: paths.map(path => ({
+            id: path.userData.id,
+            startNode: path.userData.startId,
+            endNode: path.userData.endId,
+            type: path.userData.type,
+            distance: path.userData.distManual || path.userData.distAuto,
+            isPmr: path.userData.pmr
+        }))
+    };
+
+    // Création du lien de téléchargement
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graphData, null, 4));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "graph.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+/**
+ * Déclenche l'input invisible pour choisir un fichier
+ */
+function triggerImport() {
+    document.getElementById('import-file').click();
+}
+
+/**
+ * Lit le fichier JSON et reconstruit la carte
+ */
+function importGraph(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            // Nettoyage de la carte actuelle
+            nodes.forEach(n => map.removeLayer(n));
+            paths.forEach(p => map.removeLayer(p));
+            nodes = [];
+            paths = [];
+
+            // Import des nœuds
+            data.nodes.forEach(n => {
+                // On réutilise la logique de création sans le flag "isNodeValidated"
+                createNode(n.lat, n.lng);
+                const lastNode = nodes[nodes.length - 1];
+                lastNode.userData.id = n.id;
+                lastNode.userData.name = n.name;
+                lastNode.userData.type = n.type;
+                isNodeValidated = true; // On valide automatiquement l'import
+                
+                // Mise à jour visuelle du point (couleur)
+                const color = TYPE_COLORS[n.type] || "#000";
+                lastNode.getElement().querySelector('div').style.backgroundColor = color;
+            });
+
+            // Import des chemins
+            data.paths.forEach(p => {
+                const nodeA = nodes.find(n => n.userData.id === p.startNode);
+                const nodeB = nodes.find(n => n.userData.id === p.endNode);
+                
+                if (nodeA && nodeB) {
+                    createPath(nodeA, nodeB);
+                    const lastPath = paths[paths.length - 1];
+                    lastPath.userData.id = p.id;
+                    lastPath.userData.type = p.type;
+                    lastPath.userData.pmr = p.isPmr;
+                    lastPath.userData.distManual = p.distance;
+                    lastPath.setStyle(getPathStyle(lastPath.userData));
+                }
+            });
+
+            currentVersion = parseFloat(data.metadata.version) || 1.0;
+            updateRoomList();
+            alert(`Importation réussie : Version ${currentVersion}`);
+
+        } catch (err) {
+            console.error(err);
+            alert("Erreur lors de l'importation : Fichier JSON invalide.");
+        }
+    };
+    reader.readAsText(file);
+}
 
 // ==========================================
 // LOGIQUE FONCTIONNEL

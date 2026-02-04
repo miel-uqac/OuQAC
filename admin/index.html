@@ -85,8 +85,9 @@
             </div>
 
             <div id="actions">
-                <button class="btn-action btn-save">Sauvegarder</button>
-                <button class="btn-action btn-import">Importer</button>
+                <button class="btn-action btn-save" onclick="exportGraph()">Sauvegarder</button>
+                <button class="btn-action btn-import" onclick="triggerImport()">Importer</button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importGraph(event)">
             </div>
         </div>
 
