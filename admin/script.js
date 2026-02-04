@@ -6,7 +6,10 @@
 const UQAC_COORDS = [48.4204, -71.0526];
 
 // Initialisation de la carte
-const map = L.map('map').setView(UQAC_COORDS, 17);
+const map = L.map('map', { 
+    zoomSnap: 0, 
+    zoomDelta: 0.25 
+}).setView(UQAC_COORDS, 17);
 
 // Fond de carte OpenStreetMap
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
