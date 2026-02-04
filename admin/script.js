@@ -111,18 +111,16 @@ function createNode(lat, lng) {
     nodeMarker.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
         
-        // On test dans quel mode on est :
-        // node -> édition du marker
-        // path -> création du chemin
-        if (currentMode === 'node') {
-            selectNode(nodeMarker);
-        } else if (currentMode === 'path') {
-            handleNodeClickForPath(nodeMarker);
-        }
+        // On choisi quelle action de séléction faire
+        selectingNode(nodeMarker);
     });
 
     // Événement : Drag & Drop
     nodeMarker.on('dragend', () => {
+        // Lancer les actions de séléctions quand on drag
+        selectingNode(nodeMarker);
+
+        // Mettre à jour les informations dynamiquement
         updateNodeInputs(nodeMarker);
     });
 
@@ -145,6 +143,17 @@ function createNode(lat, lng) {
     nodes.push(nodeMarker);
     isNodeValidated = false;
     selectNode(nodeMarker);
+}
+
+function selectingNode(node) {
+    // On test dans quel mode on est :
+    // node -> édition du marker
+    // path -> création du chemin
+    if (currentMode === 'node') {
+        selectNode(node);
+    } else if (currentMode === 'path') {
+        handleNodeClickForPath(node);
+    }
 }
 
 function selectNode(node) {
