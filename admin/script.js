@@ -58,9 +58,9 @@ function changeMode(mode, btn) {
     });
     paths.forEach(p => p.setStyle(getPathStyle(p.userData, false)));
     
-    // Réinitialisation des variables de sélection
-    selectedNode = null;
-    selectedPath = null;
+    // Nettoyage des formulaires et variables
+    clearNodeForm();
+    clearPathForm();
     pathStartNode = null;
     
     // UI Boutons
@@ -78,18 +78,6 @@ function changeMode(mode, btn) {
 // ==========================================
 // LOGIQUE DES NŒUDS (ÉDITION)
 // ==========================================
-
-map.on('click', function(e) {
-    if (currentMode !== 'node') return;
-
-    // Si on a un nœud en cours qui n'est pas validé, on le supprime avant d'en créer un nouveau
-    if (!isNodeValidated && selectedNode) {
-        removeNode(selectedNode);
-    }
-
-    const { lat, lng } = e.latlng;
-    createNode(lat, lng);
-});
 
 function createNode(lat, lng) {
     const id = "node_" + Date.now();
@@ -228,12 +216,9 @@ function validateNode() {
 function deleteCurrentNode() {
     if (selectedNode) {
         removeNode(selectedNode);
-        selectedNode = null;
         isNodeValidated = true;
         // Reset du formulaire
-        document.getElementById('node-id').value = "";
-        document.getElementById('node-name').value = "";
-        document.getElementById('node-coords').value = "";
+        clearNodeForm();
     }
 }
 
@@ -369,8 +354,8 @@ function deleteCurrentPath() {
     if (selectedPath) {
         map.removeLayer(selectedPath);
         paths = paths.filter(p => p !== selectedPath);
-        selectedPath = null;
-        document.getElementById('path-form').classList.add('hidden');
+        // Vider le formulaires
+        clearPathForm();
     }
 }
 
@@ -585,4 +570,49 @@ function importGraph(event) {
 
 document.addEventListener('DOMContentLoaded', () => {
     updateRoomList(); // Initialise la liste vide ou avec les nœuds existants
+});
+
+// Vide tous les champs du formulaire des Nœuds
+function clearNodeForm() {
+    document.getElementById('node-id').value = "";
+    document.getElementById('node-name').value = "";
+    document.getElementById('node-type').value = "salle";
+    document.getElementById('node-coords').value = "";
+    selectedNode = null;
+}
+
+// Vide tous les champs du formulaire des Chemins
+function clearPathForm() {
+    document.getElementById('path-node-a').value = "";
+    document.getElementById('path-node-b').value = "";
+    document.getElementById('path-id').value = "";
+    document.getElementById('path-type').value = "indoor";
+    document.getElementById('path-dist-auto').value = "";
+    document.getElementById('path-dist-manual').value = "";
+    document.getElementById('path-pmr').checked = false;
+    selectedPath = null;
+}
+
+// Logique au clic sur la map
+map.on('click', function(e) {
+    if (currentMode === 'node') {
+        // Si on a un nœud non validé, on le dégage
+        if (!isNodeValidated && selectedNode) {
+            removeNode(selectedNode);
+        }
+        createNode(e.latlng.lat, e.latlng.lng);
+    } 
+    else {
+        // En mode Vue ou Chemin, un clic sur le vide nettoie la sélection
+        clearNodeForm();
+        clearPathForm();
+        resetPathSelection(); // Pour enlever la bordure blanche du nœud source éventuel
+        
+        // On remet le style par défaut aux objets sur la carte
+        nodes.forEach(n => {
+            const div = n.getElement()?.querySelector('div');
+            if (div) div.style.border = "2px solid black";
+        });
+        paths.forEach(p => p.setStyle(getPathStyle(p.userData, false)));
+    }
 });
