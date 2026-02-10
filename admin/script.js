@@ -41,7 +41,7 @@ const APP_VERSION = "1.0.0";
 let currentMode = 'view'; // 'view', 'node', 'path'
 let nodes = []; // Stockage des objets marqueurs (noeuds)
 let selectedNode = null; // Le nœud actuellement affiché dans le formulaire
-let isNodeValidated = true; // Flag pour savoir si le nœud en cours est validé
+let nodeIsTemporary = false; // TRUE uniquement si le nœud vient d'être créé par un clic map
 let paths = []; // Stockage des lignes L.polyline (chemins)
 let pathStartNode = null; // Premier nœud cliqué pour un nouveau chemin
 let selectedPath = null; // Le chemin actuellement affiché dans le formulaire
@@ -146,7 +146,7 @@ function createNode(lat, lng) {
     });
 
     nodes.push(nodeMarker);
-    isNodeValidated = false;
+    nodeIsTemporary = true; // Nouveau nœud = temporaire
     selectNode(nodeMarker);
 }
 
@@ -155,6 +155,8 @@ function selectingNode(node) {
     // node -> édition du marker
     // path -> création du chemin
     if (currentMode === 'node') {
+        // Si on clique sur un nœud existant, il perd son statut temporaire
+        if (selectedNode !== node) nodeIsTemporary = false;
         selectNode(node);
     } else if (currentMode === 'path') {
         handleNodeClickForPath(node);
@@ -209,7 +211,7 @@ function validateNode() {
     if (selectedNode) {
         selectedNode.userData.name = document.getElementById('node-name').value;
         selectedNode.userData.type = document.getElementById('node-type').value;
-        isNodeValidated = true;
+        nodeIsTemporary = false; // VALIDÉ = n'est plus temporaire
         alert("Nœud enregistré !");
     }
 }
@@ -598,12 +600,20 @@ function clearPathForm() {
 // Logique au clic sur la map
 map.on('click', function(e) {
     if (currentMode === 'node') {
-        // Si on a un nœud non validé, on le dégage
-        if (!isNodeValidated && selectedNode) {
+        // 1. SUPPRESSION : Uniquement si le nœud sélectionné est marqué comme TEMPORAIRE
+        if (selectedNode && nodeIsTemporary) {
             removeNode(selectedNode);
         }
+
+        // 2. NETTOYAGE VISUEL : On enlève la bordure blanche de l'ancien nœud
+        nodes.forEach(n => {
+            const div = n.getElement()?.querySelector('div');
+            if (div) div.style.border = "2px solid black";
+        });
+
+        // 3. CRÉATION du nouveau
         createNode(e.latlng.lat, e.latlng.lng);
-    } 
+    }
     else {
         // En mode Vue ou Chemin, un clic sur le vide nettoie la sélection
         clearNodeForm();
