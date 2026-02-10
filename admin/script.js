@@ -262,11 +262,28 @@ function handleNodeClickForPath(node) {
             resetPathSelection();
             return;
         }
+        
+        // Vérification création d'un chemin sur un chemin existant
+        if (pathExists(pathStartNode.userData.id, node.userData.id)) {
+            alert("Un chemin existe déjà entre ces deux nœuds !");
+            resetPathSelection();
+            return;
+        }
 
         // Création du chemin
         createPath(pathStartNode, node);
         resetPathSelection();
     }
+}
+
+// Vérifie si une polyline existe déjà entre deux IDs de nœuds
+function pathExists(idA, idB) {
+    return paths.some(path => {
+        const s = path.userData.startId;
+        const e = path.userData.endId;
+        // On vérifie dans les deux sens (A->B ou B->A)
+        return (s === idA && e === idB) || (s === idB && e === idA);
+    });
 }
 
 function createPath(nodeA, nodeB) {
