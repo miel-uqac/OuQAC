@@ -51,6 +51,18 @@ let selectedPath = null; // Le chemin actuellement affiché dans le formulaire
 function changeMode(mode, btn) {
     currentMode = mode;
     
+    // Réinitialisation visuelle de tout
+    nodes.forEach(n => {
+        const div = n.getElement()?.querySelector('div');
+        if (div) div.style.border = "2px solid black";
+    });
+    paths.forEach(p => p.setStyle(getPathStyle(p.userData, false)));
+    
+    // Réinitialisation des variables de sélection
+    selectedNode = null;
+    selectedPath = null;
+    pathStartNode = null;
+    
     // UI Boutons
     document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -160,7 +172,20 @@ function selectingNode(node) {
 }
 
 function selectNode(node) {
+    // 1. Réinitialiser le style de tous les autres nœuds
+    nodes.forEach(n => {
+        const div = n.getElement()?.querySelector('div');
+        if (div) div.style.border = "2px solid black"; // Style par défaut
+    });
+
+    // 2. Appliquer le contour blanc au nœud sélectionné
     selectedNode = node;
+    const selectedDiv = node.getElement()?.querySelector('div');
+    if (selectedDiv) {
+        selectedDiv.style.border = "3px solid white";
+        selectedDiv.style.boxShadow = "0 0 5px rgba(0,0,0,0.5)";
+    }
+
     // Remplissage du formulaire latéral
     document.getElementById('node-id').value = node.userData.id;
     document.getElementById('node-name').value = node.userData.name;
@@ -280,11 +305,16 @@ function createPath(nodeA, nodeB) {
 }
 
 function selectPath(path) {
+    // 1. Réinitialiser le style de tous les autres chemins
+    paths.forEach(p => p.setStyle(getPathStyle(p.userData, false)));
+
+    // 2. Appliquer le style sélectionné
     selectedPath = path;
-    // Affichage du formulaire latéral
+    path.setStyle(getPathStyle(path.userData, true));
+    path.bringToFront(); // Met le chemin sélectionné au premier plan
+
+    // Affichage du formulaire
     document.getElementById('path-form').classList.remove('hidden');
-    
-    // Remplissage du formulaire latéral
     document.getElementById('path-id').value = path.userData.id;
     document.getElementById('path-type').value = path.userData.type;
     document.getElementById('path-dist-auto').value = path.userData.distAuto + " m";
@@ -325,12 +355,11 @@ function resetPathSelection() {
 }
 
 // Récupérer style du chemin
-function getPathStyle(userData) {
+function getPathStyle(userData, isSelected = false) {
     return {
-        color: PATH_COLORS[userData.type] || "#2c3e50",
-        weight: 5,
-        opacity: 0.8,
-        // Si pmr est vrai (coché), on met du plein (null), sinon des pointillés ('10, 10')
+        color: isSelected ? "#ff3d3d" : (PATH_COLORS[userData.type] || "#2c3e50"),
+        weight: isSelected ? 7 : 5, // Plus épais si sélectionné
+        opacity: isSelected ? 1 : 0.8,
         dashArray: userData.pmr ? null : '10, 15' 
     };
 }
