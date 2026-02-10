@@ -84,6 +84,7 @@ function changeMode(mode, btn) {
 function createNode(lat, lng) {
     const id = "node_" + Date.now();
     const defaultType = "salle";
+    const currentFloor = document.getElementById('sel-layer').value;
     
     // Création d'une icône personnalisée en forme de cercle
     const circleIcon = L.divIcon({
@@ -109,7 +110,8 @@ function createNode(lat, lng) {
     nodeMarker.userData = {
         id: id,
         name: "",
-        type: defaultType
+        type: defaultType,
+        floor: currentFloor
     };
 
     // Événement : Clic sur le marker pour l'éditer / Pour créer un chemin
@@ -148,6 +150,20 @@ function createNode(lat, lng) {
     nodes.push(nodeMarker);
     nodeIsTemporary = true; // Nouveau nœud = temporaire
     selectNode(nodeMarker);
+}
+
+function refreshNodeStyle(node) {
+    const color = TYPE_COLORS[node.userData.type] || "#000";
+    const iconDiv = node.getElement()?.querySelector('div');
+    if (iconDiv) {
+        iconDiv.style.backgroundColor = color;
+        // On remet aussi la bordure si c'est le nœud sélectionné
+        if (selectedNode === node) {
+            iconDiv.style.border = "3px solid white";
+        } else {
+            iconDiv.style.border = "2px solid black";
+        }
+    }
 }
 
 function selectingNode(node) {
@@ -198,11 +214,7 @@ document.getElementById('node-type').addEventListener('change', (e) => {
         selectedNode.userData.type = newType;
         
         // Mise à jour visuelle immédiate de la couleur du point
-        const color = TYPE_COLORS[newType] || "#000";
-        const iconDiv = selectedNode.getElement().querySelector('div');
-        if (iconDiv) {
-            iconDiv.style.backgroundColor = color;
-        }
+        refreshNodeStyle(selectedNode);
     }
 });
 
@@ -477,6 +489,7 @@ function exportGraph() {
             id: node.userData.id,
             name: node.userData.name,
             type: node.userData.type,
+            floor: node.userData.floor,
             lat: node.getLatLng().lat,
             lng: node.getLatLng().lng
         })),
@@ -533,6 +546,7 @@ function importGraph(event) {
                 lastNode.userData.id = n.id;
                 lastNode.userData.name = n.name;
                 lastNode.userData.type = n.type;
+                lastNode.userData.floor = n.floor;
                 isNodeValidated = true; // On valide automatiquement l'import
                 
                 // Mise à jour visuelle du point (couleur)
@@ -557,6 +571,7 @@ function importGraph(event) {
             });
 
             currentVersion = parseFloat(data.metadata.version) || 1.0;
+            filterElements(document.getElementById('sel-layer').value);
             updateRoomList();
             alert(`Importation réussie : Version ${currentVersion}`);
 
@@ -573,7 +588,6 @@ function importGraph(event) {
 // ==========================================
 
 // Ces points correspondent aux coins réels du pavillon principal de l'UQAC
-// Tu peux les ajuster précisément. Le script calculera l'angle et l'échelle tout seul.
 const topleft     = L.latLng(48.420607, -71.052667);
 const topright    = L.latLng(48.420174, -71.051671);
 const bottomleft  = L.latLng(48.419886, -71.053379);
@@ -604,15 +618,13 @@ document.getElementById('sel-layer').addEventListener('change', function(e) {
     }
 });
 
-/**
- * Filtre les nœuds et chemins selon l'étage
- * (Nécessite d'ajouter 'floor' dans userData lors de la création)
- */
+// Filtre les nœuds et chemins selon l'étage
 function filterElements(floor) {
     // Filtrage des nœuds
     nodes.forEach(node => {
         if (node.userData.floor === floor) {
             node.addTo(map);
+            setTimeout(() => refreshNodeStyle(node), 0);
         } else {
             map.removeLayer(node);
         }
