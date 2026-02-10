@@ -8,12 +8,14 @@ const UQAC_COORDS = [48.4204, -71.0526];
 // Initialisation de la carte
 const map = L.map('map', { 
     zoomSnap: 0, 
-    zoomDelta: 0.25 
+    zoomDelta: 0.25, 
+    maxZoom: 22 // La limite physique du zoom de l'interface
 }).setView(UQAC_COORDS, 17);
 
 // Fond de carte OpenStreetMap
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, // Zoom élevé pour l'intérieur
+    maxNativeZoom: 19, // Les images réelles s'arrêtent ici
+    maxZoom: 22,       // Mais on autorise Leaflet à les étirer jusqu'à 22
     attribution: '© OpenStreetMap'
 }).addTo(map);
 
