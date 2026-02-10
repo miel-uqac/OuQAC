@@ -328,10 +328,21 @@ function selectPath(path) {
     // 2. Appliquer le style sélectionné
     selectedPath = path;
     path.setStyle(getPathStyle(path.userData, true));
-    path.bringToFront(); // Met le chemin sélectionné au premier plan
+    path.bringToFront();
 
-    // Affichage du formulaire
+    // 3. Récupérer les noms des nœuds à partir de leurs IDs
+    const nodeA = nodes.find(n => n.userData.id === path.userData.startId);
+    const nodeB = nodes.find(n => n.userData.id === path.userData.endId);
+
+    // On gère le cas où le nœud n'a pas encore de nom (afficher "Sans nom")
+    const nameA = (nodeA && nodeA.userData.name) ? nodeA.userData.name : "Nœud sans nom";
+    const nameB = (nodeB && nodeB.userData.name) ? nodeB.userData.name : "Nœud sans nom";
+
+    // 4. Remplissage du formulaire
     document.getElementById('path-form').classList.remove('hidden');
+    document.getElementById('path-node-a').value = nameA;
+    document.getElementById('path-node-b').value = nameB;
+    
     document.getElementById('path-id').value = path.userData.id;
     document.getElementById('path-type').value = path.userData.type;
     document.getElementById('path-dist-auto').value = path.userData.distAuto + " m";
@@ -409,10 +420,7 @@ searchInput.addEventListener('input', () => {
     updateRoomList(searchInput.value.toLowerCase());
 });
 
-/**
- * Met à jour la liste des salles dans la sidebar
- * @param {string} filter - Le texte recherché
- */
+// Met à jour la liste des salles dans la sidebar/
 function updateRoomList(filter = "") {
     roomListContainer.innerHTML = ""; // On vide la liste actuelle
 
