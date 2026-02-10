@@ -569,6 +569,65 @@ function importGraph(event) {
 }
 
 // ==========================================
+// GESTION DES PLANS (ÉTAGES)
+// ==========================================
+
+// Ces points correspondent aux coins réels du pavillon principal de l'UQAC
+// Tu peux les ajuster précisément. Le script calculera l'angle et l'échelle tout seul.
+const topleft     = L.latLng(48.420607, -71.052667);
+const topright    = L.latLng(48.420174, -71.051671);
+const bottomleft  = L.latLng(48.419886, -71.053379);
+
+const floorPlan = L.imageOverlay.rotated("plans/plan_bat.jpg", topleft, topright, bottomleft, {
+    opacity: 0.7,
+    interactive: false,
+    zIndex: 100
+}).addTo(map);
+
+// ==========================================
+// SYSTÈME DE GESTION DES ÉTAGES
+// ==========================================
+
+const floors = {
+    "0": "plans/plan_bat.jpg",
+    "1": "plans/etage1.jpg",
+    "2": "plans/etage2.jpg"
+};
+
+document.getElementById('sel-layer').addEventListener('change', function(e) {
+    const floorId = e.target.value;
+    const imageUrl = floors[floorId];
+    
+    if (imageUrl) {
+        floorPlan.setUrl(imageUrl);
+        filterElements(floorId);
+    }
+});
+
+/**
+ * Filtre les nœuds et chemins selon l'étage
+ * (Nécessite d'ajouter 'floor' dans userData lors de la création)
+ */
+function filterElements(floor) {
+    // Filtrage des nœuds
+    nodes.forEach(node => {
+        if (node.userData.floor === floor) {
+            node.addTo(map);
+        } else {
+            map.removeLayer(node);
+        }
+    });
+    // Filtrage des chemins
+    paths.forEach(path => {
+        if (path.userData.floor === floor) {
+            path.addTo(map);
+        } else {
+            map.removeLayer(path);
+        }
+    });
+}
+
+// ==========================================
 // LOGIQUE FONCTIONNEL
 // ==========================================
 

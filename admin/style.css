@@ -69,3 +69,12 @@ body, html {
 /*--------Utility---------*/
 /*------------------------*/
 .hidden { display: none; }
+
+/* Classe pour faire pivoter le plan de l'UQAC */
+.rotated-floorplan {
+    /* Ajuste le chiffre 41deg ici jusqu'à l'alignement parfait */
+    transform: rotate(41deg) !important;
+    transform-origin: center center !important;
+    /* On désactive les transitions pour éviter les lags au zoom */
+    transition: none !important;
+}
