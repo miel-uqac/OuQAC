@@ -1,5 +1,5 @@
 import { state } from '../state.js';
-import { map } from '../map.js';
+import { map, setFloor, filterMapElements } from '../map.js';
 import * as NodeCtrl from '../controllers/nodeController.js';
 import { changeMode } from '../main.js';
 
@@ -65,12 +65,16 @@ export function updateRoomList(filter = "") {
     }
 
     salles.forEach(node => {
+        const nodeFloor = node.userData.floor;
         const item = document.createElement('div');
         item.className = 'room-item';
         item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type})</small>`;
         
         item.addEventListener('click', () => {
+            // Redirection vers le noeuds
             map.flyTo(node.getLatLng(), 19);
+            setFloor(nodeFloor);
+            filterMapElements(nodeFloor);
             // On bascule en mode node via le contrôleur principal simulé
             const btnNode = document.querySelectorAll('.btn-mode')[1]; 
             changeMode('node', btnNode);
