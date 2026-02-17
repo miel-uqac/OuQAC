@@ -23,7 +23,6 @@ export function handleNodeClickForPath(node) {
         }
         // Vérification création d'un chemin sur un chemin existant
         if (pathExists(state.pathStartNode.userData.id, node.userData.id)) {
-            alert("Chemin déjà existant !");
             resetPathSelection();
             return;
         }
@@ -142,7 +141,6 @@ export function validatePath() {
         
         // Appliquer le nouveau style
         state.selectedPath.setStyle(getPathStyle(state.selectedPath.userData.type, state.selectedPath.userData.pmr, true));
-        alert("Chemin validé !");
     }
 }
 

@@ -113,7 +113,6 @@ export function validateNode() {
         
         refreshNodeStyle(state.selectedNode, true);
         UI.updateRoomList();
-        alert("Nœud enregistré !");
     }
 }
 
