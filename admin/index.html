@@ -27,9 +27,9 @@
             </div>
 
             <div id="tools">
-                <button class="btn-mode active" onclick="changeMode('view', this)">Vue</button>
-                <button class="btn-mode" onclick="changeMode('node', this)">Nœuds</button>
-                <button class="btn-mode" onclick="changeMode('path', this)">Chemins</button>
+                <button class="btn-mode active">Vue</button>
+                <button class="btn-mode">Nœuds</button>
+                <button class="btn-mode">Chemins</button>
             </div>
 
             <div id="sidebar-content">
@@ -46,7 +46,7 @@
                     <div class="form-group">
                         <label>Type</label>
                         <select id="node-type">
-                            <option value="salle">Salle de cours</option>
+                            <option value="salle">Salle</option>
                             <option value="couloir">Couloir</option>
                             <option value="escalier">Escalier</option>
                             <option value="ascenseur">Ascenseur</option>
@@ -54,8 +54,8 @@
                         </select>
                     </div>
                     <div class="form-group"><label>Coordonnées</label><input type="text" id="node-coords" readonly></div>
-                    <button class="btn-action btn-delete" onclick="deleteCurrentNode()">Supprimer ce nœud</button>
-                    <button class="btn-action btn-validate" onclick="validateNode()">Valider</button>
+                    <button class="btn-action btn-delete" id="btn-del-node">Supprimer ce nœud</button>
+                    <button class="btn-action btn-validate" id="btn-save-node">Valider</button>
                 </div>
 
                 <div id="panel-path" class="hidden">
@@ -86,15 +86,15 @@
                         </div>
                         <label><input type="checkbox" id="path-pmr"> Accessible PMR</label>
                         <br><br>
-                        <button class="btn-action btn-delete" onclick="deleteCurrentPath()">Supprimer Chemin</button>
-                        <button class="btn-action btn-validate" onclick="validatePath()">Valider</button>
+                        <button class="btn-action btn-delete" id="btn-del-path">Supprimer Chemin</button>
+                        <button class="btn-action btn-validate" id="btn-save-path">Valider</button>
                     </div>
                 </div>
             </div>
 
             <div id="actions">
-                <button class="btn-action btn-save" onclick="exportGraph()">Sauvegarder</button>
-                <button class="btn-action btn-import" onclick="triggerImport()">Importer</button>
+                <button class="btn-action" id="btn-save">Sauvegarder</button>
+                <button class="btn-action" id="btn-import">Importer</button>
                 <input type="file" id="import-file" style="display:none" accept=".json" onchange="importGraph(event)">
             </div>
         </div>
@@ -104,6 +104,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-imageoverlay-rotated@0.1.4/Leaflet.ImageOverlay.Rotated.js"></script>
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
