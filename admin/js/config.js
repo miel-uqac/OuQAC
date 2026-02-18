@@ -11,8 +11,16 @@ export const CONFIG = {
         zoomSnap: 0,
         zoomDelta: 0.25,
         maxZoom: 22,
-        minZoom: 18
+        minZoom: 18,
+        // Rend la limite "solide"
+        maxBoundsViscosity: 1.0 
     },
+
+    // Limites de la carte [Coin Sud-Ouest, Coin Nord-Est]
+    MAP_BOUNDS: [
+        [48.416396, -71.060311], // Sud-Ouest
+        [48.421910, -71.046623]  // Nord-Est
+    ],
     
     // Couleurs
     TYPE_COLORS: {

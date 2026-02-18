@@ -5,8 +5,11 @@ import { state } from './state.js';
 // GESTION DE LA MAP
 // ==========================================
 
-// Initialisation de la carte
-export const map = L.map('map', CONFIG.MAP_OPTS).setView(CONFIG.UQAC_COORDS, 17);
+// Initialisation de la carte avec fusion des options et des limites
+export const map = L.map('map', {
+    ...CONFIG.MAP_OPTS,        // On récupère zoomSnap, minZoom, maxBoundsViscosity...
+    maxBounds: CONFIG.MAP_BOUNDS // On applique la restriction de zone
+}).setView(CONFIG.UQAC_COORDS, 17);
 
 // Fond de carte OSM
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
