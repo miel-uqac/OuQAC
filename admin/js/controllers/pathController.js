@@ -7,6 +7,7 @@ import * as UI from '../views/ui.js';
 // VARIABLES LOCALES
 // ==========================================
 let highlightLayer = null; // Stocke la "bordure" rouge temporaire
+let labeledNodes = [];     // Stocke les nœuds qui ont actuellement une étiquette (A/B)
 
 // ==========================================
 // GESTION DES CHEMINS
@@ -56,12 +57,18 @@ export function resetPathSelection() {
     state.pathStartNode = null;
 }
 
-// Fonction pour retirer la ligne rouge (appelée depuis main.js aussi)
+// Fonction pour retirer la ligne rouge et les étiquettes
 export function clearHighlight() {
     if (highlightLayer) {
         map.removeLayer(highlightLayer);
         highlightLayer = null;
     }
+    
+    // On retire les étiquettes A/B des nœuds
+    labeledNodes.forEach(node => {
+        node.unbindTooltip();
+    });
+    labeledNodes = []; // On vide la liste
 }
 
 // Vérifie si une polyline existe déjà entre deux IDs de nœuds
@@ -111,26 +118,45 @@ export function createPath(nodeA, nodeB, existingData = null) {
 }
 
 export function selectPath(path) {
-    // 1. Nettoyage de l'ancienne sélection (bordure rouge)
+    // 1. Nettoyage (supprime ligne rouge ET étiquettes précédentes)
     clearHighlight();
 
-    // 2. Création de la nouvelle bordure rouge (sous le chemin)
+    // 2. Création de la nouvelle bordure rouge
     highlightLayer = L.polyline(path.getLatLngs(), {
-        color: '#ff3e3e', // Rouge vif
-        weight: 10,       // Beaucoup plus épais que le chemin normal (qui est à 5)
+        color: '#ff3e3e',
+        weight: 10,
         opacity: 1
     }).addTo(map);
 
     // 3. On définit le path sélectionné
     state.selectedPath = path;
 
-    // 4. On met le chemin normal au premier plan pour qu'il soit DESSUS la ligne rouge
+    // 4. On met le chemin normal au premier plan
     path.bringToFront();
 
     // 5. Remplissage formulaire
     const nodeA = state.nodes.find(n => n.userData.id === path.userData.startId);
     const nodeB = state.nodes.find(n => n.userData.id === path.userData.endId);
     UI.fillPathForm(path, nodeA, nodeB);
+
+    // 6. Ajout des étiquettes visuelles A et B sur la carte
+    if (nodeA) {
+        nodeA.bindTooltip("<b>A</b>", { 
+            permanent: true, 
+            direction: 'top', 
+            className: 'label-path-node' 
+        }).openTooltip();
+        labeledNodes.push(nodeA);
+    }
+
+    if (nodeB) {
+        nodeB.bindTooltip("<b>B</b>", { 
+            permanent: true, 
+            direction: 'top', 
+            className: 'label-path-node' 
+        }).openTooltip();
+        labeledNodes.push(nodeB);
+    }
 }
 
 // Récupérer style du chemin
