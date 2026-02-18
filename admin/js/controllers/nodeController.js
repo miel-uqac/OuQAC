@@ -104,15 +104,21 @@ export function refreshNodeStyle(node, isSelected) {
     }
 }
 
-// Validation des modifications
-export function validateNode() {
+// Sauvegarde automatique des modifications
+export function updateCurrentNode() {
     if (state.selectedNode) {
+        // 1. Mise à jour des données du Marker
         state.selectedNode.userData.name = document.getElementById('node-name').value;
         state.selectedNode.userData.type = document.getElementById('node-type').value;
-        state.nodeIsTemporary = false;
         
+        // 2. Le nœud n'est plus temporaire dès qu'on le modifie
+        state.nodeIsTemporary = false; 
+        
+        // 3. Mise à jour visuelle (Couleur sur la map)
         refreshNodeStyle(state.selectedNode, true);
-        UI.updateRoomList();
+        
+        // 4. Mise à jour de la liste dans la sidebar (pour voir le nom changer en direct)
+        UI.updateRoomList(document.getElementById('search-room').value);
     }
 }
 

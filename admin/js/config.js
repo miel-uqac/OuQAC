@@ -11,7 +11,7 @@ export const CONFIG = {
         zoomSnap: 0,
         zoomDelta: 0.25,
         maxZoom: 22,
-        minZoom: 16
+        minZoom: 18
     },
     
     // Couleurs

@@ -73,8 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Node Form
-    document.getElementById('btn-save-node').onclick = NodeCtrl.validateNode;
     document.getElementById('btn-del-node').onclick = NodeCtrl.deleteCurrentNode;
+    // SAUVEGARDE AUTO : Quand on écrit le nom
+    document.getElementById('node-name').addEventListener('input', () => {
+        NodeCtrl.updateCurrentNode();
+    });
+
+    // SAUVEGARDE AUTO + VISUEL : Quand on change le type
+    document.getElementById('node-type').addEventListener('change', () => {
+        NodeCtrl.updateCurrentNode();
+    });
     
     // Changement type noeud -> preview couleur
     document.getElementById('node-type').addEventListener('change', () => {
