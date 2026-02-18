@@ -15,7 +15,7 @@ export function changeMode(mode, btn) {
     
     // Reset visuel global
     state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
-    state.paths.forEach(p => p.setStyle(PathCtrl.getPathStyle(p.userData.type, p.userData.pmr, false)));
+    PathCtrl.clearHighlight();
 
     // Reset formulaires
     UI.clearNodeForm();
@@ -46,8 +46,8 @@ map.on('click', function(e) {
         UI.clearNodeForm();
         UI.clearPathForm();
         PathCtrl.resetPathSelection();
+        PathCtrl.clearHighlight();
         state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
-        state.paths.forEach(p => p.setStyle(PathCtrl.getPathStyle(p.userData.type, p.userData.pmr, false)));
     }
 });
 
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Reset visuel (pour éviter qu'un élément caché reste "blanc/sélectionné")
         state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
-        state.paths.forEach(p => p.setStyle(PathCtrl.getPathStyle(p.userData.type, p.userData.pmr, false)));
+        PathCtrl.clearHighlight();
     });
 
     // Node Form

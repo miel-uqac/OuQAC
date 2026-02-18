@@ -4,6 +4,11 @@ import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
 
 // ==========================================
+// VARIABLES LOCALES
+// ==========================================
+let highlightLayer = null; // Stocke la "bordure" rouge temporaire
+
+// ==========================================
 // GESTION DES CHEMINS
 // ==========================================
 
@@ -21,12 +26,22 @@ export function handleNodeClickForPath(node) {
             resetPathSelection();
             return;
         }
+
+        const startId = state.pathStartNode.userData.id;
+        const endId = node.userData.id;
+
+        // On cherche le chemin existant
+        const existingPath = pathExists(startId, endId);
+
         // Vérification création d'un chemin sur un chemin existant
-        if (pathExists(state.pathStartNode.userData.id, node.userData.id)) {
-            resetPathSelection();
+        if (existingPath) {
+            // Si le chemin existe, on le sélectionne simplement
+            selectPath(existingPath);
+            resetPathSelection(); // On nettoie le point de départ
             return;
         }
-        // Création du chemin
+
+        // Sinon, création du chemin
         createPath(state.pathStartNode, node);
         resetPathSelection();
     }
@@ -41,12 +56,19 @@ export function resetPathSelection() {
     state.pathStartNode = null;
 }
 
+// Fonction pour retirer la ligne rouge (appelée depuis main.js aussi)
+export function clearHighlight() {
+    if (highlightLayer) {
+        map.removeLayer(highlightLayer);
+        highlightLayer = null;
+    }
+}
+
 // Vérifie si une polyline existe déjà entre deux IDs de nœuds
 function pathExists(idA, idB) {
-    return state.paths.some(p => {
+    return state.paths.find(p => {
         const s = p.userData.startId;
         const e = p.userData.endId;
-        // On vérifie dans les deux sens (A->B ou B->A)
         return (s === idA && e === idB) || (s === idB && e === idA);
     });
 }
@@ -89,19 +111,25 @@ export function createPath(nodeA, nodeB, existingData = null) {
 }
 
 export function selectPath(path) {
-    // 1. Réinitialiser le style de tous les autres chemins
-    state.paths.forEach(p => p.setStyle(getPathStyle(p.userData.type, p.userData.pmr, false)));
-    
-    // 2. Appliquer le style sélectionné
+    // 1. Nettoyage de l'ancienne sélection (bordure rouge)
+    clearHighlight();
+
+    // 2. Création de la nouvelle bordure rouge (sous le chemin)
+    highlightLayer = L.polyline(path.getLatLngs(), {
+        color: '#ff3e3e', // Rouge vif
+        weight: 10,       // Beaucoup plus épais que le chemin normal (qui est à 5)
+        opacity: 1
+    }).addTo(map);
+
+    // 3. On définit le path sélectionné
     state.selectedPath = path;
-    path.setStyle(getPathStyle(path.userData.type, path.userData.pmr, true));
+
+    // 4. On met le chemin normal au premier plan pour qu'il soit DESSUS la ligne rouge
     path.bringToFront();
 
-    // 3. Récupérer les noms des nœuds à partir de leurs IDs
+    // 5. Remplissage formulaire
     const nodeA = state.nodes.find(n => n.userData.id === path.userData.startId);
     const nodeB = state.nodes.find(n => n.userData.id === path.userData.endId);
-
-    // 4. Remplissage du formulaire
     UI.fillPathForm(path, nodeA, nodeB);
 }
 
@@ -127,6 +155,11 @@ export function updatePathsAttachedToNode(node) {
                 path.setLatLngs([nStart.getLatLng(), nEnd.getLatLng()]);
                 // Mise à jour distance auto
                 path.userData.distAuto = map.distance(nStart.getLatLng(), nEnd.getLatLng()).toFixed(2);
+
+                // Si ce chemin est celui actuellement sélectionné, on bouge aussi la ligne rouge
+                if (state.selectedPath === path && highlightLayer) {
+                    highlightLayer.setLatLngs(newLatLngs);
+                }
             }
         }
     });
