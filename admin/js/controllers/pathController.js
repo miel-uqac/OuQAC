@@ -90,7 +90,7 @@ export function createPath(nodeA, nodeB, existingData = null) {
     const pmr = existingData ? existingData.isPmr : true; // Attention nom variable JSON vs userData
     
     // On applique le style dynamiquement
-    const polyline = L.polyline(latlngs, getPathStyle(type, pmr, false)).addTo(map);
+    const polyline = L.polyline(latlngs, getPathStyle(type, pmr)).addTo(map);
 
     // Stockage des données personnalisées dans le chemin
     polyline.userData = {
@@ -118,53 +118,45 @@ export function createPath(nodeA, nodeB, existingData = null) {
 }
 
 export function selectPath(path) {
-    // 1. Nettoyage (supprime ligne rouge ET étiquettes précédentes)
+    // 1. Nettoyage
     clearHighlight();
 
-    // 2. Création de la nouvelle bordure rouge
+    // 2. Création de la surbrillance (Le calque rouge EN DESSOUS)
     highlightLayer = L.polyline(path.getLatLngs(), {
         color: '#ff3e3e',
         weight: 10,
         opacity: 1
     }).addTo(map);
 
-    // 3. On définit le path sélectionné
+    // 3. Selection state
     state.selectedPath = path;
 
-    // 4. On met le chemin normal au premier plan
+    // 4. On s'assure que le chemin garde son style normal (bleu/vert)
+    path.setStyle(getPathStyle(path.userData.type, path.userData.pmr));
     path.bringToFront();
 
-    // 5. Remplissage formulaire
+    // 5. Formulaire
     const nodeA = state.nodes.find(n => n.userData.id === path.userData.startId);
     const nodeB = state.nodes.find(n => n.userData.id === path.userData.endId);
     UI.fillPathForm(path, nodeA, nodeB);
 
-    // 6. Ajout des étiquettes visuelles A et B sur la carte
+    // 6. Tooltips
     if (nodeA) {
-        nodeA.bindTooltip("<b>A</b>", { 
-            permanent: true, 
-            direction: 'top', 
-            className: 'label-path-node' 
-        }).openTooltip();
+        nodeA.bindTooltip("<b>A</b>", { permanent: true, direction: 'top', className: 'label-path-node' }).openTooltip();
         labeledNodes.push(nodeA);
     }
-
     if (nodeB) {
-        nodeB.bindTooltip("<b>B</b>", { 
-            permanent: true, 
-            direction: 'top', 
-            className: 'label-path-node' 
-        }).openTooltip();
+        nodeB.bindTooltip("<b>B</b>", { permanent: true, direction: 'top', className: 'label-path-node' }).openTooltip();
         labeledNodes.push(nodeB);
     }
 }
 
 // Récupérer style du chemin
-export function getPathStyle(type, isPmr, isSelected) {
+export function getPathStyle(type, isPmr) {
     return {
-        color: isSelected ? "#ff3d3d" : (CONFIG.PATH_COLORS[type] || "#2c3e50"),
-        weight: isSelected ? 7 : 5, // Plus épais si sélectionné
-        opacity: isSelected ? 1 : 0.8,
+        color: CONFIG.PATH_COLORS[type] || "#2c3e50", // Toujours la couleur du type
+        weight: 7, // Toujours l'épaisseur standard
+        opacity: 0.8,
         dashArray: isPmr ? null : '10, 15'
     };
 }
@@ -202,9 +194,11 @@ export function updateCurrentPath() {
         // 2. Mise à jour du style visuel
         state.selectedPath.setStyle(getPathStyle(
             state.selectedPath.userData.type, 
-            state.selectedPath.userData.pmr, 
-            true // true car il est actuellement sélectionné
+            state.selectedPath.userData.pmr
         ));
+
+        // 3. On force le chemin à revenir au premier plan
+        state.selectedPath.bringToFront();
     }
 }
 
