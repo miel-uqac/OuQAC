@@ -8,8 +8,8 @@ export const CONFIG = {
     
     // Configuration de la carte
     MAP_OPTS: {
-        zoomSnap: 0,
-        zoomDelta: 0.25,
+        zoomSnap: 1,
+        zoomDelta: 1,
         maxZoom: 22,
         minZoom: 18,
         // Rend la limite "solide"
