@@ -132,15 +132,20 @@ export function updatePathsAttachedToNode(node) {
     });
 }
 
-// Validation des modifications
-export function validatePath() {
+// Mis à jour des modifications
+export function updateCurrentPath() {
     if (state.selectedPath) {
+        // 1. Mise à jour des données
         state.selectedPath.userData.type = document.getElementById('path-type').value;
         state.selectedPath.userData.distManual = document.getElementById('path-dist-manual').value;
         state.selectedPath.userData.pmr = document.getElementById('path-pmr').checked;
         
-        // Appliquer le nouveau style
-        state.selectedPath.setStyle(getPathStyle(state.selectedPath.userData.type, state.selectedPath.userData.pmr, true));
+        // 2. Mise à jour du style visuel
+        state.selectedPath.setStyle(getPathStyle(
+            state.selectedPath.userData.type, 
+            state.selectedPath.userData.pmr, 
+            true // true car il est actuellement sélectionné
+        ));
     }
 }
 

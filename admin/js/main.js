@@ -90,19 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Path Form
-    document.getElementById('btn-save-path').onclick = PathCtrl.validatePath;
     document.getElementById('btn-del-path').onclick = PathCtrl.deleteCurrentPath;
     
-    // Changement type chemin -> preview style
-    const updatePathPreview = () => {
-        if(state.selectedPath) {
-            state.selectedPath.userData.type = document.getElementById('path-type').value;
-            state.selectedPath.userData.pmr = document.getElementById('path-pmr').checked;
-            state.selectedPath.setStyle(PathCtrl.getPathStyle(state.selectedPath.userData.type, state.selectedPath.userData.pmr, true));
-        }
-    };
-    document.getElementById('path-type').addEventListener('change', updatePathPreview);
-    document.getElementById('path-pmr').addEventListener('change', updatePathPreview);
+    // SAUVEGARDE AUTO : Changement de type (Style + Données)
+    document.getElementById('path-type').addEventListener('change', () => {
+        PathCtrl.updateCurrentPath();
+    });
+
+    // SAUVEGARDE AUTO : Changement PMR (Style + Données)
+    document.getElementById('path-pmr').addEventListener('change', () => {
+        PathCtrl.updateCurrentPath();
+    });
+
+    // SAUVEGARDE AUTO : Distance manuelle (Données uniquement, pas de changement visuel)
+    document.getElementById('path-dist-manual').addEventListener('input', () => {
+        PathCtrl.updateCurrentPath();
+    });
 
     // Search
     document.getElementById('search-room').addEventListener('input', (e) => {
