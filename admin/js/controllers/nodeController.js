@@ -56,7 +56,6 @@ export function createNode(lat, lng, existingData = null) {
 
     // Si c'est une création manuelle (pas un import), on le sélectionne
     if (!existingData) {
-        state.nodeIsTemporary = true; // Nouveau nœud = temporaire
         selectNode(marker);
     }
     
@@ -73,8 +72,6 @@ export function handleNodeClick(node) {
     // node -> édition du marker
     // path -> création du chemin
     if (state.currentMode === 'node') {
-        // Si on clique sur un nœud existant, il perd son statut temporaire
-        if (state.selectedNode !== node) state.nodeIsTemporary = false;
         selectNode(node);
     } else if (state.currentMode === 'path') {
         PathCtrl.handleNodeClickForPath(node);
@@ -111,13 +108,10 @@ export function updateCurrentNode() {
         state.selectedNode.userData.name = document.getElementById('node-name').value;
         state.selectedNode.userData.type = document.getElementById('node-type').value;
         
-        // 2. Le nœud n'est plus temporaire dès qu'on le modifie
-        state.nodeIsTemporary = false; 
-        
-        // 3. Mise à jour visuelle (Couleur sur la map)
+        // 2. Mise à jour visuelle (Couleur sur la map)
         refreshNodeStyle(state.selectedNode, true);
         
-        // 4. Mise à jour de la liste dans la sidebar (pour voir le nom changer en direct)
+        // 3. Mise à jour de la liste dans la sidebar (pour voir le nom changer en direct)
         UI.updateRoomList(document.getElementById('search-room').value);
     }
 }

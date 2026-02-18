@@ -36,14 +36,10 @@ export function changeMode(mode, btn) {
 // Clic sur la carte (Logique principale)
 map.on('click', function(e) {
     if (state.currentMode === 'node') {
-        // Suppression nœud temporaire si existe
-        if (state.selectedNode && state.nodeIsTemporary) {
-            map.removeLayer(state.selectedNode);
-            removeNodeFromState(state.selectedNode);
-        }
-        // Reset styles
+        // Reset styles (Désélection visuelle des autres)
         state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
-        // Création nouveau
+        
+        // Création du nouveau nœud
         NodeCtrl.createNode(e.latlng.lat, e.latlng.lng);
     } else {
         // Mode View ou Path : clic dans le vide = reset
@@ -65,11 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btns[0].onclick = () => changeMode('view', btns[0]);
     btns[1].onclick = () => changeMode('node', btns[1]);
     btns[2].onclick = () => changeMode('path', btns[2]);
-
-    // Select Layer
+    
+    // Select Layer (Changement d'étage)
     document.getElementById('sel-layer').addEventListener('change', (e) => {
-        setFloor(e.target.value);
-        filterMapElements(e.target.value);
+        const floor = e.target.value;
+        setFloor(floor);
+        filterMapElements(floor);
+
+        // Désélection totale lors du changement d'étage
+        state.selectedNode = null;
+        state.selectedPath = null;
+        UI.clearNodeForm();
+        UI.clearPathForm();
+        PathCtrl.resetPathSelection();
+        
+        // Reset visuel (pour éviter qu'un élément caché reste "blanc/sélectionné")
+        state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
+        state.paths.forEach(p => p.setStyle(PathCtrl.getPathStyle(p.userData.type, p.userData.pmr, false)));
     });
 
     // Node Form

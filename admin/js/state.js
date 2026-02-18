@@ -9,7 +9,6 @@ export const state = {
     
     // Sélection actuelle
     selectedNode: null,
-    nodeIsTemporary: false,
     
     selectedPath: null,
     pathStartNode: null, // Premier clic pour création chemin
