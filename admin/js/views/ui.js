@@ -31,7 +31,7 @@ export function fillPathForm(path, nodeA, nodeB) {
     document.getElementById('path-node-b').value = nodeB ? nodeB.userData.name || "Sans nom" : "?";
     document.getElementById('path-id').value = path.userData.id;
     document.getElementById('path-type').value = path.userData.type;
-    document.getElementById('path-dist-auto').value = path.userData.distAuto + " m";
+    document.getElementById('path-dist-auto').value = path.userData.distAuto;
     document.getElementById('path-dist-manual').value = path.userData.distManual;
     document.getElementById('path-pmr').checked = path.userData.pmr;
 }
