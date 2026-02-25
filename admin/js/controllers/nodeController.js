@@ -116,6 +116,30 @@ export function updateCurrentNode() {
     }
 }
 
+// Déplacement manuel via l'input coordonnée
+export function updateNodePositionFromInput() {
+    if (!state.selectedNode) return;
+    
+    const coordsStr = document.getElementById('node-coords').value;
+    const parts = coordsStr.split(',');
+    
+    if (parts.length === 2) {
+        const lat = parseFloat(parts[0].trim());
+        const lng = parseFloat(parts[1].trim());
+        
+        // On vérifie que les coordonnées saisies sont bien des nombres valides
+        if (!isNaN(lat) && !isNaN(lng)) {
+            const newLatLng = new L.LatLng(lat, lng);
+            
+            // On déplace le nœud
+            state.selectedNode.setLatLng(newLatLng);
+            
+            // On met à jour les chemins qui y sont attachés
+            PathCtrl.updatePathsAttachedToNode(state.selectedNode);
+        }
+    }
+}
+
 // Suppression du noeud sélectionné
 export function deleteCurrentNode() {
     if (state.selectedNode) {

@@ -108,6 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
         PathCtrl.updateCurrentPath();
     });
 
+    // SAUVEGARDE AUTO + VISUEL : Déplacement manuel via input coordonnée
+    document.getElementById('node-coords').addEventListener('input', () => {
+        NodeCtrl.updateNodePositionFromInput();
+    });
+
     // Search
     document.getElementById('search-room').addEventListener('input', (e) => {
         UI.updateRoomList(e.target.value.toLowerCase());
