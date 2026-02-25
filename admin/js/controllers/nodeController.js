@@ -2,7 +2,8 @@ import { map } from '../map.js';
 import { state, removeNodeFromState } from '../state.js';
 import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
-import * as PathCtrl from './pathController.js'; // Pour mettre à jour les chemins liés
+import * as PathCtrl from './pathController.js';
+import * as IOCtrl from './ioController.js';
 
 // ==========================================
 // GESTION DES NOEUDS
@@ -50,6 +51,7 @@ export function createNode(lat, lng, existingData = null) {
         handleNodeClick(marker);
         // Mettre à jour les informations dynamiquement
         UI.fillNodeForm(marker);
+        IOCtrl.saveToLocalStorage();
     });
 
     state.nodes.push(marker);
@@ -57,8 +59,8 @@ export function createNode(lat, lng, existingData = null) {
     // Si c'est une création manuelle (pas un import), on le sélectionne
     if (!existingData) {
         selectNode(marker);
+        IOCtrl.saveToLocalStorage();
     }
-    
     return marker;
 }
 
@@ -113,6 +115,7 @@ export function updateCurrentNode() {
         
         // 3. Mise à jour de la liste dans la sidebar (pour voir le nom changer en direct)
         UI.updateRoomList(document.getElementById('search-room').value);
+        IOCtrl.saveToLocalStorage();
     }
 }
 
@@ -136,6 +139,7 @@ export function updateNodePositionFromInput() {
             
             // On met à jour les chemins qui y sont attachés
             PathCtrl.updatePathsAttachedToNode(state.selectedNode);
+            IOCtrl.saveToLocalStorage();
         }
     }
 }
@@ -148,5 +152,6 @@ export function deleteCurrentNode() {
         state.selectedNode = null;
         UI.clearNodeForm();
         UI.updateRoomList();
+        IOCtrl.saveToLocalStorage();
     }
 }

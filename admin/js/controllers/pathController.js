@@ -2,6 +2,7 @@ import { map } from '../map.js';
 import { state, removePathFromState } from '../state.js';
 import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
+import * as IOCtrl from './ioController.js';
 
 // ==========================================
 // VARIABLES LOCALES
@@ -56,6 +57,7 @@ export function handleNodeClickForPath(node) {
         // Sinon, création du chemin
         createPath(state.pathStartNode, node);
         resetPathSelection();
+        IOCtrl.saveToLocalStorage();
     }
 }
 
@@ -210,6 +212,7 @@ export function updateCurrentPath() {
 
         // 3. On force le chemin à revenir au premier plan
         state.selectedPath.bringToFront();
+        IOCtrl.saveToLocalStorage();
     }
 }
 
@@ -222,5 +225,6 @@ export function deleteCurrentPath() {
         state.selectedPath = null;
         // Vider le formulaires
         UI.clearPathForm();
+        IOCtrl.saveToLocalStorage();
     }
 }

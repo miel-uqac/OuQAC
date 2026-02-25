@@ -5,8 +5,11 @@ import * as PathCtrl from './pathController.js';
 import * as UI from '../views/ui.js';
 import { CONFIG } from '../config.js';
 
-export function exportGraph() {
-    const graphData = {
+// ==========================================
+// FONCTION UTILITAIRE
+// ==========================================
+function generateGraphData() {
+    return {
         metadata: {
             name: "OùQAC - Map Data",
             date: new Date().toLocaleString('fr-CA'),
@@ -30,6 +33,14 @@ export function exportGraph() {
             isPmr: p.userData.pmr
         }))
     };
+}
+
+// ==========================================
+// EXPORT / IMPORT FICHIER JSON
+// ==========================================
+
+export function exportGraph() {
+    const graphData = generateGraphData(); // On appelle la fonction ici
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graphData, null, 4));
     const downloadAnchor = document.createElement('a');
@@ -80,4 +91,53 @@ export function importGraph(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// ==========================================
+// SAUVEGARDE AUTOMATIQUE (LOCAL STORAGE)
+// ==========================================
+
+export function saveToLocalStorage() {
+    const graphData = generateGraphData();
+
+    localStorage.setItem('ouqac_map_data', JSON.stringify(graphData));
+    console.log("Sauvegarde automatique effectuée.");
+}
+
+export function loadFromLocalStorage() {
+    const dataStr = localStorage.getItem('ouqac_map_data');
+    if (!dataStr) return false; // Pas de données sauvegardées
+
+    try {
+        const data = JSON.parse(dataStr);
+        
+        // Nettoyage avant de charger
+        state.nodes.forEach(n => map.removeLayer(n));
+        state.paths.forEach(p => map.removeLayer(p));
+        resetState();
+
+        // Reconstruction des nœuds
+        data.nodes.forEach(nData => {
+            const node = NodeCtrl.createNode(nData.lat, nData.lng, nData);
+            NodeCtrl.refreshNodeStyle(node, false);
+        });
+
+        // Reconstruction des chemins
+        data.paths.forEach(pData => {
+            const nodeA = state.nodes.find(n => n.userData.id === pData.startNode);
+            const nodeB = state.nodes.find(n => n.userData.id === pData.endNode);
+            if (nodeA && nodeB) {
+                PathCtrl.createPath(nodeA, nodeB, pData);
+            }
+        });
+
+        filterMapElements(state.currentFloor);
+        UI.updateRoomList();
+        console.log("Données chargées depuis le cache local.");
+        return true;
+
+    } catch (err) {
+        console.error("Erreur de chargement du localStorage :", err);
+        return false;
+    }
 }

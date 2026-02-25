@@ -124,5 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('import-file').onchange = IOCtrl.importGraph;
 
     // Initialisation
-    UI.updateRoomList();
+    // On essaie de charger les données du cache
+    const dataLoaded = IOCtrl.loadFromLocalStorage();
+    
+    // Si rien n'a été chargé on met à jour la liste vide
+    if (!dataLoaded) {
+        UI.updateRoomList();
+    }
 });
