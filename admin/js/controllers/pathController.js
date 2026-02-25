@@ -205,6 +205,7 @@ export function updateCurrentPath() {
 // Suppression du chemin séléctionné
 export function deleteCurrentPath() {
     if (state.selectedPath) {
+        clearHighlight();
         map.removeLayer(state.selectedPath);
         removePathFromState(state.selectedPath);
         state.selectedPath = null;
