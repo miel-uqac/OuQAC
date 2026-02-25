@@ -67,13 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const floor = e.target.value;
         setFloor(floor);
         filterMapElements(floor);
-
-        // Désélection totale lors du changement d'étage
-        state.selectedNode = null;
-        state.selectedPath = null;
-        UI.clearNodeForm();
-        UI.clearPathForm();
-        PathCtrl.resetPathSelection();
         
         // Reset visuel (pour éviter qu'un élément caché reste "blanc/sélectionné")
         state.nodes.forEach(n => NodeCtrl.refreshNodeStyle(n, false));
