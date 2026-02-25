@@ -28,8 +28,14 @@ export function handleNodeClickForPath(node) {
             return;
         }
 
+        // Définition des const utiles
         const startId = state.pathStartNode.userData.id;
         const endId = node.userData.id;
+        const startFloor = state.pathStartNode.userData.floor;
+        const endFloor = node.userData.floor;
+        const startType = state.pathStartNode.userData.type;
+        const endType = node.userData.type;
+        const verticalTypes = ["escalier", "ascenseur"];
 
         // On cherche le chemin existant
         const existingPath = pathExists(startId, endId);
@@ -42,6 +48,11 @@ export function handleNodeClickForPath(node) {
             return;
         }
 
+        // Vérification création de chemin entre deux étages sur des noeuds autres qu'un escalier ou ascenseur
+        if (startFloor !== endFloor && (!verticalTypes.includes(startType) || !verticalTypes.includes(endType))) {
+            resetPathSelection();
+            return;
+        }
         // Sinon, création du chemin
         createPath(state.pathStartNode, node);
         resetPathSelection();
