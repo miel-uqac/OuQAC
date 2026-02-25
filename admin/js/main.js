@@ -90,6 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(state.selectedNode) NodeCtrl.refreshNodeStyle(state.selectedNode, true); // true = keep selected border
     });
 
+    // SAUVEGARDE AUTO + VISUEL : Déplacement manuel via input coordonnée
+    document.getElementById('node-coords').addEventListener('input', () => {
+        NodeCtrl.updateNodePositionFromInput();
+    });
+
     // Path Form
     document.getElementById('btn-del-path').onclick = PathCtrl.deleteCurrentPath;
     
@@ -108,10 +113,33 @@ document.addEventListener('DOMContentLoaded', () => {
         PathCtrl.updateCurrentPath();
     });
 
-    // SAUVEGARDE AUTO + VISUEL : Déplacement manuel via input coordonnée
-    document.getElementById('node-coords').addEventListener('input', () => {
-        NodeCtrl.updateNodePositionFromInput();
-    });
+    // Navigation rapide : Clic sur l'input A ou B dans le panel chemin
+    const navigateToNodeFromPath = (isNodeA) => {
+        if (!state.selectedPath) return;
+        
+        // On récupère l'ID du nœud cible
+        const targetId = isNodeA ? state.selectedPath.userData.startId : state.selectedPath.userData.endId;
+        const targetNode = state.nodes.find(n => n.userData.id === targetId);
+        
+        if (targetNode) {
+            const floor = targetNode.userData.floor;
+            
+            // 1. Changement d'étage dans le select et sur la carte
+            document.getElementById('sel-layer').value = floor;
+            setFloor(floor);
+            filterMapElements(floor);
+            
+            // 2. Bascule en mode 'node' via le contrôleur principal
+            const btnNode = document.querySelectorAll('.btn-mode')[1];
+            changeMode('node', btnNode);
+            
+            // 3. Sélection du nœud ciblé
+            NodeCtrl.selectNode(targetNode);
+        }
+    };
+
+    document.getElementById('path-node-a').addEventListener('click', () => navigateToNodeFromPath(true));
+    document.getElementById('path-node-b').addEventListener('click', () => navigateToNodeFromPath(false));
 
     // Search
     document.getElementById('search-room').addEventListener('input', (e) => {
