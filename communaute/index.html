@@ -1,11 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OùQAC?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OùQAC</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Communauté</h1>
+    <div id="app">
+        <div id="map"></div>
+
+        <div id="ui-layer">
+            
+            <div id="bottom-controls">
+                
+                <div class="floating-buttons">
+                    <button class="btn-icon btn-camera" title="Scanner / AR">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <button class="btn-icon btn-layers" title="Changer d'étage">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </button>
+                </div>
+
+                <div class="search-bar-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search">
+                    <button class="btn-mic" title="Recherche vocale">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-imageoverlay-rotated@0.1.4/Leaflet.ImageOverlay.Rotated.js"></script>
+    
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

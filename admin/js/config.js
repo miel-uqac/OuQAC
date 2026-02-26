@@ -38,9 +38,9 @@ export const CONFIG = {
 
     // Plans des étages
     FLOORS: {
-        "0": "plans/plan_bat.jpg",
-        "1": "plans/etage1.jpg",
-        "2": "plans/etage2.jpg"
+        "0": "../plans/plan_bat.jpg",
+        "1": "../plans/etage1.jpg",
+        "2": "../plans/etage2.jpg"
     },
 
     // Coordonnées de l'overlay (Plan UQAC)

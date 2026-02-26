@@ -1,0 +1,144 @@
+/*------------------------*/
+/*------- Variables ------*/
+/*------------------------*/
+:root {
+    --primary-purple: #8b5cf6; /* Le violet de ta maquette */
+    --primary-purple-hover: #7c3aed;
+    --bg-light: #f3f4f6;
+    --text-color: #4b5563;
+}
+
+/*------------------------*/
+/*---- Layout global -----*/
+/*------------------------*/
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden; /* Important pour mobile */
+}
+
+#app {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+/*------------------------*/
+/*--------- Carte --------*/
+/*------------------------*/
+#map {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    z-index: 1; /* La carte est au fond */
+    background-color: #e5e5e5;
+}
+
+/* On cache les contrôles de zoom par défaut sur mobile pour faire plus "App" */
+.leaflet-control-zoom {
+    display: none;
+}
+
+/*------------------------*/
+/*--- Interface Mobile ---*/
+/*------------------------*/
+
+/* Calque invisible qui couvre tout l'écran mais laisse passer les clics vers la carte */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000; /* Au dessus de la carte Leaflet */
+    pointer-events: none; /* Laisse passer les clics à la carte en dessous */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Pousse le contenu vers le bas */
+}
+
+/* Conteneur des contrôles du bas */
+#bottom-controls {
+    padding: 15px 20px 30px 20px; /* Padding bas plus grand pour la zone de balayage iPhone */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- Boutons Flottants (Caméra & Calques) --- */
+.floating-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.btn-icon {
+    pointer-events: auto; /* Réactive le clic sur le bouton */
+    background-color: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(139, 92, 246, 0.4);
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.btn-icon:active {
+    transform: scale(0.95);
+    background-color: var(--primary-purple-hover);
+}
+
+/* --- Barre de Recherche --- */
+.search-bar-container {
+    pointer-events: auto; /* Réactive le clic */
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-light);
+    border: 3px solid var(--primary-purple);
+    border-radius: 30px; /* Forme de pilule */
+    padding: 5px 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.search-icon {
+    color: #9ca3af;
+    font-size: 1.1rem;
+    margin-right: 10px;
+}
+
+#search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    outline: none;
+}
+
+#search-input::placeholder {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.btn-mic {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/*------------------------*/
+/*-------- Utility -------*/
+/*------------------------*/
+.hidden { display: none !important; }
