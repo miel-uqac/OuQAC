@@ -34,9 +34,18 @@
 
             <div id="sidebar-content">
                 <div id="panel-view">
-                    <input type="text" id="search-room" placeholder="Rechercher une salle...">
-                    <div id="room-list">
+                    <div class="form-group">
+                        <input type="text" id="search-room" placeholder="Rechercher un nœud...">
+                        <select id="search-type" style="margin-top: 5px;">
+                            <option value="all">Tous les types</option>
+                            <option value="salle">Salle</option>
+                            <option value="couloir">Couloir</option>
+                            <option value="escalier">Escalier</option>
+                            <option value="ascenseur">Ascenseur</option>
+                            <option value="wc">Toilettes</option>
+                        </select>
                     </div>
+                    <div id="room-list"></div>
                 </div>
 
                 <div id="panel-node" class="hidden">

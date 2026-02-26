@@ -48,30 +48,36 @@ export function clearPathForm() {
 }
 
 // Gestion de la liste des salles (Sidebar)
-export function updateRoomList(filter = "") {
+export function updateRoomList() {
     const container = document.getElementById('room-list');
+    const textFilter = document.getElementById('search-room').value.toLowerCase();
+    const typeFilter = document.getElementById('search-type').value;
+    
     container.innerHTML = "";
 
-    const salles = state.nodes.filter(node => {
+    const filteredNodes = state.nodes.filter(node => {
         const name = (node.userData.name || "").toLowerCase();
-        const matchesSearch = name.includes(filter);
-        const isSalle = node.userData.type === 'salle';
-        return matchesSearch && isSalle && node.userData.name !== "";
+        const matchesSearch = name.includes(textFilter);
+        const matchesType = typeFilter === "all" || node.userData.type === typeFilter;
+        
+        // On n'affiche que les nœuds qui ont un nom et qui correspondent aux filtres
+        return matchesSearch && matchesType && node.userData.name.trim() !== "";
     });
 
-    if (salles.length === 0) {
-        container.innerHTML = '<div class="room-item">Aucune salle trouvée</div>';
+    if (filteredNodes.length === 0) {
+        container.innerHTML = '<div class="room-item">Aucun nœud trouvé</div>';
         return;
     }
 
-    salles.forEach(node => {
+    filteredNodes.forEach(node => {
         const nodeFloor = node.userData.floor;
         const item = document.createElement('div');
         item.className = 'room-item';
-        item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type})</small>`;
+        // Affichage de l'étage pour plus de clarté dans la liste
+        item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type} - Étage ${nodeFloor})</small>`;
         
         item.addEventListener('click', () => {
-            // Redirection vers le noeuds
+            // Redirection vers le nœud
             map.flyTo(node.getLatLng(), 19);
             setFloor(nodeFloor);
             filterMapElements(nodeFloor);

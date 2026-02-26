@@ -114,7 +114,7 @@ export function updateCurrentNode() {
         refreshNodeStyle(state.selectedNode, true);
         
         // 3. Mise à jour de la liste dans la sidebar (pour voir le nom changer en direct)
-        UI.updateRoomList(document.getElementById('search-room').value);
+        UI.updateRoomList();
         IOCtrl.saveToLocalStorage();
     }
 }

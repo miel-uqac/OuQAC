@@ -141,9 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('path-node-a').addEventListener('click', () => navigateToNodeFromPath(true));
     document.getElementById('path-node-b').addEventListener('click', () => navigateToNodeFromPath(false));
 
-    // Search
-    document.getElementById('search-room').addEventListener('input', (e) => {
-        UI.updateRoomList(e.target.value.toLowerCase());
+    // Search & Filter
+    document.getElementById('search-room').addEventListener('input', () => {
+        UI.updateRoomList();
+    });
+    document.getElementById('search-type').addEventListener('change', () => {
+        UI.updateRoomList();
     });
 
     // Import / Export
