@@ -1,0 +1,132 @@
+{
+    "metadata": {
+        "name": "OùQAC - Map Data",
+        "date": "2026-03-13 12 h 14 min 43 s",
+        "version": "1.1.0",
+        "university": "UQAC"
+    },
+    "nodes": [
+        {
+            "id": "node_1773418153294",
+            "name": "B1",
+            "type": "salle",
+            "floor": "0",
+            "lat": 48.42005541867451,
+            "lng": -71.05272334120062
+        },
+        {
+            "id": "node_1773418167630",
+            "name": "B2",
+            "type": "salle",
+            "floor": "0",
+            "lat": 48.419942411764545,
+            "lng": -71.05245770962429
+        },
+        {
+            "id": "node_1773418175823",
+            "name": "Couloir-B1",
+            "type": "couloir",
+            "floor": "0",
+            "lat": 48.41999655637649,
+            "lng": -71.0525992334441
+        },
+        {
+            "id": "node_1773418377235",
+            "name": "Escalier-B1",
+            "type": "escalier",
+            "floor": "0",
+            "lat": 48.419809841198216,
+            "lng": -71.05278241547438
+        },
+        {
+            "id": "node_1773418402284",
+            "name": "Escalier-B3",
+            "type": "escalier",
+            "floor": "1",
+            "lat": 48.41980717173366,
+            "lng": -71.05277839075356
+        },
+        {
+            "id": "node_1773418412186",
+            "name": "B3",
+            "type": "salle",
+            "floor": "1",
+            "lat": 48.42005721097287,
+            "lng": -71.05272070308799
+        },
+        {
+            "id": "node_1773418417079",
+            "name": "B4",
+            "type": "salle",
+            "floor": "1",
+            "lat": 48.41993797533248,
+            "lng": -71.05244702206996
+        },
+        {
+            "id": "node_1773418422479",
+            "name": "Couloir-B3",
+            "type": "couloir",
+            "floor": "1",
+            "lat": 48.419996703369414,
+            "lng": -71.05259593674153
+        }
+    ],
+    "paths": [
+        {
+            "id": "path_1773418365441",
+            "startNode": "node_1773418153294",
+            "endNode": "node_1773418175823",
+            "type": "indoor",
+            "distance": "11.26",
+            "isPmr": true
+        },
+        {
+            "id": "path_1773418367018",
+            "startNode": "node_1773418175823",
+            "endNode": "node_1773418167630",
+            "type": "indoor",
+            "distance": "12.06",
+            "isPmr": true
+        },
+        {
+            "id": "path_1773418389002",
+            "startNode": "node_1773418377235",
+            "endNode": "node_1773418175823",
+            "type": "indoor",
+            "distance": "24.77",
+            "isPmr": false
+        },
+        {
+            "id": "path_1773418435598",
+            "startNode": "node_1773418412186",
+            "endNode": "node_1773418422479",
+            "type": "indoor",
+            "distance": "11.40",
+            "isPmr": true
+        },
+        {
+            "id": "path_1773418438524",
+            "startNode": "node_1773418417079",
+            "endNode": "node_1773418422479",
+            "type": "indoor",
+            "distance": "12.78",
+            "isPmr": true
+        },
+        {
+            "id": "path_1773418441921",
+            "startNode": "node_1773418422479",
+            "endNode": "node_1773418402284",
+            "type": "indoor",
+            "distance": "25.01",
+            "isPmr": false
+        },
+        {
+            "id": "path_1773418448596",
+            "startNode": "node_1773418402284",
+            "endNode": "node_1773418377235",
+            "type": "indoor",
+            "distance": "0",
+            "isPmr": false
+        }
+    ]
+}

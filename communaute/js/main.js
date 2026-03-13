@@ -1,6 +1,7 @@
 import { map } from './map.js';
+import { loadGraphData } from './controllers/dataController.js';
 
-// Initialisation simple pour le moment.
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("App Communauté initialisée");
+    // Chargement automatique des données du campus
+    loadGraphData();
 });
