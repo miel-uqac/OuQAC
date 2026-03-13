@@ -74,7 +74,7 @@ html, body {
     gap: 15px;
 }
 
-/* --- Boutons Flottants (Caméra & Calques) --- */
+/* --- Boutons Flottants --- */
 .floating-buttons {
     display: flex;
     justify-content: space-between;
@@ -82,7 +82,7 @@ html, body {
 }
 
 .btn-icon {
-    pointer-events: auto; /* Réactive le clic sur le bouton */
+    pointer-events: auto;
     background-color: var(--primary-purple);
     color: white;
     border: none;
@@ -103,14 +103,58 @@ html, body {
     background-color: var(--primary-purple-hover);
 }
 
+/* --- Overlay étages --- */
+.layer-menu-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+#floor-menu {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    background-color: var(--primary-purple);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 200px; 
+    box-shadow: 0 4px 6px rgba(139, 92, 246, 0.4);
+    pointer-events: auto;
+    z-index: 10;
+    scrollbar-width: none; /* Firefox */
+}
+#floor-menu::-webkit-scrollbar {
+    display: none; /* Safari/Chrome */
+}
+
+.floor-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    width: 100%;
+    height: 50px;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.floor-btn:last-child { border-bottom: none; }
+.floor-btn.active, .floor-btn:active {
+    background-color: var(--primary-purple-hover);
+}
+
 /* --- Barre de Recherche --- */
 .search-bar-container {
-    pointer-events: auto; /* Réactive le clic */
+    pointer-events: auto;
     display: flex;
     align-items: center;
     background-color: var(--bg-light);
     border: 3px solid var(--primary-purple);
-    border-radius: 30px; /* Forme de pilule */
+    border-radius: 30px;
     padding: 5px 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }

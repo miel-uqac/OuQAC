@@ -4,5 +4,6 @@
 
 export const state = {
     nodes: [],
-    paths: []
+    paths: [],
+    currentFloor: "0"
 };

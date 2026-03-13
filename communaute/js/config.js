@@ -26,4 +26,18 @@ export const CONFIG = {
         "indoor": "#3498db",  // Bleu
         "outdoor": "#2ecc71"  // Vert
     },
+
+    // Plans des étages
+    FLOORS: {
+        "0": "../plans/plan_bat.jpg",
+        "1": "../plans/etage1.jpg",
+        "2": "../plans/etage2.jpg"
+    },
+
+    // Coordonnées de l'overlay (Plan UQAC)
+    OVERLAY_COORDS: {
+        topLeft: [48.420607, -71.052667],
+        topRight: [48.420174, -71.051671],
+        bottomLeft: [48.419886, -71.053379]
+    }
 };
