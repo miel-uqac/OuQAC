@@ -19,7 +19,7 @@ export function renderPath(pathData) {
             opacity: 0.6,
             dashArray: dashArray,
             interactive: false
-        }).addTo(map);
+        });
 
         polyline.userData = pathData;
         state.paths.push(polyline);

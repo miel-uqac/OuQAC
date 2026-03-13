@@ -36,18 +36,20 @@ export function setFloor(floorId) {
 }
 
 export function filterMapElements(floorId) {
-    // Filtrage des nœuds
+    // Filtrage des nœuds : on n'affiche que la salle recherchée
     state.nodes.forEach(node => {
-        if (String(node.userData.floor) === String(floorId)) {
+        if (state.targetNode === node && String(node.userData.floor) === String(floorId)) {
             if (!map.hasLayer(node)) node.addTo(map);
         } else {
             map.removeLayer(node);
         }
     });
 
-    // Filtrage des chemins
+    // Filtrage des chemins : on les cache tous pour l'instant
     state.paths.forEach(path => {
-        // Cherche les nœuds de ce chemin
+        map.removeLayer(path);
+
+        /* // Cherche les nœuds de ce chemin
         const startNode = state.nodes.find(n => n.userData.id === path.userData.startNode);
         const endNode = state.nodes.find(n => n.userData.id === path.userData.endNode);
 
@@ -60,6 +62,7 @@ export function filterMapElements(floorId) {
             if (!map.hasLayer(path)) path.addTo(map);
         } else {
             map.removeLayer(path);
-        }
+        } */
+
     });
 }

@@ -142,7 +142,7 @@ html, body {
     cursor: pointer;
 }
 
-.floor-btn:last-child { border-bottom: none; }
+.floor-btn:not(:last-child) { border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
 .floor-btn.active, .floor-btn:active {
     background-color: var(--primary-purple-hover);
 }
@@ -165,7 +165,7 @@ html, body {
     margin-right: 10px;
 }
 
-#search-input {
+.search-bar-container input {
     flex: 1;
     border: none;
     background: transparent;
@@ -173,9 +173,10 @@ html, body {
     font-size: 1.1rem;
     color: var(--text-color);
     outline: none;
+    width: 100%;
 }
 
-#search-input::placeholder {
+.search-bar-container input::placeholder {
     color: #9ca3af;
     font-weight: 500;
 }
@@ -187,6 +188,95 @@ html, body {
     font-size: 1.2rem;
     cursor: pointer;
     padding: 5px;
+}
+
+/* --- Overlay de Recherche  --- */
+#search-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75vh;
+    background-color: var(--primary-purple);
+    border-radius: 25px 25px 0 0;
+    padding: 10px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2000;
+    pointer-events: auto;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+}
+
+.drag-handle {
+    width: 45px;
+    height: 6px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 3px;
+    margin: 0 auto 15px auto;
+}
+
+.search-overlay-header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.search-overlay-header .search-bar-container {
+    flex: 1;
+    background-color: white;
+    border: none;
+}
+
+.btn-close-overlay {
+    background-color: #e5e5e5;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.search-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.search-section-title {
+    color: white;
+    margin: 0 0 10px 5px;
+    font-size: 1.1rem;
+}
+
+/* La carte blanche contenant la liste */
+.location-list {
+    background-color: white;
+    border-radius: 15px;
+    padding: 5px 20px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    flex: 1; /* S'étire jusqu'en bas */
+}
+
+.location-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #111;
+    cursor: pointer;
+}
+
+.location-item:last-child {
+    border-bottom: none;
 }
 
 /*------------------------*/

@@ -5,5 +5,6 @@
 export const state = {
     nodes: [],
     paths: [],
-    currentFloor: "0"
+    currentFloor: "0",
+    targetNode: null
 };

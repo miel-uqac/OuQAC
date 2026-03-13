@@ -19,9 +19,7 @@
         <div id="map"></div>
 
         <div id="ui-layer">
-            
             <div id="bottom-controls">
-                
                 <div class="floating-buttons">
                     <button class="btn-icon btn-camera" title="Scanner / AR">
                         <i class="fa-solid fa-camera"></i>
@@ -39,20 +37,57 @@
                             <button class="floor-btn" data-floor="1">1</button>
                             <button class="floor-btn active" data-floor="0">RC</button>
                         </div>
+
                         <button class="btn-icon btn-layers" id="btn-toggle-floors" title="Changer d'étage">
                             <i class="fa-solid fa-layer-group"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="search-bar-container">
+                <div class="search-bar-container" id="main-search-trigger">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Search">
+                    <input type="text" placeholder="Search" readonly style="cursor: pointer;">
                     <button class="btn-mic" title="Recherche vocale">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
                 </div>
+            </div>
 
+            <div id="search-overlay" class="hidden">
+                <div class="drag-handle"></div>
+                
+                <div class="search-overlay-header">
+                    <div class="search-bar-container active-search">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="active-search-input" placeholder="Search">
+                        <button class="btn-mic" title="Recherche vocale">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                    </div>
+                    <button id="btn-close-search" class="btn-close-overlay">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="search-content">
+                    <div id="common-places">
+                        <h3 class="search-section-title">Lieux courants</h3>
+                        <div class="location-list">
+                            <div class="location-item">Cafétéria</div>
+                            <div class="location-item">Bibliothèque</div>
+                            <div class="location-item">Le Cube</div>
+                            <div class="location-item">Pavillon Sportif</div>
+                            <div class="location-item">Bureau du registraire</div>
+                            <div class="location-item">Accueil</div>
+                            <div class="location-item">BarUQAC</div>
+                        </div>
+                    </div>
+
+                    <div id="search-results" class="hidden">
+                        <h3 class="search-section-title">Résultats</h3>
+                        <div class="location-list" id="dynamic-results-list"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

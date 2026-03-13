@@ -16,7 +16,7 @@ export function renderNode(nodeData) {
     const marker = L.marker([nodeData.lat, nodeData.lng], {
         icon: circleIcon,
         interactive: false
-    }).addTo(map);
+    });
 
     marker.userData = nodeData;
     state.nodes.push(marker);
