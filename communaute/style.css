@@ -205,6 +205,7 @@ html, body {
     z-index: 2000;
     pointer-events: auto;
     box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease-out;
 }
 
 .drag-handle {

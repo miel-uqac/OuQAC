@@ -48,16 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Ferme le menu si on clique sur la carte
-    map.on('click', () => {
-        if (!floorMenu.classList.contains('hidden')) {
-            floorMenu.classList.add('hidden');
-            btnToggleFloors.classList.remove('hidden'); // Réaffiche l'icône
-        }
-    });
 
     // ==========================================
-    // GESTION DE LA RECHERCHE (OVERLAY)
+    // GESTION DE L'OVERLAY RECHERCHE
     // ==========================================
     const searchTrigger = document.getElementById('main-search-trigger');
     const searchOverlay = document.getElementById('search-overlay');
@@ -69,26 +62,93 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResultsSection = document.getElementById('search-results');
     const dynamicResultsList = document.getElementById('dynamic-results-list');
 
-    // Ouvre l'overlay
-    searchTrigger.addEventListener('click', () => {
-        searchOverlay.classList.remove('hidden');
-        searchInput.focus(); // Ouvre automatiquement le clavier
-    });
-
-    // Ferme l'overlay
-    btnCloseSearch.addEventListener('click', () => {
+    // Fonction pour fermer l'overlay
+    const closeSearchOverlay = () => {
         searchOverlay.classList.add('hidden');
         searchInput.value = ''; // Réinitialise la recherche
         commonPlacesSection.classList.remove('hidden');
         searchResultsSection.classList.add('hidden');
+        
+        // Nettoie le transform du swipe
+        setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
+    };
+
+    // Ouvre l'overlay
+    searchTrigger.addEventListener('click', () => {
+        searchOverlay.classList.remove('hidden');
+        searchOverlay.style.transform = 'translateY(0)'; // S'assure de son placement
+        searchInput.focus(); // Ouvre automatiquement le clavier
     });
 
-    // Fonction commune pour sélectionner un lieu
-    const selectLocation = (node) => {
-        state.targetNode = node; // On le définit comme cible
+    // Ferme l'overlay via la croix
+    btnCloseSearch.addEventListener('click', closeSearchOverlay);
+
+    // Fermeture via un click sur la map
+    map.on('click', () => {
+        // Clic pour fermer le menu des étages
+        if (!floorMenu.classList.contains('hidden')) {
+            floorMenu.classList.add('hidden');
+            btnToggleFloors.classList.remove('hidden');
+        }
         
-        // Ferme l'overlay
-        searchOverlay.classList.add('hidden');
+        // Clic pour fermer la recherche
+        if (!searchOverlay.classList.contains('hidden')) {
+            closeSearchOverlay();
+        }
+    });
+
+    // Gestion du swipe pour fermer
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    searchOverlay.addEventListener('touchstart', (e) => {
+        const activeList = searchOverlay.querySelector('.location-list:not(.hidden)');
+        const isHeader = e.target.closest('.search-overlay-header') || e.target.closest('.drag-handle');
+        
+        // On ne déclenche le swipe que s'il touche le haut de l'overlay
+        if (activeList && activeList.scrollTop > 0 && !isHeader) return; 
+
+        startY = e.touches[0].clientY;
+        currentY = startY;
+        isDragging = true;
+        searchOverlay.style.transition = 'none'; // Désactive la transition pendant le swipe
+    }, {passive: true});
+
+    searchOverlay.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+
+        // Si le doigt va vers le bas on déplace l'overlay
+        if (diff > 0) {
+            searchOverlay.style.transform = `translateY(${diff}px)`;
+        }
+    }, {passive: true});
+
+    searchOverlay.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        searchOverlay.style.transition = 'transform 0.2s ease-out'; // Réactive la transition
+        
+        const diff = currentY - startY;
+        
+        // Si on a glissé vers le bas de plus de 200 pixels on ferme
+        if (diff > 200) {
+            closeSearchOverlay();
+        } else {
+            // Sinon l'overlay remonte à sa place
+            searchOverlay.style.transform = 'translateY(0)';
+        }
+    });
+
+    // ==========================================
+    // LOGIQUE DE RECHERCHE
+    // ==========================================
+    const selectLocation = (node) => {
+        state.targetNode = node; 
+        
+        closeSearchOverlay();
         
         // Met à jour l'étage visuel du menu des étages
         floorBtns.forEach(b => b.classList.remove('active'));
@@ -101,6 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Aller au noeud
         map.flyTo(node.getLatLng(), 19, { duration: 1.5 });
+        
+        mainSearchInput.value = node.userData.name;
     };
 
     // Tape dans la barre de recherche
@@ -127,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 filtered.forEach(node => {
                     const div = document.createElement('div');
                     div.className = 'location-item';
-                    div.textContent = node.userData.name; // Affiche le nom
+                    div.textContent = node.userData.name; 
                     
                     div.addEventListener('click', () => selectLocation(node));
                     dynamicResultsList.appendChild(div);
