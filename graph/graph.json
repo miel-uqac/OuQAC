@@ -1,7 +1,7 @@
 {
     "metadata": {
         "name": "OùQAC - Map Data",
-        "date": "2026-03-20 14 h 53 min 09 s",
+        "date": "2026-03-20 15 h 10 min 06 s",
         "version": "1.1.0",
         "university": "UQAC"
     },
@@ -141,6 +141,30 @@
             "floor": "1",
             "lat": 48.42010520273247,
             "lng": -71.05222442123902
+        },
+        {
+            "id": "node_1774033668637",
+            "name": "Escale",
+            "type": "salle",
+            "floor": "0",
+            "lat": 48.420349183236866,
+            "lng": -71.05331183983742
+        },
+        {
+            "id": "node_1774033672461",
+            "name": "Exterieur-Escale",
+            "type": "couloir",
+            "floor": "0",
+            "lat": 48.42051279486914,
+            "lng": -71.05292507961948
+        },
+        {
+            "id": "node_1774033711150",
+            "name": "Interieur-Escale",
+            "type": "couloir",
+            "floor": "0",
+            "lat": 48.42012663181615,
+            "lng": -71.05282810403504
         }
     ],
     "paths": [
@@ -311,6 +335,38 @@
             "type": "indoor",
             "distance": "18.74",
             "isPmr": false
+        },
+        {
+            "id": "path_1774033680774",
+            "startNode": "node_1774033672461",
+            "endNode": "node_1774033668637",
+            "type": "outdoor",
+            "distance": "33.85",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774033685367",
+            "startNode": "node_1774033672461",
+            "endNode": "node_1774032502148",
+            "type": "outdoor",
+            "distance": "37.95",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774033721100",
+            "startNode": "node_1774032502148",
+            "endNode": "node_1774033711150",
+            "type": "indoor",
+            "distance": "40.98",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774033722517",
+            "startNode": "node_1774033711150",
+            "endNode": "node_1774033668637",
+            "type": "indoor",
+            "distance": "43.44",
+            "isPmr": true
         }
     ]
 }
