@@ -4,6 +4,7 @@
 :root {
     --primary-color: #6b8915;
     --primary-color-hover: #536b12;
+    --action-orange: #ff6b00;
     --bg-light: #f3f4f6;
     --text-color: #4b5563;
 }
@@ -278,6 +279,121 @@ html, body {
 
 .location-item:last-child {
     border-bottom: none;
+}
+
+/* --- Overlay d'Itinéraire --- */
+#route-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--primary-color);
+    border-radius: 25px 25px 0 0;
+    padding: 10px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2000;
+    pointer-events: auto;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease-out;
+}
+
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.route-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.toggle-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.toggle-btn {
+    flex: 1;
+    background-color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s;
+}
+
+/* Effet visuel basique pour le bouton inactif */
+.toggle-btn:not(.active) {
+    opacity: 0.6;
+}
+
+.route-inputs {
+    background-color: white;
+    border-radius: 15px;
+    padding: 5px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.route-input-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.route-input-group:last-child {
+    border-bottom: none;
+}
+
+.route-input-group input {
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    width: 100%;
+    background: transparent;
+    font-weight: bold;
+    color: #111;
+    cursor: pointer;
+}
+
+.route-input-group i {
+    font-size: 1.2rem;
+}
+
+.text-orange {
+    color: var(--action-orange);
+}
+
+.add-stop span {
+    font-weight: bold;
+    color: #111;
+    font-size: 1.05rem;
+}
+
+.btn-primary {
+    background-color: var(--action-orange);
+    color: black;
+    border: none;
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /*------------------------*/

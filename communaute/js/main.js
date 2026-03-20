@@ -50,125 +50,111 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ==========================================
-    // GESTION DE L'OVERLAY RECHERCHE
+    // VARIABLES DES OVERLAYS ET ÉTATS
     // ==========================================
     const searchTrigger = document.getElementById('main-search-trigger');
     const searchOverlay = document.getElementById('search-overlay');
+    const routeOverlay = document.getElementById('route-overlay');
+    
     const btnCloseSearch = document.getElementById('btn-close-search');
+    const btnCloseRoute = document.getElementById('btn-close-route');
+    
     const searchInput = document.getElementById('active-search-input');
-    const mainSearchInput = searchTrigger.querySelector('input');
+    const routeStartInput = document.getElementById('route-start-input');
+    const routeEndInput = document.getElementById('route-end-input');
     
     const commonPlacesSection = document.getElementById('common-places');
     const searchResultsSection = document.getElementById('search-results');
     const dynamicResultsList = document.getElementById('dynamic-results-list');
 
-    // Fonction pour fermer l'overlay
-    const closeSearchOverlay = () => {
-        searchOverlay.classList.add('hidden');
-        searchInput.value = ''; // Réinitialise la recherche
+    // États de l'application
+    let currentSearchTarget = 'start'; // 'start' ou 'end'
+    state.startNode = null;
+    state.endNode = null;
+
+    // ==========================================
+    // LOGIQUE D'OUVERTURE / FERMETURE
+    // ==========================================
+    const openSearchOverlay = (target) => {
+        currentSearchTarget = target;
+        routeOverlay.classList.add('hidden');
+        searchOverlay.classList.remove('hidden');
+        searchOverlay.style.transform = 'translateY(0)';
+        
+        searchInput.value = ''; // Reset la barre
         commonPlacesSection.classList.remove('hidden');
         searchResultsSection.classList.add('hidden');
-        
-        // Nettoie le transform du swipe
-        setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
+        searchInput.focus();
     };
 
-    // Ouvre l'overlay
-    searchTrigger.addEventListener('click', () => {
-        searchOverlay.classList.remove('hidden');
-        searchOverlay.style.transform = 'translateY(0)'; // S'assure de son placement
-        searchInput.focus(); // Ouvre automatiquement le clavier
-    });
+    const closeSearchOverlay = () => {
+        searchOverlay.classList.add('hidden');
+        setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
+        
+        // Si on a annulé la recherche d'arrivée, on retourne sur l'itinéraire
+        if (state.startNode) {
+            routeOverlay.classList.remove('hidden');
+        }
+    };
 
-    // Ferme l'overlay via la croix
+    const openRouteOverlay = () => {
+        searchOverlay.classList.add('hidden');
+        routeOverlay.classList.remove('hidden');
+        routeOverlay.style.transform = 'translateY(0)';
+    };
+
+    const closeRouteOverlay = () => {
+        routeOverlay.classList.add('hidden');
+        setTimeout(() => { routeOverlay.style.transform = ''; }, 200);
+        // Reset la recherche si on ferme tout
+        state.startNode = null;
+        state.endNode = null;
+        routeStartInput.value = '';
+        routeEndInput.value = '';
+        document.querySelector('#main-search-trigger input').value = ''; // Reset la barre principale
+    };
+
+    // Événements des boutons
+    searchTrigger.addEventListener('click', () => openSearchOverlay('start'));
+    routeStartInput.addEventListener('click', () => openSearchOverlay('start'));
+    routeEndInput.addEventListener('click', () => openSearchOverlay('end'));
+    
     btnCloseSearch.addEventListener('click', closeSearchOverlay);
-
-    // Fermeture via un click sur la map
-    map.on('click', () => {
-        // Clic pour fermer le menu des étages
-        if (!floorMenu.classList.contains('hidden')) {
-            floorMenu.classList.add('hidden');
-            btnToggleFloors.classList.remove('hidden');
-        }
-        
-        // Clic pour fermer la recherche
-        if (!searchOverlay.classList.contains('hidden')) {
-            closeSearchOverlay();
-        }
-    });
-
-    // Gestion du swipe pour fermer
-    let startY = 0;
-    let currentY = 0;
-    let isDragging = false;
-
-    searchOverlay.addEventListener('touchstart', (e) => {
-        const activeList = searchOverlay.querySelector('.location-list:not(.hidden)');
-        const isHeader = e.target.closest('.search-overlay-header') || e.target.closest('.drag-handle');
-        
-        // On ne déclenche le swipe que s'il touche le haut de l'overlay
-        if (activeList && activeList.scrollTop > 0 && !isHeader) return; 
-
-        startY = e.touches[0].clientY;
-        currentY = startY;
-        isDragging = true;
-        searchOverlay.style.transition = 'none'; // Désactive la transition pendant le swipe
-    }, {passive: true});
-
-    searchOverlay.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentY = e.touches[0].clientY;
-        const diff = currentY - startY;
-
-        // Si le doigt va vers le bas on déplace l'overlay
-        if (diff > 0) {
-            searchOverlay.style.transform = `translateY(${diff}px)`;
-        }
-    }, {passive: true});
-
-    searchOverlay.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        searchOverlay.style.transition = 'transform 0.2s ease-out'; // Réactive la transition
-        
-        const diff = currentY - startY;
-        
-        // Si on a glissé vers le bas de plus de 200 pixels on ferme
-        if (diff > 200) {
-            closeSearchOverlay();
-        } else {
-            // Sinon l'overlay remonte à sa place
-            searchOverlay.style.transform = 'translateY(0)';
-        }
-    });
+    btnCloseRoute.addEventListener('click', closeRouteOverlay);
 
     // ==========================================
-    // LOGIQUE DE RECHERCHE
+    // SÉLECTION D'UN LIEU
     // ==========================================
     const selectLocation = (node) => {
-        state.targetNode = node; 
-        
-        closeSearchOverlay();
-        
-        // Met à jour l'étage visuel du menu des étages
+        // Mise à jour de la carte (focus sur le point)
         floorBtns.forEach(b => b.classList.remove('active'));
         const btnFloor = document.querySelector(`.floor-btn[data-floor="${node.userData.floor}"]`);
         if (btnFloor) btnFloor.classList.add('active');
-
-        // Met à jour la carte et les filtres
+        
         setFloor(node.userData.floor);
+        // Exception: On dit au state local que c'est le target pour l'afficher
+        state.targetNode = node; 
         filterMapElements(node.userData.floor);
-        
-        // Aller au noeud
         map.flyTo(node.getLatLng(), 19, { duration: 1.5 });
-        
-        mainSearchInput.value = node.userData.name;
+
+        // Traitement selon ce qu'on cherchait
+        if (currentSearchTarget === 'start') {
+            state.startNode = node;
+            routeStartInput.value = node.userData.name;
+            document.querySelector('#main-search-trigger input').value = node.userData.name;
+            openRouteOverlay(); // Ouvre le menu itinéraire
+        } else if (currentSearchTarget === 'end') {
+            state.endNode = node;
+            routeEndInput.value = node.userData.name;
+            openRouteOverlay(); // Retour au menu itinéraire
+        }
     };
 
-    // Tape dans la barre de recherche
+    // ==========================================
+    // MOTEUR DE RECHERCHE
+    // ==========================================
     searchInput.addEventListener('input', (e) => {
         const val = e.target.value.toLowerCase().trim();
-        
         if (val === '') {
             commonPlacesSection.classList.remove('hidden');
             searchResultsSection.classList.add('hidden');
@@ -176,13 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
             commonPlacesSection.classList.add('hidden');
             searchResultsSection.classList.remove('hidden');
             
-            // Cherche les salles correspondantes
             const filtered = state.nodes.filter(n => 
                 n.userData.name.toLowerCase().includes(val) && n.userData.type === 'salle'
             );
             
             dynamicResultsList.innerHTML = '';
-            
             if (filtered.length === 0) {
                 dynamicResultsList.innerHTML = '<div class="location-item" style="font-weight:normal; color:#888;">Aucun résultat</div>';
             } else {
@@ -190,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const div = document.createElement('div');
                     div.className = 'location-item';
                     div.textContent = node.userData.name; 
-                    
                     div.addEventListener('click', () => selectLocation(node));
                     dynamicResultsList.appendChild(div);
                 });
@@ -205,5 +188,59 @@ document.addEventListener('DOMContentLoaded', () => {
             // On essaie de trouver un nœud qui a exactement ce nom
             const node = state.nodes.find(n => n.userData.name.toLowerCase() === name.toLowerCase());
         });
+    });
+
+    // ==========================================
+    // SWIPE DOWN GÉNÉRIQUE & CLIC CARTE
+    // ==========================================
+    const setupSwipeToClose = (overlayElement, closeCallback) => {
+        let startY = 0, currentY = 0, isDragging = false;
+
+        overlayElement.addEventListener('touchstart', (e) => {
+            const activeList = overlayElement.querySelector('.location-list:not(.hidden)');
+            const isHeader = e.target.closest('.search-overlay-header') || e.target.closest('.drag-handle') || e.target.closest('.route-header');
+            
+            // Permet le défilement de la liste sans fermer l'overlay
+            if (activeList && activeList.scrollTop > 0 && !isHeader) return; 
+
+            startY = e.touches[0].clientY;
+            currentY = startY;
+            isDragging = true;
+            overlayElement.style.transition = 'none';
+        }, {passive: true});
+
+        overlayElement.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+            if (diff > 0) overlayElement.style.transform = `translateY(${diff}px)`;
+        }, {passive: true});
+
+        overlayElement.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            overlayElement.style.transition = 'transform 0.2s ease-out';
+            
+            const diff = currentY - startY;
+            if (diff > 150) {
+                closeCallback();
+            } else {
+                overlayElement.style.transform = 'translateY(0)';
+            }
+        });
+    };
+
+    // Application du Swipe aux deux overlays
+    setupSwipeToClose(searchOverlay, closeSearchOverlay);
+    setupSwipeToClose(routeOverlay, closeRouteOverlay);
+
+    // Clic en dehors (sur la carte)
+    map.on('click', () => {
+        if (!floorMenu.classList.contains('hidden')) {
+            floorMenu.classList.add('hidden');
+            btnToggleFloors.classList.remove('hidden');
+        }
+        if (!searchOverlay.classList.contains('hidden')) closeSearchOverlay();
+        if (!routeOverlay.classList.contains('hidden')) closeRouteOverlay();
     });
 });

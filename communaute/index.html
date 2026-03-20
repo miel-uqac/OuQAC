@@ -89,6 +89,46 @@
                     </div>
                 </div>
             </div>
+
+            <div id="route-overlay" class="hidden">
+                <div class="drag-handle"></div>
+                
+                <div class="route-header">
+                    <h2>Itinéraire</h2>
+                    <button id="btn-close-route" class="btn-close-overlay">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="route-content">
+                    <div class="route-options toggle-group">
+                        <button class="toggle-btn active"><i class="fa-solid fa-person-walking"></i></button>
+                        <button class="toggle-btn"><i class="fa-solid fa-wheelchair"></i></button>
+                    </div>
+                    
+                    <div class="route-inputs">
+                        <div class="route-input-group">
+                            <i class="fa-regular fa-circle text-orange"></i>
+                            <input type="text" id="route-start-input" readonly placeholder="Départ">
+                        </div>
+                        <div class="route-input-group">
+                            <i class="fa-solid fa-location-dot text-orange"></i>
+                            <input type="text" id="route-end-input" readonly placeholder="Arrivée">
+                        </div>
+                        <div class="route-input-group add-stop">
+                            <i class="fa-solid fa-circle-plus text-orange"></i>
+                            <span>Ajouter un arrêt</span>
+                        </div>
+                    </div>
+
+                    <div class="route-options toggle-group">
+                        <button class="toggle-btn"><i class="fa-solid fa-cloud-sun"></i></button>
+                        <button class="toggle-btn active"><i class="fa-solid fa-house"></i></button>
+                    </div>
+
+                    <button id="btn-lets-go" class="btn-primary">LET'S GO !</button>
+                </div>
+            </div>
         </div>
     </div>
 
