@@ -1,5 +1,6 @@
 import { map, setFloor, filterMapElements } from './map.js';
 import { loadGraphData } from './controllers/dataController.js';
+import * as RouteCtrl from './controllers/routeController.js';
 import { state } from './state.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -106,12 +107,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeRouteOverlay = () => {
         routeOverlay.classList.add('hidden');
         setTimeout(() => { routeOverlay.style.transform = ''; }, 200);
-        // Reset la recherche si on ferme tout
+        
+        // Reset absolument tout
         state.startNode = null;
         state.endNode = null;
+        state.targetNode = null;
+        state.activeRouteNodes = [];
+        state.activeRoutePaths = [];
+        
         routeStartInput.value = '';
         routeEndInput.value = '';
-        document.querySelector('#main-search-trigger input').value = ''; // Reset la barre principale
+        document.querySelector('#main-search-trigger input').value = ''; 
+        
+        // Rafraîchit la carte
+        filterMapElements(state.currentFloor);
     };
 
     // Événements des boutons
@@ -242,5 +251,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (!searchOverlay.classList.contains('hidden')) closeSearchOverlay();
         if (!routeOverlay.classList.contains('hidden')) closeRouteOverlay();
+    });
+
+    // ==========================================
+    // LANCEMENT ITINERAIRE
+    // ==========================================
+    document.getElementById('btn-lets-go').addEventListener('click', () => {
+        if (!state.startNode || !state.endNode) {
+            alert("Veuillez définir un départ et une arrivée avant de lancer l'itinéraire.");
+            return;
+        }
+
+        // Lancement A*
+        const route = RouteCtrl.calculateRoute(state.startNode, state.endNode);
+        
+        if (route) {
+            // On sauvegarde le résultat pour la carte
+            state.activeRouteNodes = route.nodes;
+            state.activeRoutePaths = route.paths;
+            
+            // On cache juste le panneau
+            routeOverlay.classList.add('hidden');
+            
+            // On va à l'étage du départ
+            const startFloor = state.startNode.userData.floor;
+            setFloor(startFloor);
+            
+            // Met à jour visuellement le menu des étages sur le côté droit
+            floorBtns.forEach(b => b.classList.remove('active'));
+            const btnFloor = document.querySelector(`.floor-btn[data-floor="${startFloor}"]`);
+            if (btnFloor) btnFloor.classList.add('active');
+
+            // On dessine la carte
+            filterMapElements(startFloor);
+            
+            // On fait voler la caméra vers le point de départ avec un peu de recul pour voir la ligne
+            map.flyTo(state.startNode.getLatLng(), 18, {duration: 1});
+        } else {
+            alert("Oups ! Aucun itinéraire n'a pu être trouvé entre ces deux points. Vérifiez que les chemins sont bien connectés dans l'éditeur.");
+        }
     });
 });

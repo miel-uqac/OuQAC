@@ -6,5 +6,11 @@ export const state = {
     nodes: [],
     paths: [],
     currentFloor: "0",
-    targetNode: null
+    targetNode: null,
+    
+    // Variables pour l'itinéraire
+    startNode: null,
+    endNode: null,
+    activeRouteNodes: [], // Contiendra les  nœuds du chemin
+    activeRoutePaths: []  // Contiendra les paths du chemin
 };

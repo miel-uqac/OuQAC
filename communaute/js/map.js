@@ -36,33 +36,44 @@ export function setFloor(floorId) {
 }
 
 export function filterMapElements(floorId) {
-    // Filtrage des nœuds : on n'affiche que la salle recherchée
+    // Filtrage des nœuds
     state.nodes.forEach(node => {
-        if (state.targetNode === node && String(node.userData.floor) === String(floorId)) {
+        const isTarget = state.targetNode === node;
+        const isStart = state.startNode === node;
+        const isEnd = state.endNode === node;
+        const inRoute = state.activeRouteNodes.includes(node.userData.id);
+
+        // On affiche si c'est la cible OU dans l'itinéraire, ET que c'est sur le bon étage
+        if ((isTarget || isStart || isEnd || inRoute) && String(node.userData.floor) === String(floorId)) {
             if (!map.hasLayer(node)) node.addTo(map);
         } else {
             map.removeLayer(node);
         }
     });
 
-    // Filtrage des chemins : on les cache tous pour l'instant
+    // Filtrage des chemins
     state.paths.forEach(path => {
-        map.removeLayer(path);
+        const inRoute = state.activeRoutePaths.includes(path);
+        
+        // On n'affiche QUE les chemins qui font partie de l'itinéraire calculé
+        if (inRoute) {
+            const startNode = state.nodes.find(n => n.userData.id === path.userData.startNode);
+            const endNode = state.nodes.find(n => n.userData.id === path.userData.endNode);
+            
+            const startFloor = startNode ? String(startNode.userData.floor) : null;
+            const endFloor = endNode ? String(endNode.userData.floor) : null;
 
-        /* // Cherche les nœuds de ce chemin
-        const startNode = state.nodes.find(n => n.userData.id === path.userData.startNode);
-        const endNode = state.nodes.find(n => n.userData.id === path.userData.endNode);
-
-        // On récupère leurs étages (s'ils existent)
-        const startFloor = startNode ? String(startNode.userData.floor) : null;
-        const endFloor = endNode ? String(endNode.userData.floor) : null;
-
-        // Si l'un des deux nœuds est sur l'étage actuel, on affiche le chemin
-        if (startFloor === String(floorId) || endFloor === String(floorId)) {
-            if (!map.hasLayer(path)) path.addTo(map);
+            if (startFloor === String(floorId) || endFloor === String(floorId)) {
+                if (!map.hasLayer(path)) path.addTo(map);
+                
+                // On stylise le chemin
+                path.setStyle({ color: '#ff6b00', weight: 6, opacity: 1, dashArray: null });
+                path.bringToFront();
+            } else {
+                map.removeLayer(path);
+            }
         } else {
             map.removeLayer(path);
-        } */
-
+        }
     });
 }
