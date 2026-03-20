@@ -54,13 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // VARIABLES DES OVERLAYS ET ÉTATS
     // ==========================================
     const searchTrigger = document.getElementById('main-search-trigger');
+    const minimizedRouteTrigger = document.getElementById('minimized-route-trigger'); // NOUVEAU
+    
     const searchOverlay = document.getElementById('search-overlay');
     const routeOverlay = document.getElementById('route-overlay');
     
     const btnCloseSearch = document.getElementById('btn-close-search');
     const btnCloseRoute = document.getElementById('btn-close-route');
+    const btnCancelRouteMini = document.getElementById('btn-cancel-route-mini'); // NOUVEAU
     
     const searchInput = document.getElementById('active-search-input');
+    const mainSearchInput = searchTrigger.querySelector('input');
+    const miniRouteText = document.getElementById('mini-route-text'); // NOUVEAU
+    
     const routeStartInput = document.getElementById('route-start-input');
     const routeEndInput = document.getElementById('route-end-input');
     
@@ -74,34 +80,54 @@ document.addEventListener('DOMContentLoaded', () => {
     state.endNode = null;
 
     // ==========================================
-    // LOGIQUE D'OUVERTURE / FERMETURE
+    // LOGIQUE DE RÉDUCTION
     // ==========================================
-    const openSearchOverlay = (target) => {
-        currentSearchTarget = target;
-        routeOverlay.classList.add('hidden');
-        searchOverlay.classList.remove('hidden');
-        searchOverlay.style.transform = 'translateY(0)';
+    const minimizeSearchOverlay = () => {
+        searchOverlay.classList.add('hidden');
+        setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
         
-        searchInput.value = ''; // Reset la barre
-        commonPlacesSection.classList.remove('hidden');
-        searchResultsSection.classList.add('hidden');
-        searchInput.focus();
+        // On conserve le texte dans la barre du bas
+        mainSearchInput.value = searchInput.value;
+        
+        // Si on était en train de paramétrer un itinéraire, on retourne dessus
+        if (state.startNode || state.endNode) {
+            openRouteOverlay();
+        }
     };
 
+    const minimizeRouteOverlay = () => {
+        routeOverlay.classList.add('hidden');
+        setTimeout(() => { routeOverlay.style.transform = ''; }, 200);
+        
+        // On cache la barre de recherche classique et on affiche celle de l'itinéraire
+        searchTrigger.classList.add('hidden');
+        minimizedRouteTrigger.classList.remove('hidden');
+        
+        // On met à jour le texte de la barre réduite
+        const startName = state.startNode ? state.startNode.userData.name : '...';
+        const endName = state.endNode ? state.endNode.userData.name : '...';
+        miniRouteText.value = `${startName} ➔ ${endName}`;
+    };
+
+    // ==========================================
+    // LOGIQUE DE FERMETURE
+    // ==========================================
     const closeSearchOverlay = () => {
         searchOverlay.classList.add('hidden');
         setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
         
+        searchInput.value = ''; // Reset la barre
+        mainSearchInput.value = '';
+        commonPlacesSection.classList.remove('hidden');
+        searchResultsSection.classList.add('hidden');
+        
         // Si on a annulé la recherche d'arrivée, on retourne sur l'itinéraire
-        if (state.startNode) {
-            routeOverlay.classList.remove('hidden');
+        if (state.startNode || state.endNode) {
+            openRouteOverlay();
+        } else {
+            state.targetNode = null;
+            filterMapElements(state.currentFloor);
         }
-    };
-
-    const openRouteOverlay = () => {
-        searchOverlay.classList.add('hidden');
-        routeOverlay.classList.remove('hidden');
-        routeOverlay.style.transform = 'translateY(0)';
     };
 
     const closeRouteOverlay = () => {
@@ -117,19 +143,64 @@ document.addEventListener('DOMContentLoaded', () => {
         
         routeStartInput.value = '';
         routeEndInput.value = '';
-        document.querySelector('#main-search-trigger input').value = ''; 
+        mainSearchInput.value = ''; 
+        searchInput.value = '';
         
+        // On remet la barre de recherche par défaut
+        minimizedRouteTrigger.classList.add('hidden');
+        searchTrigger.classList.remove('hidden');
+
         // Rafraîchit la carte
         filterMapElements(state.currentFloor);
     };
 
-    // Événements des boutons
+    // ==========================================
+    // LOGIQUE D'OUVERTURE
+    // ==========================================
+    const openSearchOverlay = (target) => {
+        // Si on change de contexte, on vide l'input
+        if (currentSearchTarget !== target) {
+            searchInput.value = '';
+            commonPlacesSection.classList.remove('hidden');
+            searchResultsSection.classList.add('hidden');
+        }
+        currentSearchTarget = target;
+        
+        routeOverlay.classList.add('hidden');
+        minimizedRouteTrigger.classList.add('hidden');
+        searchTrigger.classList.remove('hidden');
+
+        searchOverlay.classList.remove('hidden');
+        searchOverlay.style.transform = 'translateY(0)';
+        
+        searchInput.focus();
+    };
+
+    const openRouteOverlay = () => {
+        searchOverlay.classList.add('hidden');
+        minimizedRouteTrigger.classList.add('hidden');
+        searchTrigger.classList.remove('hidden');
+        
+        routeOverlay.classList.remove('hidden');
+        routeOverlay.style.transform = 'translateY(0)';
+    };
+
+    // Événements d'ouverture
     searchTrigger.addEventListener('click', () => openSearchOverlay('start'));
     routeStartInput.addEventListener('click', () => openSearchOverlay('start'));
     routeEndInput.addEventListener('click', () => openSearchOverlay('end'));
     
+    // Rouvrir l'itinéraire si on clique sur la barre réduite
+    minimizedRouteTrigger.addEventListener('click', (e) => {
+        if (!e.target.closest('#btn-cancel-route-mini')) {
+            openRouteOverlay();
+        }
+    });
+    
+    // Événements des croix
     btnCloseSearch.addEventListener('click', closeSearchOverlay);
     btnCloseRoute.addEventListener('click', closeRouteOverlay);
+    btnCancelRouteMini.addEventListener('click', closeRouteOverlay);
 
     // ==========================================
     // SÉLECTION D'UN LIEU
@@ -150,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentSearchTarget === 'start') {
             state.startNode = node;
             routeStartInput.value = node.userData.name;
-            document.querySelector('#main-search-trigger input').value = node.userData.name;
+            mainSearchInput.value = node.userData.name;
             openRouteOverlay(); // Ouvre le menu itinéraire
         } else if (currentSearchTarget === 'end') {
             state.endNode = node;
@@ -202,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // SWIPE DOWN GÉNÉRIQUE & CLIC CARTE
     // ==========================================
-    const setupSwipeToClose = (overlayElement, closeCallback) => {
+    const setupSwipeToClose = (overlayElement, minimizeCallback) => {
         let startY = 0, currentY = 0, isDragging = false;
 
         overlayElement.addEventListener('touchstart', (e) => {
@@ -231,26 +302,27 @@ document.addEventListener('DOMContentLoaded', () => {
             overlayElement.style.transition = 'transform 0.2s ease-out';
             
             const diff = currentY - startY;
+            // Si on a glissé vers le bas on réduit
             if (diff > 150) {
-                closeCallback();
+                minimizeCallback();
             } else {
                 overlayElement.style.transform = 'translateY(0)';
             }
         });
     };
 
-    // Application du Swipe aux deux overlays
-    setupSwipeToClose(searchOverlay, closeSearchOverlay);
-    setupSwipeToClose(routeOverlay, closeRouteOverlay);
+    // On applique les comportements de réduction au swipe
+    setupSwipeToClose(searchOverlay, minimizeSearchOverlay);
+    setupSwipeToClose(routeOverlay, minimizeRouteOverlay);
 
-    // Clic en dehors (sur la carte)
+    // Clic en dehors (sur la carte) -> réduction
     map.on('click', () => {
         if (!floorMenu.classList.contains('hidden')) {
             floorMenu.classList.add('hidden');
             btnToggleFloors.classList.remove('hidden');
         }
-        if (!searchOverlay.classList.contains('hidden')) closeSearchOverlay();
-        if (!routeOverlay.classList.contains('hidden')) closeRouteOverlay();
+        if (!searchOverlay.classList.contains('hidden')) minimizeSearchOverlay();
+        if (!routeOverlay.classList.contains('hidden')) minimizeRouteOverlay();
     });
 
     // ==========================================
@@ -270,8 +342,8 @@ document.addEventListener('DOMContentLoaded', () => {
             state.activeRouteNodes = route.nodes;
             state.activeRoutePaths = route.paths;
             
-            // On cache juste le panneau
-            routeOverlay.classList.add('hidden');
+            // On REDUIT le panneau pour afficher l'itinéraire en petit en bas
+            minimizeRouteOverlay();
             
             // On va à l'étage du départ
             const startFloor = state.startNode.userData.floor;
