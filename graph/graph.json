@@ -1,7 +1,7 @@
 {
     "metadata": {
         "name": "OùQAC - Map Data",
-        "date": "2026-03-13 12 h 14 min 43 s",
+        "date": "2026-03-20 14 h 53 min 09 s",
         "version": "1.1.0",
         "university": "UQAC"
     },
@@ -69,6 +69,78 @@
             "floor": "1",
             "lat": 48.419996703369414,
             "lng": -71.05259593674153
+        },
+        {
+            "id": "node_1774032354609",
+            "name": "Ascenseur-B1",
+            "type": "ascenseur",
+            "floor": "0",
+            "lat": 48.420061107619105,
+            "lng": -71.0525393021672
+        },
+        {
+            "id": "node_1774032412060",
+            "name": "Ascenseur-B3",
+            "type": "ascenseur",
+            "floor": "1",
+            "lat": 48.420061,
+            "lng": -71.052539
+        },
+        {
+            "id": "node_1774032502148",
+            "name": "B0",
+            "type": "salle",
+            "floor": "0",
+            "lat": 48.42039260264375,
+            "lng": -71.05244374741555
+        },
+        {
+            "id": "node_1774032518331",
+            "name": "Couloir-B0",
+            "type": "couloir",
+            "floor": "0",
+            "lat": 48.42031341186416,
+            "lng": -71.05227405946286
+        },
+        {
+            "id": "node_1774032593655",
+            "name": "Escalier-B0",
+            "type": "escalier",
+            "floor": "0",
+            "lat": 48.4202413369857,
+            "lng": -71.05207416499383
+        },
+        {
+            "id": "node_1774032611550",
+            "name": "Escalier-B5",
+            "type": "escalier",
+            "floor": "1",
+            "lat": 48.420241,
+            "lng": -71.052074
+        },
+        {
+            "id": "node_1774032637617",
+            "name": "Couloir-B5",
+            "type": "couloir",
+            "floor": "1",
+            "lat": 48.42031074242603,
+            "lng": -71.05228747519905
+        },
+        {
+            "id": "node_1774032648321",
+            "name": "B5",
+            "type": "salle",
+            "floor": "1",
+            "lat": 48.42038371561092,
+            "lng": -71.05247452714379
+        },
+        {
+            "id": "node_1774032702086",
+            "name": "Couloir-B4",
+            "type": "couloir",
+            "floor": "1",
+            "lat": 48.42010520273247,
+            "lng": -71.05222442123902
         }
     ],
     "paths": [
@@ -125,7 +197,119 @@
             "startNode": "node_1773418402284",
             "endNode": "node_1773418377235",
             "type": "indoor",
-            "distance": "0",
+            "distance": "1",
+            "isPmr": false
+        },
+        {
+            "id": "path_1774032395594",
+            "startNode": "node_1773418175823",
+            "endNode": "node_1774032354609",
+            "type": "indoor",
+            "distance": "8.43",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032423958",
+            "startNode": "node_1774032412060",
+            "endNode": "node_1773418422479",
+            "type": "indoor",
+            "distance": "8.29",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032430889",
+            "startNode": "node_1774032354609",
+            "endNode": "node_1774032412060",
+            "type": "indoor",
+            "distance": "1",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032531397",
+            "startNode": "node_1774032518331",
+            "endNode": "node_1774032354609",
+            "type": "indoor",
+            "distance": "34.21",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032537265",
+            "startNode": "node_1774032502148",
+            "endNode": "node_1774032518331",
+            "type": "indoor",
+            "distance": "15.31",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032583611",
+            "startNode": "node_1774032518331",
+            "endNode": "node_1773418175823",
+            "type": "indoor",
+            "distance": "42.63",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032606341",
+            "startNode": "node_1774032518331",
+            "endNode": "node_1774032593655",
+            "type": "indoor",
+            "distance": "16.79",
+            "isPmr": false
+        },
+        {
+            "id": "path_1774032658715",
+            "startNode": "node_1774032648321",
+            "endNode": "node_1774032637617",
+            "type": "indoor",
+            "distance": "16.01",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032660464",
+            "startNode": "node_1774032637617",
+            "endNode": "node_1774032611550",
+            "type": "indoor",
+            "distance": "17.56",
+            "isPmr": false
+        },
+        {
+            "id": "path_1774032665161",
+            "startNode": "node_1774032611550",
+            "endNode": "node_1774032593655",
+            "type": "indoor",
+            "distance": "1",
+            "isPmr": false
+        },
+        {
+            "id": "path_1774032685816",
+            "startNode": "node_1774032637617",
+            "endNode": "node_1774032412060",
+            "type": "indoor",
+            "distance": "33.40",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032688679",
+            "startNode": "node_1774032637617",
+            "endNode": "node_1773418422479",
+            "type": "indoor",
+            "distance": "41.68",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032711534",
+            "startNode": "node_1773418417079",
+            "endNode": "node_1774032702086",
+            "type": "indoor",
+            "distance": "24.81",
+            "isPmr": true
+        },
+        {
+            "id": "path_1774032713025",
+            "startNode": "node_1774032702086",
+            "endNode": "node_1774032611550",
+            "type": "indoor",
+            "distance": "18.74",
             "isPmr": false
         }
     ]

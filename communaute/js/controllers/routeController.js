@@ -4,7 +4,7 @@ import { map } from '../map.js';
 // Construit la liste d'adjacence
 function buildGraph() {
     const graph = new Map();
-    
+
     // Initialise un tableau vide pour chaque nœud
     state.nodes.forEach(node => {
         graph.set(node.userData.id, []);
@@ -14,8 +14,22 @@ function buildGraph() {
     state.paths.forEach(path => {
         const u = path.userData.startNode;
         const v = path.userData.endNode;
-        // On récupère la distance du JSON ou on met 1 par défaut
-        const cost = parseFloat(path.userData.distance) || 1;
+        let cost = parseFloat(path.userData.distance) || 1;
+
+        // --- Filtre PMR ---
+        // Si l'utilisateur choisi PMR et que le chemin ne l'est pas, on l'ignore totalement
+        if (state.routePrefPmr && path.userData.isPmr === false) {
+            return; // Stoppe ici, ce chemin n'est pas ajouté au graphe
+        }
+
+        // --- Pénalité d'Environnement ---
+        // On multiplie artificiellement le coût par 15 pour décourager A* de prendre ce chemin,
+        // tout en le laissant disponible s'il n'y a absolument pas d'autre choix
+        if (state.routePrefEnvironment === 'indoor' && path.userData.type === 'outdoor') {
+            cost *= 15;
+        } else if (state.routePrefEnvironment === 'outdoor' && path.userData.type === 'indoor') {
+            cost *= 15;
+        }
 
         if (graph.has(u)) graph.get(u).push({ target: v, path: path, cost: cost });
         if (graph.has(v)) graph.get(v).push({ target: u, path: path, cost: cost });

@@ -12,5 +12,9 @@ export const state = {
     startNode: null,
     endNode: null,
     activeRouteNodes: [], // Contiendra les  nœuds du chemin
-    activeRoutePaths: []  // Contiendra les paths du chemin
+    activeRoutePaths: [],  // Contiendra les paths du chemin
+
+    // Préférences de l'itinéraire
+    routePrefPmr: false,           // false = marche, true = fauteuil
+    routePrefEnvironment: 'indoor' // 'indoor' ou 'outdoor'
 };

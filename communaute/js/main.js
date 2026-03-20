@@ -291,4 +291,38 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Oups ! Aucun itinéraire n'a pu être trouvé entre ces deux points. Vérifiez que les chemins sont bien connectés dans l'éditeur.");
         }
     });
+
+    // ==========================================
+    // GESTION DES OPTIONS D'ITINÉRAIRE
+    // ==========================================
+    const btnWalk = document.querySelector('.fa-person-walking').parentElement;
+    const btnWheelchair = document.querySelector('.fa-wheelchair').parentElement;
+    const btnOutdoor = document.querySelector('.fa-cloud-sun').parentElement;
+    const btnIndoor = document.querySelector('.fa-house').parentElement;
+
+    // Choix du mode de transport
+    btnWalk.addEventListener('click', () => {
+        btnWalk.classList.add('active');
+        btnWheelchair.classList.remove('active');
+        state.routePrefPmr = false;
+    });
+
+    btnWheelchair.addEventListener('click', () => {
+        btnWheelchair.classList.add('active');
+        btnWalk.classList.remove('active');
+        state.routePrefPmr = true;
+    });
+
+    // Choix de l'environnement
+    btnOutdoor.addEventListener('click', () => {
+        btnOutdoor.classList.add('active');
+        btnIndoor.classList.remove('active');
+        state.routePrefEnvironment = 'outdoor';
+    });
+
+    btnIndoor.addEventListener('click', () => {
+        btnIndoor.classList.add('active');
+        btnOutdoor.classList.remove('active');
+        state.routePrefEnvironment = 'indoor';
+    });
 });
