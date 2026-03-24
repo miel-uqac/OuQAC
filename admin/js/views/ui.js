@@ -1,6 +1,7 @@
 import { state } from '../state.js';
 import { map, setFloor, filterMapElements } from '../map.js';
 import * as NodeCtrl from '../controllers/nodeController.js';
+import * as PathCtrl from '../controllers/pathController.js';
 import { changeMode } from '../main.js';
 
 // ==========================================
@@ -15,6 +16,52 @@ export function fillNodeForm(node) {
     document.getElementById('node-type').value = node.userData.type;
     const pos = node.getLatLng();
     document.getElementById('node-coords').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+
+    // Remplissage des chemins inter-étages
+    const interfloorContainer = document.getElementById('node-interfloor-container');
+    const interfloorList = document.getElementById('node-interfloor-list');
+    interfloorList.innerHTML = '';
+
+    // Filtrer les chemins qui relient ce nœud à un autre étage
+    const interfloorPaths = state.paths.filter(p => {
+        if (p.userData.startId !== node.userData.id && p.userData.endId !== node.userData.id) return false;
+        const nA = state.nodes.find(n => n.userData.id === p.userData.startId);
+        const nB = state.nodes.find(n => n.userData.id === p.userData.endId);
+        return nA && nB && nA.userData.floor !== nB.userData.floor;
+    });
+
+    if (interfloorPaths.length > 0) {
+        interfloorContainer.classList.remove('hidden');
+        
+        interfloorPaths.forEach(p => {
+            const isStart = p.userData.startId === node.userData.id;
+            const otherNodeId = isStart ? p.userData.endId : p.userData.startId;
+            const otherNode = state.nodes.find(n => n.userData.id === otherNodeId);
+            
+            const otherName = otherNode ? (otherNode.userData.name || "Sans nom") : "?";
+            const otherFloor = otherNode ? otherNode.userData.floor : "?";
+
+            const item = document.createElement('div');
+            item.className = 'room-item';
+            item.innerHTML = `➔ Vers <b>${otherName}</b> <br><small>Étage ${otherFloor} (${p.userData.type})</small>`;
+            item.style.border = "1px solid #ddd";
+            item.style.marginBottom = "5px";
+            item.style.borderRadius = "4px";
+
+            item.addEventListener('click', () => {
+                // Bascule en mode Chemin et sélectionne ce chemin
+                const btnPath = document.querySelectorAll('.btn-mode')[2];
+                changeMode('path', btnPath);
+                PathCtrl.selectPath(p);
+                clearNodeForm();
+                state.selectedNode = null;
+            });
+
+            interfloorList.appendChild(item);
+        });
+    } else {
+        interfloorContainer.classList.add('hidden');
+    }
 }
 
 export function clearNodeForm() {
@@ -81,7 +128,7 @@ export function updateRoomList() {
             map.flyTo(node.getLatLng(), 19);
             setFloor(nodeFloor);
             filterMapElements(nodeFloor);
-            // On bascule en mode node via le contrôleur principal simulé
+            // On bascule en mode node
             const btnNode = document.querySelectorAll('.btn-mode')[1]; 
             changeMode('node', btnNode);
             NodeCtrl.selectNode(node);

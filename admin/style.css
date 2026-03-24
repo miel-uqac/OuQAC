@@ -43,15 +43,18 @@ body, html {
 
 /* --- Recherche salle --- */
 #search-room { margin-bottom:10px; padding:5px; }
+
 /* --- Liste des salles --- */
 .room-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; }
 .room-item:hover { background: #f3f3f3; }
+
 /* --- Formualaire --- */
 .form-group { margin-bottom: 10px; }
 .form-group label { display: block; font-size: 0.85rem; color: #666; }
 .form-group input, .form-group select { width: 100%; padding: 5px; box-sizing: border-box; }
 .btn-delete { --btn-color: #f44336; width:100% }
 .btn-validate { --btn-color: #4CAF50; width:100%; margin-top:5px; }
+#node-interfloor-container {margin-top: 15px; margin-bottom: 15px; border-top: 1px solid #ddd; padding-top: 15px;};
 
 /* --- Actions Bas --- */
 #actions { padding: 15px; border-top: 1px solid #ddd; background: white; display: flex; gap: 10px; }

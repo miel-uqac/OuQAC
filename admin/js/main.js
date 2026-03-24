@@ -124,16 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (targetNode) {
             const floor = targetNode.userData.floor;
             
-            // 1. Changement d'étage dans le select et sur la carte
+            // Changement d'étage dans le select et sur la carte
             document.getElementById('sel-layer').value = floor;
             setFloor(floor);
             filterMapElements(floor);
             
-            // 2. Bascule en mode 'node' via le contrôleur principal
+            // Bascule en mode 'node'
             const btnNode = document.querySelectorAll('.btn-mode')[1];
             changeMode('node', btnNode);
             
-            // 3. Sélection du nœud ciblé
+            // Sélection du nœud ciblé
             NodeCtrl.selectNode(targetNode);
         }
     };
