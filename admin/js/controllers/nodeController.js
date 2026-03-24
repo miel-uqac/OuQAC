@@ -1,5 +1,5 @@
 import { map } from '../map.js';
-import { state, removeNodeFromState } from '../state.js';
+import { state, removeNodeFromState, removePathFromState } from '../state.js';
 import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
 import * as PathCtrl from './pathController.js';
@@ -144,12 +144,29 @@ export function updateNodePositionFromInput() {
     }
 }
 
-// Suppression du noeud sélectionné
+// Suppression du noeud sélectionné et de ses chemins associés
 export function deleteCurrentNode() {
     if (state.selectedNode) {
+        const nodeId = state.selectedNode.userData.id;
+
+        // Trouver tous les chemins connectés à ce nœud
+        const pathsToDelete = state.paths.filter(path => 
+            path.userData.startId === nodeId || path.userData.endId === nodeId
+        );
+
+        // Supprimer visuellement et du state chaque chemin trouvé
+        pathsToDelete.forEach(path => {
+            map.removeLayer(path);
+            removePathFromState(path);
+        });
+
+        // Supprimer le nœud
         map.removeLayer(state.selectedNode);
         removeNodeFromState(state.selectedNode);
+        
+        // Nettoyage de l'UI et du State
         state.selectedNode = null;
+
         UI.clearNodeForm();
         UI.updateRoomList();
         IOCtrl.saveToLocalStorage();
