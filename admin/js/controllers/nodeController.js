@@ -66,7 +66,7 @@ export function createNode(lat, lng, existingData = null) {
 
 function getNodeHtml(type) {
     const color = CONFIG.TYPE_COLORS[type] || "#000";
-    return `<div style="background-color: ${color}; width: 12px; height: 12px; border: 2px solid black; border-radius: 50%;"></div>`;
+    return `<div style="background-color: ${color}; width: 12px; height: 12px; border: 2px solid black; border-radius: 50%; display: flex; align-items: center; justify-content: center;"></div>`;
 }
 
 export function handleNodeClick(node) {
@@ -100,6 +100,21 @@ export function refreshNodeStyle(node, isSelected) {
         div.style.border = isSelected ? "3px solid white" : "2px solid black";
         if (isSelected) div.style.boxShadow = "0 0 5px rgba(0,0,0,0.5)";
         else div.style.boxShadow = "none";
+
+        // Vérification des chemins inter-étages ---
+        const hasInterfloor = state.paths.some(p => {
+            if (p.userData.startId !== node.userData.id && p.userData.endId !== node.userData.id) return false;
+            const nA = state.nodes.find(n => n.userData.id === p.userData.startId);
+            const nB = state.nodes.find(n => n.userData.id === p.userData.endId);
+            return nA && nB && nA.userData.floor !== nB.userData.floor;
+        });
+
+        // Ajoute un point blanc à l'intérieur pour indiquer la connexion
+        if (hasInterfloor) {
+            div.innerHTML = `<div style="background-color: white; width: 4px; height: 4px; border-radius: 50%;"></div>`;
+        } else {
+            div.innerHTML = '';
+        }
     }
 }
 

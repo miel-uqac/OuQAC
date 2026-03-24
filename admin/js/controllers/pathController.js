@@ -1,5 +1,6 @@
 import { map } from '../map.js';
 import { state, removePathFromState } from '../state.js';
+import * as NodeCtrl from './nodeController.js';
 import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
 import * as IOCtrl from './ioController.js';
@@ -126,6 +127,11 @@ export function createPath(nodeA, nodeB, existingData = null) {
     });
 
     state.paths.push(polyline);
+
+    // Rafraîchit visuellement les nœuds
+    NodeCtrl.refreshNodeStyle(nodeA, state.selectedNode === nodeA);
+    NodeCtrl.refreshNodeStyle(nodeB, state.selectedNode === nodeB);
+
     if (!existingData) selectPath(polyline);
     return polyline;
 }
@@ -219,12 +225,21 @@ export function updateCurrentPath() {
 // Suppression du chemin séléctionné
 export function deleteCurrentPath() {
     if (state.selectedPath) {
+        // Récupération des nœuds avant suppression
+        const nodeA = state.nodes.find(n => n.userData.id === state.selectedPath.userData.startId);
+        const nodeB = state.nodes.find(n => n.userData.id === state.selectedPath.userData.endId);
+
         clearHighlight();
         map.removeLayer(state.selectedPath);
         removePathFromState(state.selectedPath);
         state.selectedPath = null;
-        // Vider le formulaires
+        
+        // Vider le formulaire
         UI.clearPathForm();
         IOCtrl.saveToLocalStorage();
+
+        // Rafraîchit visuellement les nœuds après suppression
+        if (nodeA) NodeCtrl.refreshNodeStyle(nodeA, state.selectedNode === nodeA);
+        if (nodeB) NodeCtrl.refreshNodeStyle(nodeB, state.selectedNode === nodeB);
     }
 }
