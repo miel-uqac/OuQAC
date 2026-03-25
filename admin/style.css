@@ -54,7 +54,6 @@ body, html {
 .form-group input, .form-group select { width: 100%; padding: 5px; box-sizing: border-box; }
 .btn-delete { --btn-color: #f44336; width:100% }
 .btn-validate { --btn-color: #4CAF50; width:100%; margin-top:5px; }
-#node-interfloor-container {margin-top: 15px; margin-bottom: 15px; border-top: 1px solid #ddd; padding-top: 15px;};
 
 /* --- Actions Bas --- */
 #actions { padding: 15px; border-top: 1px solid #ddd; background: white; display: flex; gap: 10px; }
