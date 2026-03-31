@@ -1,6 +1,9 @@
 import { state } from '../state.js';
 import { map } from '../map.js';
 
+// ==========================================
+// GENERATIION DE L'ITINERAIRE
+// ==========================================
 // Construit la liste d'adjacence
 function buildGraph() {
     const graph = new Map();
@@ -124,4 +127,55 @@ function reconstructPath(cameFrom, currentId) {
     }
 
     return { nodes: pathNodes, paths: pathEdges };
+}
+
+// ==========================================
+// GÉNÉRATEUR D'ÉTAPES TEXTUELLES
+// ==========================================
+export function generateItinerarySteps(route) {
+    const steps = [];
+    const nodes = route.nodes.map(id => state.nodes.find(n => n.userData.id === id));
+    const paths = route.paths;
+
+    if (nodes.length < 2) return steps;
+
+    // Étape de départ
+    steps.push(`Départ de ${nodes[0].userData.name || 'votre position'} (Étage ${nodes[0].userData.floor})`);
+
+    let currentEnvironment = paths[0].userData.type; // 'indoor' ou 'outdoor'
+
+    // On boucle sur tous les nœuds intermédiaires
+    for (let i = 0; i < nodes.length - 1; i++) {
+        const current = nodes[i];
+        const next = nodes[i + 1];
+        const path = paths[i];
+
+        // Changement d'étage
+        if (current.userData.floor !== next.userData.floor) {
+            const transport = (current.userData.type === 'ascenseur' || next.userData.type === 'ascenseur') ? "l'ascenseur" : "les escaliers";
+            steps.push(`Prendre ${transport} jusqu'à l'étage ${next.userData.floor}`);
+            continue; // On passe à l'étape suivante pour ne pas spammer
+        }
+
+        // Changement d'environnement (Intérieur / Extérieur)
+        if (path.userData.type !== currentEnvironment) {
+            if (path.userData.type === 'outdoor') {
+                steps.push(`Sortir du bâtiment`);
+            } else {
+                steps.push(`Entrer dans le bâtiment`);
+            }
+            currentEnvironment = path.userData.type;
+        }
+
+        // Point de repère (On ignore les simples "couloirs" sans nom pour ne pas polluer)
+        // On s'assure aussi de ne pas annoncer l'arrivée en double (i + 1 !== nodes.length - 1)
+        if (i + 1 !== nodes.length - 1 && next.userData.name && next.userData.type !== 'couloir') {
+            steps.push(`Avancer jusqu'à ${next.userData.name}`);
+        }
+    }
+
+    // L'arrivée
+    steps.push(`Arrivée à ${nodes[nodes.length - 1].userData.name || 'votre destination'} (Étage ${nodes[nodes.length - 1].userData.floor})`);
+
+    return steps;
 }

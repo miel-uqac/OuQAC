@@ -341,8 +341,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // On sauvegarde le résultat pour la carte
             state.activeRouteNodes = route.nodes;
             state.activeRoutePaths = route.paths;
+
+            // Génération et affichage des étapes
+            const steps = RouteCtrl.generateItinerarySteps(route);
+            console.log("===============================");
+            console.log("NOUVEL ITINÉRAIRE CALCULÉ");
+            console.log("===============================");
+            steps.forEach((step, index) => {
+                console.log(`${index + 1}. ${step}`);
+            });
+            console.log("===============================");
             
-            // On REDUIT le panneau pour afficher l'itinéraire en petit en bas
+            // On réduit le panneau pour afficher l'itinéraire en petit en bas
             minimizeRouteOverlay();
             
             // On va à l'étage du départ
