@@ -2,147 +2,121 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OùQAC - Admin</title>
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="OùQAC">
-    
-    <title>OùQAC</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <div id="map"></div>
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h2>Éditeur Map - OùQAC</h2>
+            </div>
 
-        <div id="ui-layer">
-            <div id="bottom-controls">
-                <div class="floating-buttons">
-                    <button class="btn-icon btn-camera" title="Scanner / AR">
-                        <i class="fa-solid fa-camera"></i>
-                    </button>
-                    
-                    <div class="layer-menu-container">
-                        <div id="floor-menu" class="hidden">
-                            <button class="floor-btn" data-floor="8">8</button>
-                            <button class="floor-btn" data-floor="7">7</button>
-                            <button class="floor-btn" data-floor="6">6</button>
-                            <button class="floor-btn" data-floor="5">5</button>
-                            <button class="floor-btn" data-floor="4">4</button>
-                            <button class="floor-btn" data-floor="3">3</button>
-                            <button class="floor-btn" data-floor="2">2</button>
-                            <button class="floor-btn" data-floor="1">1</button>
-                            <button class="floor-btn active" data-floor="0">RC</button>
-                        </div>
+            <div id="selector">
+                <select name="layers" id="sel-layer">
+                    <option value="0">Rez-de-chaussée (0)</option>
+                    <option value="1">Étage 1</option>
+                    <option value="2">Étage 2</option>
+                </select>
+            </div>
 
-                        <button class="btn-icon btn-layers" id="btn-toggle-floors" title="Changer d'étage">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </button>
+            <div id="tools">
+                <button class="btn-mode active">Vue</button>
+                <button class="btn-mode">Nœuds</button>
+                <button class="btn-mode">Chemins</button>
+            </div>
+
+            <div id="sidebar-content">
+                <div id="panel-view">
+                    <div class="form-group">
+                        <input type="text" id="search-room" placeholder="Rechercher un nœud...">
+                        <select id="search-type" style="margin-top: 5px;">
+                            <option value="all">Tous les types</option>
+                            <option value="salle">Salle</option>
+                            <option value="couloir">Couloir</option>
+                            <option value="escalier">Escalier</option>
+                            <option value="ascenseur">Ascenseur</option>
+                            <option value="wc">Toilettes</option>
+                        </select>
                     </div>
+                    <div id="room-list"></div>
                 </div>
 
-                <div class="search-bar-container" id="main-search-trigger">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" placeholder="Search" readonly style="cursor: pointer;">
-                    <button class="btn-mic" title="Recherche vocale">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
+                <div id="panel-node" class="hidden">
+                    <h3>Édition Nœud</h3>
+                    <div class="form-group"><label>ID</label><input type="text" id="node-id" disabled style="background:#eee;"></div>
+                    <div class="form-group"><label>Nom / Numéro</label><input type="text" id="node-name"></div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="node-type">
+                            <option value="salle">Salle</option>
+                            <option value="couloir">Couloir</option>
+                            <option value="escalier">Escalier</option>
+                            <option value="ascenseur">Ascenseur</option>
+                            <option value="wc">Toilettes</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Coordonnées</label><input type="text" id="node-coords"></div>
+                    
+                    <div class="form-group" id="node-interfloor-container" class="hidden">
+                        <label>Chemins vers autres étages :</label>
+                        <div id="node-interfloor-list"></div>
+                    </div>
+
+                    <button class="btn-action btn-delete" id="btn-del-node">Supprimer ce nœud</button>
                 </div>
 
-                <div class="search-bar-container hidden" id="minimized-route-trigger">
-                    <i class="fa-solid fa-route search-icon text-primary"></i>
-                    <input type="text" id="mini-route-text" class="text-primary" readonly style="cursor: pointer; font-weight: bold;">
-                    <button class="btn-mic" id="btn-cancel-route-mini" title="Annuler l'itinéraire">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                <div id="panel-path" class="hidden">
+                    <h3>Édition Chemin</h3>
+                    <p>Sélectionnez deux nœuds pour créer un lien.</p>
+                    <div id="path-form" class="hidden">
+                        <div class="form-group"><label>ID Chemin</label><input type="text" id="path-id" disabled style="background:#eee;"></div>
+                        <div class="form-group"><label>Type</label>
+                            <select id="path-type">
+                                <option value="indoor">Intérieur</option>
+                                <option value="outdoor">Extérieur</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Distance (m)</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="text" id="path-dist-auto" disabled style="background:#eee;">
+                                <input type="text" id="path-dist-manual" placeholder="Override">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Nœud de départ (A)</label>
+                            <input type="text" id="path-node-a" readonly style="background:#eee; cursor:pointer;" title="Aller à ce nœud">
+                        </div>
+                        <div class="form-group">
+                            <label>Nœud d'arrivée (B)</label>
+                            <input type="text" id="path-node-b" readonly style="background:#eee; cursor:pointer;" title="Aller à ce nœud">
+                        </div>
+                        <label><input type="checkbox" id="path-pmr"> Accessible PMR</label>
+                        <br><br>
+                        <button class="btn-action btn-delete" id="btn-del-path">Supprimer Chemin</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="search-overlay" class="hidden">
-                <div class="drag-handle"></div>
-                
-                <div class="search-overlay-header">
-                    <div class="search-bar-container active-search">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="active-search-input" placeholder="Search">
-                        <button class="btn-mic" title="Recherche vocale">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-                    </div>
-                    <button id="btn-close-search" class="btn-close-overlay">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <div class="search-content">
-                    <div id="common-places">
-                        <h3 class="search-section-title">Lieux courants</h3>
-                        <div class="location-list">
-                            <div class="location-item">Cafétéria</div>
-                            <div class="location-item">Bibliothèque</div>
-                            <div class="location-item">Le Cube</div>
-                            <div class="location-item">Pavillon Sportif</div>
-                            <div class="location-item">Bureau du registraire</div>
-                            <div class="location-item">Accueil</div>
-                            <div class="location-item">BarUQAC</div>
-                        </div>
-                    </div>
-
-                    <div id="search-results" class="hidden">
-                        <h3 class="search-section-title">Résultats</h3>
-                        <div class="location-list" id="dynamic-results-list"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="route-overlay" class="hidden">
-                <div class="drag-handle"></div>
-                
-                <div class="route-header">
-                    <h2>Itinéraire</h2>
-                    <button id="btn-close-route" class="btn-close-overlay">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <div class="route-content">
-                    <div class="route-options toggle-group">
-                        <button class="toggle-btn active"><i class="fa-solid fa-person-walking"></i></button>
-                        <button class="toggle-btn"><i class="fa-solid fa-wheelchair"></i></button>
-                    </div>
-                    
-                    <div class="route-inputs">
-                        <div class="route-input-group">
-                            <i class="fa-regular fa-circle text-primary"></i>
-                            <input type="text" id="route-start-input" readonly placeholder="Départ">
-                        </div>
-                        <div class="route-input-group">
-                            <i class="fa-solid fa-location-dot text-primary"></i>
-                            <input type="text" id="route-end-input" readonly placeholder="Arrivée">
-                        </div>
-                        <div class="route-input-group add-stop">
-                            <i class="fa-solid fa-circle-plus text-primary"></i>
-                            <span>Ajouter un arrêt</span>
-                        </div>
-                    </div>
-
-                    <div class="route-options toggle-group">
-                        <button class="toggle-btn"><i class="fa-solid fa-cloud-sun"></i></button>
-                        <button class="toggle-btn active"><i class="fa-solid fa-house"></i></button>
-                    </div>
-
-                    <button id="btn-lets-go" class="btn-primary">LET'S GO !</button>
-                </div>
+            <div id="actions">
+                <button class="btn-action" id="btn-save">Sauvegarder</button>
+                <button class="btn-action" id="btn-import">Importer</button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importGraph(event)">
             </div>
         </div>
+
+        <div id="map"></div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-imageoverlay-rotated@0.1.4/Leaflet.ImageOverlay.Rotated.js"></script>
-    
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

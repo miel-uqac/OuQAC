@@ -53,30 +53,12 @@
                 </div>
 
                 <div class="search-bar-container hidden" id="minimized-route-trigger">
-                    <i class="fa-solid fa-route search-icon text-orange"></i>
-                    <input type="text" id="mini-route-text" readonly style="cursor: pointer; color: var(--action-orange); font-weight: bold;">
+                    <i class="fa-solid fa-route search-icon text-primary"></i>
+                    <input type="text" id="mini-route-text" class="text-primary" readonly style="cursor: pointer; font-weight: bold;">
                     <button class="btn-mic" id="btn-cancel-route-mini" title="Annuler l'itinéraire">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-                
-                <div class="route-summary-container hidden" id="route-summary-trigger">
-                     <div class="route-summary-content">
-                         <div class="summary-dots">
-                             <i class="fa-regular fa-circle text-orange"></i>
-                             <i class="fa-solid fa-ellipsis-vertical text-orange summary-line"></i>
-                             <i class="fa-solid fa-location-dot text-orange"></i>
-                         </div>
-                         <div class="summary-texts">
-                             <span id="summary-start-text">Départ</span>
-                             <span id="summary-end-text">Arrivée</span>
-                         </div>
-                     </div>
-                     <button id="btn-cancel-route" class="btn-cancel-summary">
-                         <i class="fa-solid fa-xmark"></i>
-                     </button>
-                </div>
-
             </div>
 
             <div id="search-overlay" class="hidden">
@@ -134,15 +116,15 @@
                     
                     <div class="route-inputs">
                         <div class="route-input-group">
-                            <i class="fa-regular fa-circle text-orange"></i>
+                            <i class="fa-regular fa-circle text-primary"></i>
                             <input type="text" id="route-start-input" readonly placeholder="Départ">
                         </div>
                         <div class="route-input-group">
-                            <i class="fa-solid fa-location-dot text-orange"></i>
+                            <i class="fa-solid fa-location-dot text-primary"></i>
                             <input type="text" id="route-end-input" readonly placeholder="Arrivée">
                         </div>
                         <div class="route-input-group add-stop">
-                            <i class="fa-solid fa-circle-plus text-orange"></i>
+                            <i class="fa-solid fa-circle-plus text-primary"></i>
                             <span>Ajouter un arrêt</span>
                         </div>
                     </div>
