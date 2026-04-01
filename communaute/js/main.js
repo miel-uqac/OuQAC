@@ -54,18 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // VARIABLES DES OVERLAYS ET ÉTATS
     // ==========================================
     const searchTrigger = document.getElementById('main-search-trigger');
-    const minimizedRouteTrigger = document.getElementById('minimized-route-trigger'); // NOUVEAU
+    const minimizedRouteTrigger = document.getElementById('minimized-route-trigger');
     
     const searchOverlay = document.getElementById('search-overlay');
     const routeOverlay = document.getElementById('route-overlay');
     
     const btnCloseSearch = document.getElementById('btn-close-search');
     const btnCloseRoute = document.getElementById('btn-close-route');
-    const btnCancelRouteMini = document.getElementById('btn-cancel-route-mini'); // NOUVEAU
+    const btnCancelRouteMini = document.getElementById('btn-cancel-route-mini');
     
     const searchInput = document.getElementById('active-search-input');
     const mainSearchInput = searchTrigger.querySelector('input');
-    const miniRouteText = document.getElementById('mini-route-text'); // NOUVEAU
+    const miniRouteText = document.getElementById('mini-route-text');
     
     const routeStartInput = document.getElementById('route-start-input');
     const routeEndInput = document.getElementById('route-end-input');
@@ -79,10 +79,42 @@ document.addEventListener('DOMContentLoaded', () => {
     state.startNode = null;
     state.endNode = null;
 
+
+    // ==========================================
+    // GESTION DE L'HISTORIQUE
+    // ==========================================
+    
+    // Ajoute un faux statut dans l'URL pour bloquer la sortie de l'app
+    const setOverlayHash = () => {
+        if (window.location.hash !== '#active') {
+            history.pushState(null, null, '#active');
+        }
+    };
+
+    // Si on ferme via nos boutons, on retire le faux statut
+    const clearOverlayHash = (skipHistory) => {
+        if (!skipHistory && window.location.hash === '#active') {
+            history.back();
+        }
+    };
+
+    // Écouteur global : Dès que l'utilisateur fait "Retour" sur son téléphone
+    window.addEventListener('popstate', () => {
+        if (window.location.hash === '') {
+            if (!searchOverlay.classList.contains('hidden')) {
+                minimizeSearchOverlay(true);
+            } else if (!routeOverlay.classList.contains('hidden')) {
+                minimizeRouteOverlay(true);
+            }
+        }
+    });
+
+
     // ==========================================
     // LOGIQUE DE RÉDUCTION
     // ==========================================
-    const minimizeSearchOverlay = () => {
+    const minimizeSearchOverlay = (skipHistory = false) => {
+        clearOverlayHash(skipHistory);
         searchOverlay.classList.add('hidden');
         setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
         
@@ -95,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const minimizeRouteOverlay = () => {
+    const minimizeRouteOverlay = (skipHistory = false) => {
+        clearOverlayHash(skipHistory);
         routeOverlay.classList.add('hidden');
         setTimeout(() => { routeOverlay.style.transform = ''; }, 200);
         
@@ -112,7 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // LOGIQUE DE FERMETURE
     // ==========================================
-    const closeSearchOverlay = () => {
+    const closeSearchOverlay = (skipHistory = false) => {
+        clearOverlayHash(skipHistory);
         searchOverlay.classList.add('hidden');
         setTimeout(() => { searchOverlay.style.transform = ''; }, 200);
         
@@ -130,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const closeRouteOverlay = () => {
+    const closeRouteOverlay = (skipHistory = false) => {
+        clearOverlayHash(skipHistory);
         routeOverlay.classList.add('hidden');
         setTimeout(() => { routeOverlay.style.transform = ''; }, 200);
         
@@ -158,6 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOGIQUE D'OUVERTURE
     // ==========================================
     const openSearchOverlay = (target) => {
+        setOverlayHash(); // Sécurise le bouton retour Android
+        
         // Si on change de contexte, on vide l'input
         if (currentSearchTarget !== target) {
             searchInput.value = '';
@@ -177,6 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openRouteOverlay = () => {
+        setOverlayHash(); // Sécurise le bouton retour Android
+        
         searchOverlay.classList.add('hidden');
         minimizedRouteTrigger.classList.add('hidden');
         searchTrigger.classList.remove('hidden');
@@ -197,10 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Événements des croix
-    btnCloseSearch.addEventListener('click', closeSearchOverlay);
-    btnCloseRoute.addEventListener('click', closeRouteOverlay);
-    btnCancelRouteMini.addEventListener('click', closeRouteOverlay);
+    // Événements des croix (On ajoute la fonction fléchée pour éviter de passer l'Event à "skipHistory")
+    btnCloseSearch.addEventListener('click', () => closeSearchOverlay());
+    btnCloseRoute.addEventListener('click', () => closeRouteOverlay());
+    btnCancelRouteMini.addEventListener('click', () => closeRouteOverlay());
 
     // ==========================================
     // SÉLECTION D'UN LIEU
@@ -261,12 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // TODO: Clic sur un lieu courant
+    // Clic sur un lieu courant
     document.querySelectorAll('#common-places .location-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const name = e.target.textContent;
             // On essaie de trouver un nœud qui a exactement ce nom
             const node = state.nodes.find(n => n.userData.name.toLowerCase() === name.toLowerCase());
+            if (node) selectLocation(node);
         });
     });
 
@@ -312,8 +352,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // On applique les comportements de réduction au swipe
-    setupSwipeToClose(searchOverlay, minimizeSearchOverlay);
-    setupSwipeToClose(routeOverlay, minimizeRouteOverlay);
+    setupSwipeToClose(searchOverlay, () => minimizeSearchOverlay());
+    setupSwipeToClose(routeOverlay, () => minimizeRouteOverlay());
 
     // Clic en dehors (sur la carte) -> réduction
     map.on('click', () => {
