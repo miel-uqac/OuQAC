@@ -167,10 +167,54 @@ export function generateItinerarySteps(route) {
             currentEnvironment = path.userData.type;
         }
 
-        // Point de repère (On ignore les simples "couloirs" sans nom pour ne pas polluer)
-        // On s'assure aussi de ne pas annoncer l'arrivée en double (i + 1 !== nodes.length - 1)
+        // Calcul direction
+        // On a besoin d'un nœud précédent (i > 0) sur le même étage pour faire le calcul géométrique
+        if (i > 0) {
+            const prev = nodes[i - 1];
+            
+            if (prev.userData.floor === current.userData.floor) {
+                // Vecteur d'arrivée (Précédent -> Actuel)
+                const dy1 = current.getLatLng().lat - prev.getLatLng().lat;
+                const dx1 = current.getLatLng().lng - prev.getLatLng().lng;
+                const angle1 = Math.atan2(dy1, dx1) * (180 / Math.PI);
+
+                // Vecteur de départ (Actuel -> Suivant)
+                const dy2 = next.getLatLng().lat - current.getLatLng().lat;
+                const dx2 = next.getLatLng().lng - current.getLatLng().lng;
+                const angle2 = Math.atan2(dy2, dx2) * (180 / Math.PI);
+
+                // Différence d'angle
+                let diff = angle2 - angle1;
+
+                // Normalisation entre -180° et 180°
+                while (diff > 180) diff -= 360;
+                while (diff < -180) diff += 360;
+
+                // Ajout d'une tolérance de 30° pour ignorer les irrégularités du tracé
+                let turnInstruction = null;
+                if (diff >= 30 && diff <= 150) {
+                    turnInstruction = "Tourner à gauche";
+                } else if (diff <= -30 && diff >= -150) {
+                    turnInstruction = "Tourner à droite";
+                } else if (diff > 150 || diff < -150) {
+                    turnInstruction = "Faire demi-tour";
+                }
+
+                if (turnInstruction) {
+                    // Si le nœud actuel porte un nom, on l'intègre à la phrase
+                    const locationContext = current.userData.name ? ` au niveau de ${current.userData.name}` : '';
+                    steps.push(`${turnInstruction}${locationContext}`);
+                }
+            }
+        }
+
+        // Point de repère
         if (i + 1 !== nodes.length - 1 && next.userData.name && next.userData.type !== 'couloir') {
-            steps.push(`Avancer jusqu'à ${next.userData.name}`);
+            // Petite vérification pour éviter de dire "Tourner à gauche à B3" puis "Avancer jusqu'à B3"
+            const lastStep = steps.length > 0 ? steps[steps.length - 1] : "";
+            if (!lastStep.includes(`au niveau de ${next.userData.name}`)) {
+                steps.push(`Avancer jusqu'à ${next.userData.name}`);
+            }
         }
     }
 
