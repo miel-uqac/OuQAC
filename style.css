@@ -1,0 +1,104 @@
+/* Variables de couleurs */
+:root {
+    --couleur-fond: #f4f7f6;
+    --couleur-carte: #ffffff;
+    --texte-principal: #333333;
+    --texte-secondaire: #666666;
+    --vert-uqac: #6b8915;
+    --vert-uqac-hover: #536b12;
+    --gris-admin: #455a64;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--couleur-fond);
+    color: var(--texte-principal);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Style de la card */
+.container {
+    background-color: var(--couleur-carte);
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: var(--vert-uqac);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: var(--texte-secondaire);
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+/* Conteneur des boutons */
+.boutons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+/* Style global des boutons */
+.btn {
+    display: block;
+    padding: 14px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Bouton principal (Espace Communauté) */
+.btn-primaire {
+    background-color: var(--vert-uqac);
+    color: white;
+    box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
+}
+
+.btn-primaire:hover {
+    background-color: var(--vert-uqac-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.3);
+}
+
+/* Bouton secondaire (Admin) */
+.btn-secondaire {
+    background-color: transparent;
+    color: var(--gris-admin);
+    border: 2px solid #cfd8dc;
+}
+
+.btn-secondaire:hover {
+    border-color: var(--gris-admin);
+    color: var(--gris-admin);
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+    .container {
+        padding: 30px 20px;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+}
