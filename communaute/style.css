@@ -5,6 +5,7 @@
     /* Couleurs principales */
     --primary-color: #6b8915;
     --primary-color-hover: #536b12;
+    --primary-black: #1a1a1a;
 
     /* Fonds */
     --bg-main: #f3f4f6;
@@ -389,7 +390,7 @@ html, body {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background-color: var(--primary-black);
     color: var(--text-inverse);
     border: none;
     border-radius: 30px;
