@@ -40,6 +40,11 @@ html, body {
     background-color: var(--bg-main);
 }
 
+/* Suppression Overlay Bleu */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
 #app {
     position: absolute;
     top: 0;
