@@ -285,6 +285,13 @@ html, body {
     overflow: hidden;
 }
 
+#common-places, #search-results {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
 .search-section-title {
     color: var(--primary-color);
     margin: 0 0 10px 5px;
