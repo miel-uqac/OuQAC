@@ -20,7 +20,7 @@ const floorPlan = L.imageOverlay.rotated(
     L.latLng(CONFIG.OVERLAY_COORDS.topLeft),
     L.latLng(CONFIG.OVERLAY_COORDS.topRight),
     L.latLng(CONFIG.OVERLAY_COORDS.bottomLeft),
-    { opacity: 0.7, interactive: false, zIndex: 100 }
+    { opacity: 1, interactive: false, zIndex: 100 }
 ).addTo(map);
 
 // Fonctions de filtrage
@@ -29,7 +29,7 @@ export function setFloor(floorId) {
     const imageUrl = CONFIG.FLOORS[floorId];
     if (imageUrl) {
         floorPlan.setUrl(imageUrl);
-        floorPlan.setOpacity(0.7);
+        floorPlan.setOpacity(1);
     } else {
         floorPlan.setOpacity(0); // Cache le plan s'il n'existe pas encore
     }

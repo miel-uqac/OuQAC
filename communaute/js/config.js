@@ -29,15 +29,15 @@ export const CONFIG = {
 
     // Plans des étages
     FLOORS: {
-        "0": "../plans/plan_bat.jpg",
-        "1": "../plans/etage1.jpg",
-        "2": "../plans/etage2.jpg"
+        "0": "../plans/pp/pp_nv1.svg",
+        "1": "../plans/pp/pp_nv1.svg",
+        "2": "../plans/pp/pp_nv1.svg",
     },
 
     // Coordonnées de l'overlay (Plan UQAC)
     OVERLAY_COORDS: {
-        topLeft: [48.420607, -71.052667],
-        topRight: [48.420174, -71.051671],
-        bottomLeft: [48.419886, -71.053379]
+        topLeft: [48.420673, -71.052806],
+        topRight: [48.420125, -71.051561],
+        bottomLeft: [48.419939, -71.053541]
     }
 };

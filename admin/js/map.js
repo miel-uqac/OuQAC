@@ -24,7 +24,7 @@ const floorPlan = L.imageOverlay.rotated(
     L.latLng(CONFIG.OVERLAY_COORDS.topLeft),
     L.latLng(CONFIG.OVERLAY_COORDS.topRight),
     L.latLng(CONFIG.OVERLAY_COORDS.bottomLeft),
-    { opacity: 0.7, interactive: false, zIndex: 100 }
+    { opacity: 1, interactive: false, zIndex: 100 }
 ).addTo(map);
 
 // Fonction pour changer l'étage
@@ -54,3 +54,53 @@ export function filterMapElements(floorId) {
         }
     });
 }
+
+/*
+// ==========================================
+// OUTIL DE CALIBRAGE TEMPORAIRE (À SUPPRIMER APRÈS)
+// ==========================================
+
+// 1. Création d'une petite boîte UI pour afficher les coordonnées
+const coordsBox = L.control({ position: 'bottomright' });
+coordsBox.onAdd = function() {
+    let div = L.DomUtil.create('div', 'info-coords');
+    div.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    div.style.color = 'white';
+    div.style.padding = '15px';
+    div.style.borderRadius = '8px';
+    div.style.fontFamily = 'monospace';
+    div.style.fontSize = '12px';
+    div.style.whiteSpace = 'pre-wrap';
+    div.innerHTML = 'Bougez les marqueurs...';
+    return div;
+};
+coordsBox.addTo(map);
+
+// 2. Création des 3 marqueurs déplaçables aux positions initiales
+let mTopLeft = L.marker(CONFIG.OVERLAY_COORDS.topLeft, { draggable: true }).addTo(map);
+let mTopRight = L.marker(CONFIG.OVERLAY_COORDS.topRight, { draggable: true }).addTo(map);
+let mBottomLeft = L.marker(CONFIG.OVERLAY_COORDS.bottomLeft, { draggable: true }).addTo(map);
+
+// 3. Fonction pour mettre à jour l'image et le texte
+function updateCalibration() {
+    let tl = mTopLeft.getLatLng();
+    let tr = mTopRight.getLatLng();
+    let bl = mBottomLeft.getLatLng();
+
+    // On déplace l'image en temps réel
+    floorPlan.reposition(tl, tr, bl);
+
+    // On met à jour le texte dans la boîte avec le format exact pour config.js
+    document.querySelector('.info-coords').innerHTML = 
+`topLeft: [${tl.lat.toFixed(6)}, ${tl.lng.toFixed(6)}],
+topRight: [${tr.lat.toFixed(6)}, ${tr.lng.toFixed(6)}],
+bottomLeft: [${bl.lat.toFixed(6)}, ${bl.lng.toFixed(6)}]`;
+}
+
+// 4. Écouter les mouvements des marqueurs
+mTopLeft.on('drag', updateCalibration);
+mTopRight.on('drag', updateCalibration);
+mBottomLeft.on('drag', updateCalibration);
+
+// Lancer une première fois pour initialiser le texte
+updateCalibration();*/
