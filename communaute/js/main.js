@@ -366,11 +366,101 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
+    // ETAT DE NAVIGATION ACTIVE (GPS)
+    // ==========================================
+    let currentSteps = []; // Tableau contenant toutes les étapes
+    let activeStepIndex = 0; // L'étape active
+
+    const activeRouteUI = document.getElementById('active-route-ui');
+    const bottomControls = document.getElementById('bottom-controls');
+    
+    const stepTitle = document.getElementById('step-title');
+    const stepDesc = document.getElementById('step-desc');
+    const stepIcon = document.getElementById('step-icon');
+    
+    const btnPrevStep = document.getElementById('btn-prev-step');
+    const btnNextStep = document.getElementById('btn-next-step');
+    const btnQuitNav = document.getElementById('btn-quit-navigation');
+    const mapElement = document.getElementById('map');
+
+    // Met à jour l'interface en fonction de l'étape active
+    const updateNavigationUI = () => {
+        if (currentSteps.length === 0) return;
+
+        const step = currentSteps[activeStepIndex];
+        const stepText = step.text.toLowerCase();
+        
+        // Icone et Titre
+        let iconClass = "fa-person-walking";
+        let title = "Continuer";
+
+        if (stepText.includes("départ")) { iconClass = "fa-location-dot"; title = "Départ"; }
+        else if (stepText.includes("arrivée")) { iconClass = "fa-flag-checkered"; title = "Arrivée"; }
+        else if (stepText.includes("ascenseur")) { iconClass = "fa-elevator"; title = "Changement d'étage"; }
+        else if (stepText.includes("escalier")) { iconClass = "fa-stairs"; title = "Changement d'étage"; }
+        else if (stepText.includes("gauche")) { iconClass = "fa-arrow-turn-down fa-rotate-90"; title = "Tourner à gauche"; }
+        else if (stepText.includes("droite")) { iconClass = "fa-arrow-turn-up fa-rotate-90"; title = "Tourner à droite"; }
+        else if (stepText.includes("sortir") || stepText.includes("entrer")) { iconClass = "fa-door-open"; title = "Porte"; }
+
+        stepIcon.className = `fa-solid ${iconClass}`;
+        stepTitle.textContent = title;
+        stepDesc.textContent = step.text;
+
+        // Boutons Prev/Next
+        btnPrevStep.disabled = (activeStepIndex === 0);
+        btnNextStep.disabled = (activeStepIndex === currentSteps.length - 1);
+
+        // Mise à jour de l'étage automatique
+        if (state.currentFloor !== step.node.userData.floor) {
+            setFloor(step.node.userData.floor);
+            floorBtns.forEach(b => b.classList.remove('active'));
+            const btnFloor = document.querySelector(`.floor-btn[data-floor="${step.node.userData.floor}"]`);
+            if (btnFloor) btnFloor.classList.add('active');
+        }
+
+        // Filtrage des chemins
+        // On modifie activeRoutePaths pour n'afficher que le chemin restant
+        state.activeRoutePaths = routeOverlay.fullRoutePaths.slice(step.pathIndex);
+        filterMapElements(state.currentFloor);
+
+        // Centrage de la caméra et Rotation de la carte
+        map.flyTo(step.node.getLatLng(), 19, {duration: 0.5});
+        
+        if (step.angle !== 0) {
+            // Fait tourner la carte visuellement vers la cible
+            mapElement.style.transform = `rotate(${step.angle}deg)`;
+        } else {
+            mapElement.style.transform = `rotate(0deg)`;
+        }
+    };
+
+    // Événements des boutons de navigation
+    btnPrevStep.addEventListener('click', () => {
+        if (activeStepIndex > 0) { activeStepIndex--; updateNavigationUI(); }
+    });
+
+    btnNextStep.addEventListener('click', () => {
+        if (activeStepIndex < currentSteps.length - 1) { activeStepIndex++; updateNavigationUI(); }
+    });
+
+    btnQuitNav.addEventListener('click', () => {
+        activeRouteUI.classList.add('hidden');
+        bottomControls.classList.remove('hidden'); // Réaffiche la barre de recherche
+        mapElement.style.transform = `rotate(0deg)`; // Reset la rotation de la carte
+        
+        // Restaure la ligne complète
+        state.activeRoutePaths = routeOverlay.fullRoutePaths;
+        filterMapElements(state.currentFloor);
+        
+        openRouteOverlay(); 
+    });
+
+    // ==========================================
     // LANCEMENT ITINERAIRE
     // ==========================================
     document.getElementById('btn-lets-go').addEventListener('click', () => {
         if (!state.startNode || !state.endNode) {
-            alert("Veuillez définir un départ et une arrivée avant de lancer l'itinéraire.");
+            alert("Veuillez définir un départ et une arrivée.");
             return;
         }
 
@@ -378,39 +468,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const route = RouteCtrl.calculateRoute(state.startNode, state.endNode);
         
         if (route) {
-            // On sauvegarde le résultat pour la carte
             state.activeRouteNodes = route.nodes;
+            // On sauvegarde le chemin total
+            routeOverlay.fullRoutePaths = route.paths;
             state.activeRoutePaths = route.paths;
 
-            // Génération et affichage des étapes
-            const steps = RouteCtrl.generateItinerarySteps(route);
-            console.log("===============================");
-            console.log("NOUVEL ITINÉRAIRE CALCULÉ");
-            console.log("===============================");
-            steps.forEach((step, index) => {
-                console.log(`${index + 1}. ${step}`);
-            });
-            console.log("===============================");
-            
-            // On réduit le panneau pour afficher l'itinéraire en petit en bas
-            minimizeRouteOverlay();
-            
-            // On va à l'étage du départ
-            const startFloor = state.startNode.userData.floor;
-            setFloor(startFloor);
-            
-            // Met à jour visuellement le menu des étages sur le côté droit
-            floorBtns.forEach(b => b.classList.remove('active'));
-            const btnFloor = document.querySelector(`.floor-btn[data-floor="${startFloor}"]`);
-            if (btnFloor) btnFloor.classList.add('active');
+            // Génération des étapes
+            currentSteps = RouteCtrl.generateItinerarySteps(route);
+            activeStepIndex = 0;
 
-            // On dessine la carte
-            filterMapElements(startFloor);
+            // Gestion de l'interface
+            routeOverlay.classList.add('hidden');
+            bottomControls.classList.add('hidden');
+            minimizedRouteTrigger.classList.add('hidden');
             
-            // On fait voler la caméra vers le point de départ avec un peu de recul pour voir la ligne
-            map.flyTo(state.startNode.getLatLng(), 18, {duration: 1});
+            activeRouteUI.classList.remove('hidden');
+            updateNavigationUI();
+
         } else {
-            alert("Oups ! Aucun itinéraire n'a pu être trouvé entre ces deux points. Vérifiez que les chemins sont bien connectés dans l'éditeur.");
+            alert("Aucun itinéraire trouvé.");
         }
     });
 

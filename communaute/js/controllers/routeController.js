@@ -121,9 +121,9 @@ function reconstructPath(cameFrom, currentId) {
 
     while (cameFrom.has(currentId)) {
         const data = cameFrom.get(currentId);
-        pathEdges.push(data.path);
+        pathEdges.unshift(data.path); 
         currentId = data.prevId;
-        pathNodes.unshift(currentId); // On insère au début du tableau
+        pathNodes.unshift(currentId);
     }
 
     return { nodes: pathNodes, paths: pathEdges };
@@ -139,87 +139,105 @@ export function generateItinerarySteps(route) {
 
     if (nodes.length < 2) return steps;
 
+    // Fonction utilitaire pour calculer le cap vers le prochain point
+    const getBearing = (p1, p2) => {
+        const dLat = p2.lat - p1.lat;
+        const dLng = p2.lng - p1.lng;
+        
+        // Calcul du cap en degrés
+        const bearing = (Math.atan2(dLng, dLat) * 180) / Math.PI; 
+        
+        return -bearing; 
+    };
+
+    let currentEnvironment = paths[0].userData.type;
+
     // Étape de départ
-    steps.push(`Départ de ${nodes[0].userData.name || 'votre position'} (Étage ${nodes[0].userData.floor})`);
+    steps.push({
+        text: `Départ de ${nodes[0].userData.name || 'votre position'}`,
+        node: nodes[0],
+        pathIndex: 0,
+        angle: getBearing(nodes[0].getLatLng(), nodes[1].getLatLng())
+    });
 
-    let currentEnvironment = paths[0].userData.type; // 'indoor' ou 'outdoor'
-
-    // On boucle sur tous les nœuds intermédiaires
     for (let i = 0; i < nodes.length - 1; i++) {
         const current = nodes[i];
         const next = nodes[i + 1];
         const path = paths[i];
+        const currentAngle = getBearing(current.getLatLng(), next.getLatLng());
 
         // Changement d'étage
         if (current.userData.floor !== next.userData.floor) {
             const transport = (current.userData.type === 'ascenseur' || next.userData.type === 'ascenseur') ? "l'ascenseur" : "les escaliers";
-            steps.push(`Prendre ${transport} jusqu'à l'étage ${next.userData.floor}`);
-            continue; // On passe à l'étape suivante pour ne pas spammer
+            steps.push({
+                text: `Prendre ${transport} jusqu'à l'étage ${next.userData.floor}`,
+                node: current,
+                pathIndex: i,
+                angle: currentAngle
+            });
+            continue; 
         }
 
-        // Changement d'environnement (Intérieur / Extérieur)
+        // Changement d'environnement
         if (path.userData.type !== currentEnvironment) {
-            if (path.userData.type === 'outdoor') {
-                steps.push(`Sortir du bâtiment`);
-            } else {
-                steps.push(`Entrer dans le bâtiment`);
-            }
+            steps.push({
+                text: path.userData.type === 'outdoor' ? `Sortir du bâtiment` : `Entrer dans le bâtiment`,
+                node: current,
+                pathIndex: i,
+                angle: currentAngle
+            });
             currentEnvironment = path.userData.type;
         }
 
-        // Calcul direction
-        // On a besoin d'un nœud précédent (i > 0) sur le même étage pour faire le calcul géométrique
+        // Calcul direction (Virages)
         if (i > 0) {
             const prev = nodes[i - 1];
-            
             if (prev.userData.floor === current.userData.floor) {
-                // Vecteur d'arrivée (Précédent -> Actuel)
-                const dy1 = current.getLatLng().lat - prev.getLatLng().lat;
-                const dx1 = current.getLatLng().lng - prev.getLatLng().lng;
-                const angle1 = Math.atan2(dy1, dx1) * (180 / Math.PI);
-
-                // Vecteur de départ (Actuel -> Suivant)
-                const dy2 = next.getLatLng().lat - current.getLatLng().lat;
-                const dx2 = next.getLatLng().lng - current.getLatLng().lng;
-                const angle2 = Math.atan2(dy2, dx2) * (180 / Math.PI);
-
-                // Différence d'angle
+                const angle1 = Math.atan2(current.getLatLng().lat - prev.getLatLng().lat, current.getLatLng().lng - prev.getLatLng().lng) * 180 / Math.PI;
+                const angle2 = Math.atan2(next.getLatLng().lat - current.getLatLng().lat, next.getLatLng().lng - current.getLatLng().lng) * 180 / Math.PI;
+                
                 let diff = angle2 - angle1;
-
-                // Normalisation entre -180° et 180°
                 while (diff > 180) diff -= 360;
                 while (diff < -180) diff += 360;
 
-                // Ajout d'une tolérance de 30° pour ignorer les irrégularités du tracé
                 let turnInstruction = null;
-                if (diff >= 30 && diff <= 150) {
-                    turnInstruction = "Tourner à gauche";
-                } else if (diff <= -30 && diff >= -150) {
-                    turnInstruction = "Tourner à droite";
-                } else if (diff > 150 || diff < -150) {
-                    turnInstruction = "Faire demi-tour";
-                }
+                if (diff >= 30 && diff <= 150) turnInstruction = "Tourner à gauche";
+                else if (diff <= -30 && diff >= -150) turnInstruction = "Tourner à droite";
+                else if (diff > 150 || diff < -150) turnInstruction = "Faire demi-tour";
 
                 if (turnInstruction) {
-                    // Si le nœud actuel porte un nom, on l'intègre à la phrase
                     const locationContext = current.userData.name ? ` au niveau de ${current.userData.name}` : '';
-                    steps.push(`${turnInstruction}${locationContext}`);
+                    steps.push({
+                        text: `${turnInstruction}${locationContext}`,
+                        node: current,
+                        pathIndex: i,
+                        angle: currentAngle
+                    });
                 }
             }
         }
 
         // Point de repère
         if (i + 1 !== nodes.length - 1 && next.userData.name && next.userData.type !== 'couloir') {
-            // Petite vérification pour éviter de dire "Tourner à gauche à B3" puis "Avancer jusqu'à B3"
-            const lastStep = steps.length > 0 ? steps[steps.length - 1] : "";
+            const lastStep = steps.length > 0 ? steps[steps.length - 1].text : "";
             if (!lastStep.includes(`au niveau de ${next.userData.name}`)) {
-                steps.push(`Avancer jusqu'à ${next.userData.name}`);
+                steps.push({
+                    text: `Avancer jusqu'à ${next.userData.name}`,
+                    node: current,
+                    pathIndex: i,
+                    angle: currentAngle
+                });
             }
         }
     }
 
     // L'arrivée
-    steps.push(`Arrivée à ${nodes[nodes.length - 1].userData.name || 'votre destination'} (Étage ${nodes[nodes.length - 1].userData.floor})`);
+    steps.push({
+        text: `Arrivée à ${nodes[nodes.length - 1].userData.name || 'votre destination'}`,
+        node: nodes[nodes.length - 1],
+        pathIndex: paths.length - 1,
+        angle: 0
+    });
 
     return steps;
 }

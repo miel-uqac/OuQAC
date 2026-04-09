@@ -61,6 +61,30 @@
                 </div>
             </div>
 
+            <div id="active-route-ui" class="hidden">
+                <div class="route-instruction-card">
+                    <div class="instruction-icon">
+                        <i id="step-icon" class="fa-solid fa-person-walking"></i>
+                    </div>
+                    <div class="instruction-text">
+                        <h3 id="step-title">Départ</h3>
+                        <p id="step-desc">En attente...</p>
+                    </div>
+                    <button class="btn-icon-small btn-close-active-route" id="btn-quit-navigation">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="route-nav-controls">
+                    <button class="btn-nav" id="btn-prev-step">
+                        <i class="fa-solid fa-arrow-left"></i> Précédent
+                    </button>
+                    <button class="btn-nav" id="btn-next-step">
+                        Suivant <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
             <div id="search-overlay" class="hidden">
                 <div class="drag-handle"></div>
                 

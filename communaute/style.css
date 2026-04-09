@@ -64,6 +64,8 @@ html, body {
     bottom: 0;
     z-index: 1;
     background-color: var(--bg-map);
+    transform-origin: center center;
+    transition: transform 0.5s ease-in-out;
 }
 
 .leaflet-control-zoom {
@@ -412,6 +414,100 @@ html, body {
     cursor: pointer;
     width: 100%;
     box-shadow: 0 4px 10px rgba(107, 137, 21, 0.4);
+}
+
+/* --- OVERLAY NAVIGATION ACTIVE (GPS) --- */
+#active-route-ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(15px + env(safe-area-inset-top)) 15px calc(15px + env(safe-area-inset-bottom)) 15px;
+    z-index: 1500;
+}
+
+.route-instruction-card {
+    pointer-events: auto;
+    background-color: var(--primary-color);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 5px 15px var(--shadow-strong);
+    color: var(--text-inverse);
+}
+
+.instruction-icon {
+    font-size: 2rem;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.instruction-text {
+    flex: 1;
+}
+
+.instruction-text h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+}
+
+.instruction-text p {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.btn-icon-small {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.route-nav-controls {
+    pointer-events: auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.btn-nav {
+    flex: 1;
+    background-color: var(--primary-color);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px var(--shadow-soft);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-nav:disabled {
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
 }
 
 /*------------------------*/
