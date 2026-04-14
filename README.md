@@ -103,7 +103,7 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ## 👨‍💻 Auteur
 
-**Baptiste Crépon** - *Créateur & Développeur Principal*
+**Baptiste Crepon** - *Créateur & Développeur Principal*
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white)](https://github.com/baptcrp) 
 
 *Un grand merci à l'UQAC et à ses étudiants pour l'inspiration derrière ce projet.*
