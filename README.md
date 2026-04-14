@@ -91,7 +91,7 @@ Pour faire tourner un petit serveur local très facilement, nous utilisons Pytho
    *(Note : sur certains systèmes, la commande peut être `python3 -m http.server`)*
 5. **Ouvrir l'application :** Lancez votre navigateur et allez à l'adresse `http://localhost:8000`. Vous pourrez y voir le site et naviguer vers `/communaute/` ou `/admin/`.
 
-📖 **Avant de plonger dans le code :** Pour bien comprendre la structure des fichiers, le rôle de chaque dossier et la logique globale, **[consultez la page Architecture de notre Wiki](../../wiki)**.
+📖 **Avant de plonger dans le code :** Pour bien comprendre la structure des fichiers, le rôle de chaque dossier et la logique globale, **[consultez la page Architecture de notre Wiki](../../wiki/Architecture-d'OùQAC)**.
 
 ---
 
