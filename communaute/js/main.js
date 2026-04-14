@@ -426,12 +426,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Centrage de la caméra et Rotation de la carte
         map.flyTo(step.node.getLatLng(), 19, {duration: 0.5});
         
-        if (step.angle !== 0) {
+        /*if (step.angle !== 0) {
             // Fait tourner la carte visuellement vers la cible
             mapElement.style.transform = `rotate(${step.angle}deg)`;
         } else {
             mapElement.style.transform = `rotate(0deg)`;
-        }
+        }*/
     };
 
     // Événements des boutons de navigation
