@@ -42,9 +42,9 @@ OùQAC est une **Progressive Web App (PWA)** fonctionnant entièrement côté cl
 
 ## 📸 Aperçus
 
-| Recherche & Lieux Courants | Sélection de l'Itinéraire | Trajet en Cours (GPS) |
-| :---: | :---: | :---: |
-| ![Aperçu Recherche](lien/vers/capture-recherche.png) | ![Aperçu Itinéraire](lien/vers/capture-itineraire.png) | ![Aperçu Trajet](lien/vers/capture-trajet.png) |
+| La Carte | Recherche & Lieux Courants | Sélection de l'Itinéraire | Trajet en Cours (GPS) |
+| :---: | :---: | :---: | :---: |
+| ![Aperçu Carte](./images/captures/capture-carte.png) | ![Aperçu Recherche](./images/captures/capture-recherche.png) | ![Aperçu Itinéraire](./images/captures/capture-itineraire.png) | ![Aperçu Trajet](./images/captures/capture-trajet.png) |
 
 ---
 
@@ -63,10 +63,47 @@ Ce projet a fait le choix de la légèreté et de la performance en s'affranchis
 
 Étant donné la complexité de certaines mécaniques (notamment le système de graphes, l'algorithme A*, et la logique de filtrage multi-étages), une documentation détaillée est à votre disposition.
 
-Pour comprendre le code en profondeur, l'architecture des données JSON, ou savoir comment modifier le comportement de la carte, **[consultez notre Wiki complet ici](lien/vers/le/wiki)**.
+Pour comprendre le code en profondeur, l'architecture des données JSON, ou savoir comment modifier le comportement de la carte, **[consultez notre Wiki complet ici](../../wiki)**.
+
+---
+
+## 🤝 Contribuer au projet
+
+L'application utilisant des modules JavaScript (ES6), elle doit obligatoirement être exécutée sur un serveur local pour fonctionner correctement lors du développement (afin d'éviter les erreurs de sécurité CORS).
+
+Voici les étapes pour installer et modifier le projet sur votre machine :
+
+### 1. Prérequis : Installer Python
+Pour faire tourner un petit serveur local très facilement, nous utilisons Python. Si vous ne l'avez pas encore, téléchargez-le et installez-le depuis le site officiel : [python.org](https://www.python.org/downloads/). 
+*(Attention : sur Windows, n'oubliez pas de cocher la case "Add Python to PATH" lors de l'installation).*
+
+### 2. Installation et Lancement
+1. **Cloner ou télécharger le dépôt :**
+   ```bash
+   git clone https://github.com/Miel-UQAC/OuQAC.git
+   ```
+2. **Ouvrir le dossier :** Accédez au dossier racine du projet que vous venez de récupérer (le dossier `OuQAC`).
+3. **Ouvrir un terminal** à l'intérieur de ce dossier.
+4. **Héberger le projet en local** en tapant la commande suivante :
+   ```bash
+   python -m http.server
+   ```
+   *(Note : sur certains systèmes, la commande peut être `python3 -m http.server`)*
+5. **Ouvrir l'application :** Lancez votre navigateur et allez à l'adresse `http://localhost:8000`. Vous pourrez y voir le site et naviguer vers `/communaute/` ou `/admin/`.
+
+📖 **Avant de plonger dans le code :** Pour bien comprendre la structure des fichiers, le rôle de chaque dossier et la logique globale, **[consultez la page Architecture de notre Wiki](../../wiki/Architecture-d'OùQAC)**.
 
 ---
 
 ## 📄 Licence
 
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+---
+
+## 👨‍💻 Auteur
+
+**Baptiste Crepon** - *Créateur & Développeur Principal*
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white)](https://github.com/baptcrp) 
+
+*Un grand merci à l'UQAC et à ses étudiants pour l'inspiration derrière ce projet.*
