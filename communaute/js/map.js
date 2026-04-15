@@ -14,25 +14,31 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
 }).addTo(map);
 
-// Gestion du plan d'étage
-const floorPlan = L.imageOverlay.rotated(
-    CONFIG.FLOORS["0"],
-    L.latLng(CONFIG.OVERLAY_COORDS.topLeft),
-    L.latLng(CONFIG.OVERLAY_COORDS.topRight),
-    L.latLng(CONFIG.OVERLAY_COORDS.bottomLeft),
-    { opacity: 1, interactive: false, zIndex: 100 }
-).addTo(map);
+// Pré-chargement de tous les calques d'images en mémoire
+const allOverlays = {};
+CONFIG.PLANS.forEach(plan => {
+    allOverlays[plan.id] = L.imageOverlay.rotated(
+        plan.url,
+        L.latLng(plan.coords.topLeft),
+        L.latLng(plan.coords.topRight),
+        L.latLng(plan.coords.bottomLeft),
+        { opacity: 1, interactive: false, zIndex: 100 }
+    );
+});
 
-// Fonctions de filtrage
+// Fonctions de changement d'étage
 export function setFloor(floorId) {
     state.currentFloor = floorId;
-    const imageUrl = CONFIG.FLOORS[floorId];
-    if (imageUrl) {
-        floorPlan.setUrl(imageUrl);
-        floorPlan.setOpacity(1);
-    } else {
-        floorPlan.setOpacity(0); // Cache le plan s'il n'existe pas encore
-    }
+    
+    // On retire d'abord toutes les images de la carte
+    Object.values(allOverlays).forEach(overlay => {
+        if (map.hasLayer(overlay)) map.removeLayer(overlay);
+    });
+
+    // On ajoute uniquement les images qui correspondent au nouvel étage demandé
+    CONFIG.PLANS.filter(p => String(p.floor) === String(floorId)).forEach(plan => {
+        allOverlays[plan.id].addTo(map);
+    });
 }
 
 export function filterMapElements(floorId) {
