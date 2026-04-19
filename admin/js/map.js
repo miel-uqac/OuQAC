@@ -1,3 +1,38 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : map.js
+ * RÔLE : Initialisation et gestion du moteur cartographique (Leaflet)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier est responsable de tout ce qui touche directement à l'instance 
+ * de la carte Leaflet. Il initialise la vue, gère le fond de carte (OSM) 
+ * et s'occupe de la superposition des plans de l'université. Il intègre 
+ * également un outil de calibrage visuel pour positionner ces plans.
+ * * FONCTIONS PRINCIPALES :
+ * - Initialisation : Création de la constante `map` avec les options de 
+ * restrictions de zone et de zoom issues de config.js.
+ * - Pré-chargement : Génération et stockage en mémoire de tous les calques 
+ * d'images (overlays) pour éviter les temps de chargement lors des 
+ * changements d'étages.
+ * - setFloor(floorId) : Bascule l'affichage des images de fond. Retire 
+ * tous les plans actifs et n'affiche que ceux liés au nouvel étage.
+ * - filterMapElements(floorId) : Parcourt le state.js pour afficher ou 
+ * masquer les nœuds et les chemins vectoriels selon l'étage actif.
+ * - Outil de calibrage (Multi-plans) : Interface UI en bas à droite et 
+ * marqueurs déplaçables permettant d'ajuster visuellement les coins 
+ * (Haut-Gauche, Haut-Droit, Bas-Gauche) des plans et de générer 
+ * automatiquement les coordonnées précises à copier dans config.js.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Au chargement, le fichier lit config.js pour instancier la carte et 
+ * préparer les calques d'images en arrière-plan.
+ * 2. Lors d'un changement d'étage déclenché par l'utilisateur (intercepté 
+ * par main.js), setFloor() et filterMapElements() sont appelés.
+ * 3. Ces fonctions lisent l'état global (state.js) pour masquer ce qui 
+ * n'est plus pertinent et injecter (addTo) les nouveaux éléments visuels 
+ * dans l'instance Leaflet, mettant ainsi la carte à jour.
+ **/
+
 import { CONFIG } from './config.js';
 import { state } from './state.js';
 
@@ -65,12 +100,12 @@ export function filterMapElements(floorId) {
 }
 
 // ==========================================
-// OUTIL DE CALIBRAGE MULTI-PLANS (À SUPPRIMER APRÈS)
+// OUTIL DE CALIBRAGE MULTI-PLANS (À MODIFIER APRÈS)
 // ==========================================
 
 let currentCalibPlanId = null;
 
-// 1. UI de calibrage
+// UI de calibrage
 const coordsBox = L.control({ position: 'bottomright' });
 coordsBox.onAdd = function() {
     let div = L.DomUtil.create('div', 'info-coords');
@@ -97,12 +132,12 @@ coordsBox.onAdd = function() {
 };
 coordsBox.addTo(map);
 
-// 2. Marqueurs déplaçables
+// Marqueurs déplaçables
 let mTopLeft = L.marker([0,0], { draggable: true }).addTo(map);
 let mTopRight = L.marker([0,0], { draggable: true }).addTo(map);
 let mBottomLeft = L.marker([0,0], { draggable: true }).addTo(map);
 
-// 3. Charger les marqueurs sur un plan spécifique
+// Charger les marqueurs sur un plan spécifique
 function loadCalibrationPlan(planId) {
     currentCalibPlanId = planId;
     const plan = CONFIG.PLANS.find(p => p.id === planId);
@@ -123,7 +158,7 @@ function loadCalibrationPlan(planId) {
     updateCalibration();
 }
 
-// 4. Mettre à jour l'image et le texte lors du glissement
+// Mettre à jour l'image et le texte lors du glissement
 function updateCalibration() {
     if (!currentCalibPlanId) return;
 

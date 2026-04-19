@@ -1,3 +1,42 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Communauté
+ * FICHIER : main.js
+ * RÔLE : Point d'entrée principal (Gestionnaire des interactions mobiles)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Contrairement à l'Admin, ce fichier agit comme le contrôleur principal 
+ * d'une application "Mobile-First". Il orchestre les transitions entre 
+ * les différents "écrans" (Overlays) qui se superposent à la carte, et gère 
+ * l'expérience de navigation GPS étape par étape.
+ * * FONCTIONS PRINCIPALES :
+ * - Gestion des Overlays : Gère l'ouverture, la réduction (minimize) et la 
+ * fermeture des panneaux "Recherche" et "Itinéraire". Il intègre une logique 
+ * complexe pour gérer l'historique du navigateur (History API), permettant 
+ * à l'utilisateur de fermer les panneaux avec le bouton physique "Retour" de 
+ * son téléphone.
+ * - Moteur de recherche local : Écoute les frappes dans la barre de recherche, 
+ * filtre le `state.nodes` en direct et demande à `UI.renderSearchResults` 
+ * d'afficher les résultats.
+ * - Mode Navigation (GPS) : Lors du clic sur "C'est parti", appelle `RouteCtrl` 
+ * pour calculer le chemin (A*) et générer les étapes textuelles. Il active 
+ * ensuite une interface simplifiée (Carte de navigation en haut de l'écran) 
+ * et permet de passer d'une étape à l'autre, en modifiant automatiquement 
+ * l'étage actif et la vue de la caméra (flyTo).
+ * - Gestion des filtres : Capture les clics sur les préférences d'itinéraire 
+ * (PMR, Intérieur/Extérieur) et met à jour le state.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Initialisation : Déclenche silencieusement `loadGraphData()` (dataController.js) 
+ * pour télécharger le graphe JSON.
+ * 2. Interaction Menu/Recherche : L'utilisateur navigue dans les menus. `main.js` 
+ * manipule les classes CSS (`hidden`, `transform`) pour animer les panneaux et 
+ * interroge les données pour proposer des suggestions de salles.
+ * 3. Interaction Carte/GPS : L'utilisateur définit un point A et un point B. `main.js` 
+ * demande à `RouteCtrl` la liste des instructions. Il boucle ensuite sur ce 
+ * tableau (currentSteps) à chaque clic sur "Suivant/Précédent", en synchronisant 
+ * la carte Leaflet et l'étage affiché.
+ **/
+
 import { map, setFloor, filterMapElements } from './map.js';
 import { loadGraphData } from './controllers/dataController.js';
 import * as RouteCtrl from './controllers/routeController.js';

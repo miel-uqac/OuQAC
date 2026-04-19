@@ -1,3 +1,28 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Communauté
+ * FICHIER : config.js
+ * RÔLE : Constantes de Configuration et Thème Visuel
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier sert de référentiel unique pour tous les paramètres de 
+ * l'interface utilisateur. Il définit l'environnement dans lequel 
+ * évolue le GPS.
+ * * PARAMÈTRES INCLUS :
+ * - Coordonnées et Limites : Définit la zone de navigation autorisée 
+ * autour du campus de l'UQAC.
+ * - Paramètres Leaflet : Optimisés pour mobile (zoomSnap fluide, 
+ * désactivation du contrôle de zoom natif pour épurer l'UI).
+ * - Identité Visuelle : Palettes de couleurs pour les types de pièces 
+ * et la distinction entre les trajets intérieurs/extérieurs.
+ * - Registre des Plans : Catalogue des SVG des pavillons par étage, 
+ * permettant au moteur de rendu de superposer les plans exacts.
+ * * NOTE : 
+ * La synchronisation de ce fichier avec celui de l'Admin est cruciale 
+ * pour garantir que les coordonnées calibrées correspondent.
+ * ====================================================================
+ */
+
 export const CONFIG = {
     UQAC_COORDS: [48.4204, -71.0526],
     MAP_OPTS: {

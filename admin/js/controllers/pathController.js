@@ -1,3 +1,44 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : pathController.js (Controllers)
+ * RÔLE : Contrôleur de la logique métier des Chemins (Liaisons/Arêtes)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier gère l'ensemble du cycle de vie des chemins (lignes vectorielles 
+ * reliant les nœuds). Il applique les règles métiers de la cartographie, 
+ * gère le style dynamique (couleurs, tiretés PMR) et maintient la cohérence 
+ * visuelle lorsque les nœuds auxquels les chemins sont attachés sont modifiés.
+ * * FONCTIONS PRINCIPALES :
+ * - handleNodeClickForPath(node) : Gère la logique de création en deux clics. 
+ * Elle inclut des sécurités métiers strictes (empêche la création de doublons, 
+ * bloque la liaison entre deux étages si les nœuds cibles ne sont pas de type 
+ * "escalier" ou "ascenseur").
+ * - createPath(nodeA, nodeB, existingData) : Génère une Polyline Leaflet, 
+ * calcule mathématiquement la distance réelle en mètres entre les deux points 
+ * pour le système de navigation, et l'injecte dans le state global.
+ * - selectPath(path) & clearHighlight() : S'occupent de l'expérience visuelle 
+ * de sélection. Pour mettre en évidence un chemin, une seconde ligne rouge plus 
+ * épaisse est glissée sous la ligne sélectionnée, et des infobulles "A" et "B" 
+ * sont générées sur les nœuds connectés pour faciliter la lecture du formulaire.
+ * - updatePathsAttachedToNode(node) : Méthode "élastique" appelée par le 
+ * NodeController lorsqu'un nœud est déplacé (drag & drop). Elle trouve toutes 
+ * les polylignes attachées au nœud et met à jour leurs coordonnées et distances.
+ * - updateCurrentPath() & deleteCurrentPath() : Récupèrent les changements de 
+ * l'interface UI (statut PMR, distance manuelle, type) pour mettre à jour la 
+ * ligne, ou la détruisent proprement en nettoyant l'affichage.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Création : L'utilisateur en mode "Chemin" clique sur un nœud initial 
+ * (mis en mémoire), puis sur un second.
+ * 2. Traitement : Le contrôleur valide l'action, instancie la ligne Leaflet, 
+ * calcule la distance automatique et stocke les IDs de départ et d'arrivée.
+ * 3. Cascade : Les chemins sont esclaves des nœuds. Le flux de données est 
+ * souvent poussé par `nodeController.js` (déplacement/suppression d'un nœud) 
+ * qui ordonne à `pathController.js` de réajuster ou supprimer les lignes affectées.
+ * 4. Rendu & Sauvegarde : Toute action finale déclenche une mise à jour de `ui.js` 
+ * et une sauvegarde silencieuse via `IOCtrl.saveToLocalStorage()`.
+ **/
+
 import { map } from '../map.js';
 import { state, removePathFromState } from '../state.js';
 import * as NodeCtrl from './nodeController.js';

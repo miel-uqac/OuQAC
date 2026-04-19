@@ -1,3 +1,34 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : ioController.js (Controllers)
+ * RÔLE : Gestionnaire d'Entrées/Sorties (Sauvegarde et Importation)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce contrôleur est responsable de la persistance des données. Il permet 
+ * de convertir l'état actuel de la carte (graphe de nœuds et chemins) en 
+ * un format de données standardisé (JSON) pour le sauvegarder, l'exporter, 
+ * ou le restaurer.
+ * * FONCTIONS PRINCIPALES :
+ * - generateGraphData() : Formate les données brutes du state.js (Leaflet) 
+ * en un objet JavaScript propre et structuré, incluant des métadonnées 
+ * (date, version de l'app).
+ * - exportGraph() & importGraph(event) : Gèrent respectivement le téléchargement 
+ * du fichier `graph.json` vers la machine de l'utilisateur, et la lecture 
+ * d'un fichier externe pour écraser et remplacer le graphe actuel.
+ * - saveToLocalStorage() & loadFromLocalStorage() : Gèrent la sauvegarde 
+ * automatique en cache dans le navigateur. Évite de perdre tout son travail 
+ * si l'utilisateur rafraîchit la page par erreur.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Sauvegarde/Export : Le contrôleur lit le `state.js`, extrait les coordonnées 
+ * et propriétés (`userData`) de chaque élément Leaflet, puis sérialise le tout en JSON.
+ * 2. Import/Chargement : À la réception d'un JSON (fichier ou LocalStorage), le 
+ * contrôleur ordonne un nettoyage complet (`resetState`), puis itère sur 
+ * les données lues. Il délègue la recréation visuelle aux contrôleurs 
+ * spécifiques (NodeCtrl.createNode et PathCtrl.createPath) et demande à 
+ * l'UI de se rafraîchir.
+ **/
+
 import { state, resetState } from '../state.js';
 import { map, filterMapElements } from '../map.js';
 import * as NodeCtrl from './nodeController.js';

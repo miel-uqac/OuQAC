@@ -1,6 +1,37 @@
-// ==========================================
-// GESTION DE L'INTERFACE (VUES)
-// ==========================================
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Communauté
+ * FICHIER : ui.js (Views)
+ * RÔLE : Gestionnaire de l'interface utilisateur et des interactions tactiles
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier centralise toute la manipulation visuelle de l'interface HTML 
+ * (DOM) pour l'application publique. Fortement orienté "mobile-first", 
+ * il isole la logique d'affichage, les animations, et l'adaptation de 
+ * l'écran lors du passage du mode "Exploration" au mode "GPS".
+ * * FONCTIONS PRINCIPALES :
+ * - renderSearchResults(filteredNodes, container, selectCallback) : Génère et 
+ * injecte dynamiquement la liste cliquable des salles correspondant à la 
+ * recherche de l'utilisateur.
+ * - updateNavigationCard(step, index, totalSteps) : Met à jour le bandeau 
+ * supérieur de guidage GPS. Elle analyse intelligemment le texte de l'étape 
+ * ("gauche", "ascenseur", "sortir") pour afficher automatiquement la bonne 
+ * icône (FontAwesome) et gère l'état (activé/désactivé) des flèches de navigation.
+ * - toggleNavigationMode(isActive) : Bascule l'état global de l'application. 
+ * Lors de l'activation du GPS, elle masque les menus de recherche et les 
+ * boutons d'étages du bas pour maximiser la visibilité de la carte.
+ * - setupSwipeToClose(overlayElement, minimizeCallback) : Implémente la physique 
+ * tactile native (Touch Events). Elle permet à l'utilisateur de fermer les panneaux 
+ * superposés (overlays) d'un simple glissement de doigt vers le bas (swipe-down).
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Écoute passive : Ce module ne décide de rien. Il attend d'être appelé 
+ * par `main.js` (suite à un clic) ou par la boucle de navigation.
+ * 2. Exécution : Il reçoit des données brutes (un tableau de nœuds filtrés, 
+ * un objet d'étape GPS) et les traduit en éléments HTML.
+ * 3. Rendu visuel : Il manipule directement les classes CSS (ajout/retrait de 
+ * `hidden` ou `active`) et modifie les styles en ligne (`transform: translateY`) 
+ * pour créer une expérience utilisateur fluide sans recharger la page.
+ **/
 
 // Rendu des résultats de recherche
 export function renderSearchResults(filteredNodes, container, selectCallback) {

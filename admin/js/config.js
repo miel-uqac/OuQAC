@@ -1,6 +1,24 @@
-// ==========================================
-// CONFIGURATION
-// ==========================================
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : config.js
+ * RÔLE : Constantes de Configuration Globale
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier centralise tous les paramètres structurels de l'application.
+ * Il permet de modifier le comportement ou l'apparence de la carte sans
+ * toucher au code logique.
+ * * PARAMÈTRES INCLUS :
+ * - Coordonnées géographiques de référence (UQAC).
+ * - Configuration technique du moteur Leaflet (Zooms, Limites de zone).
+ * - Thème visuel : Codes couleurs par types de salles et de chemins.
+ * - Registre des Plans : Liste exhaustive des fichiers SVG/Images des 
+ * étages, incluant leurs identifiants, noms et coordonnées de calibrage.
+ * * USAGE : 
+ * Les coordonnées dans 'PLANS' sont destinées à être mises à jour via 
+ * l'outil de calibrage présent dans 'map.js'.
+ * ====================================================================
+ */
 
 export const CONFIG = {
     UQAC_COORDS: [48.4204, -71.0526],

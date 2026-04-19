@@ -1,3 +1,38 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : nodeController.js (Controllers)
+ * RÔLE : Contrôleur de la logique métier des Nœuds (Points sur la carte)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier centralise toute la gestion du cycle de vie des nœuds (création, 
+ * édition, déplacement, suppression). Il fait le pont entre les objets 
+ * graphiques (Markers Leaflet) et les données métiers (userData).
+ * * FONCTIONS PRINCIPALES :
+ * - createNode(lat, lng, existingData) : Génère un Marker Leaflet personnalisé 
+ * (un cercle HTML dont la couleur dépend du type de salle). Assigne les données, 
+ * attache les écouteurs d'événements (clic, drag & drop) et l'ajoute au state.
+ * - handleNodeClick(node) : Route l'action selon le mode actif. Si on est en mode 
+ * 'node', il sélectionne le nœud. Si on est en mode 'path', il l'utilise pour 
+ * dessiner un chemin.
+ * - selectNode(node) & refreshNodeStyle(node, isSelected) : Gèrent la mise en 
+ * surbrillance visuelle (bordure blanche) et détectent automatiquement si le 
+ * nœud relie un autre étage pour afficher un point blanc central (escalier/ascenseur).
+ * - updateCurrentNode() & updateNodePositionFromInput() : Récupèrent les valeurs 
+ * tapées dans l'UI par l'utilisateur pour mettre à jour le nœud en temps réel 
+ * (nom, type, coordonnées manuelles).
+ * - deleteCurrentNode() : Supprime le nœud sélectionné de la carte et du state, 
+ * mais supprime également en cascade tous les chemins (paths) qui lui étaient attachés.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Déclenchement : Une interaction utilisateur (clic sur la carte, déplacement 
+ * d'un point, ou saisie dans un formulaire UI) appelle une de ces fonctions.
+ * 2. Traitement : Le contrôleur met à jour l'objet Leaflet et ses données (userData).
+ * 3. Répercussion : Lors d'un déplacement ou d'une suppression, il fait appel 
+ * à PathCtrl pour mettre à jour les lignes qui sont attachées au nœud.
+ * 4. Rendu & Sauvegarde : Il ordonne à ui.js de rafraîchir les formulaires et listes, 
+ * puis déclenche systématiquement IOCtrl.saveToLocalStorage() pour la persistance.
+ **/
+
 import { map } from '../map.js';
 import { state, removeNodeFromState, removePathFromState } from '../state.js';
 import { CONFIG } from '../config.js';

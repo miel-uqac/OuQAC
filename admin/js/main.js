@@ -1,3 +1,35 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : main.js
+ * RÔLE : Point d'entrée principal (Chef d'orchestre)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier agit comme le routeur principal et le chef d'orchestre de 
+ * l'interface Admin. Il connecte les interactions de l'utilisateur (clics, 
+ * saisies) avec la logique métier des contrôleurs et l'affichage de la carte.
+ * * FONCTIONS PRINCIPALES :
+ * - changeMode(mode, btn) : Gère le basculement entre les modes interactifs 
+ * (View, Node, Path). Elle s'assure de nettoyer l'interface (fermeture des 
+ * panneaux, réinitialisation des formulaires) et de désélectionner les 
+ * éléments visuels sur la carte pour éviter les conflits d'état.
+ * - Gestionnaire de clic Leaflet : Écoute les clics directs sur la carte. 
+ * En mode "Nœud", il ordonne la création d'un point ; dans les autres modes, 
+ * il agit comme un bouton d'échappement (reset de la sélection).
+ * - Initialisation (DOMContentLoaded) : Lie (bind) tous les éléments HTML 
+ * (boutons, inputs, sélecteurs) à leurs actions respectives. Il configure 
+ * notamment la sauvegarde automatique "à la volée" lors de la modification 
+ * des formulaires, la navigation rapide entre les nœuds d'un chemin, et 
+ * le chargement des données initiales.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Écoute : L'utilisateur interagit avec le DOM ou la carte Leaflet.
+ * 2. Interception : main.js capte l'événement (ex: 'input' sur le nom d'un nœud).
+ * 3. Délégation : Il appelle les modules spécialisés (ex: NodeCtrl.updateCurrentNode() 
+ * ou setFloor()).
+ * 4. Les contrôleurs appelés vont alors modifier le state.js et ordonner 
+ * à ui.js de rafraîchir l'écran, bouclant ainsi le flux sans surcharger main.js.
+ **/
+
 import { map, setFloor, filterMapElements } from './map.js';
 import { state, removeNodeFromState } from './state.js';
 import * as NodeCtrl from './controllers/nodeController.js';

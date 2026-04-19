@@ -1,3 +1,37 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Communauté
+ * FICHIER : routeController.js (Controllers)
+ * RÔLE : Moteur de recherche d'itinéraire (GPS) et Pathfinding (A*)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier est le "cerveau" mathématique et logique de l'application. 
+ * Il ne gère pas d'interface, mais s'occupe de calculer le trajet le plus 
+ * court ou le plus adapté entre deux points, puis de traduire ce tracé 
+ * vectoriel en instructions de navigation humaines (GPS).
+ * * FONCTIONS PRINCIPALES :
+ * - buildGraph() : Convertit les données brutes (state.nodes et state.paths) 
+ * en une structure de graphe (liste d'adjacence). C'est ici que s'appliquent 
+ * les filtres dynamiques : elle ignore les chemins inaccessibles si l'option 
+ * PMR est cochée, et multiplie artificiellement le "coût" des chemins pour 
+ * privilégier l'intérieur ou l'extérieur selon les préférences.
+ * - calculateRoute(startNode, endNode) & heuristic(idA, idB) : Implémentation 
+ * de l'algorithme de recherche A* (A-Star). Cherche le chemin optimal en 
+ * combinant le coût réel (distance) et une estimation (distance à vol d'oiseau).
+ * - generateItinerarySteps(route) : Le traducteur. Il parcourt les nœuds 
+ * de l'itinéraire trouvé et utilise la trigonométrie (getBearing, Math.atan2) 
+ * pour calculer les angles entre les points. Il en déduit s'il faut dire 
+ * "Tourner à gauche", "Prendre l'ascenseur" ou "Sortir du bâtiment".
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Déclenchement : L'utilisateur clique sur "C'est parti" dans `main.js`.
+ * 2. Modélisation : Le contrôleur génère le graphe pondéré à l'instant T 
+ * en fonction des options de mobilité choisies.
+ * 3. Calcul : L'algorithme A* trouve la séquence optimale de nœuds et chemins.
+ * 4. Traduction : La liste des points est envoyée au générateur d'étapes qui 
+ * construit le tableau des instructions textuelles.
+ * 5. Retour : Le tableau final est renvoyé à `main.js` pour lancer l'interface GPS.
+ **/
+
 import { state } from '../state.js';
 import { map } from '../map.js';
 

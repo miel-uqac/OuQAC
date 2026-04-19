@@ -1,3 +1,38 @@
+/**
+ * ====================================================================
+ * APPLICATION : OùQAC - Panel Admin
+ * FICHIER : ui.js (Views)
+ * RÔLE : Gestionnaire de l'interface utilisateur (Manipulation du DOM)
+ * ====================================================================
+ * * DESCRIPTION :
+ * Ce fichier est responsable de toute la manipulation visuelle de l'interface 
+ * HTML de l'éditeur (hors carte Leaflet). Il isole la logique liée aux 
+ * formulaires et aux listes dynamiques pour garder les contrôleurs propres.
+ * * FONCTIONS PRINCIPALES :
+ * - fillNodeForm(node) & fillPathForm(path, nodeA, nodeB) : Remplissent les 
+ * formulaires du panneau d'édition avec les données (userData) de l'élément 
+ * sélectionné. 
+ * `fillNodeForm` détecte également de façon dynamique si le nœud possède 
+ * des connexions vers d'autres étages (ascenseurs/escaliers) et crée des 
+ * raccourcis cliquables.
+ * - clearNodeForm() & clearPathForm() : Vident et réinitialisent les champs 
+ * des panneaux d'édition lorsqu'un élément est désélectionné.
+ * - updateRoomList() : Gère le moteur de recherche de la barre latérale. 
+ * Elle filtre la liste globale des nœuds (state.nodes) selon le texte saisi 
+ * et le type sélectionné, puis génère une liste de résultats cliquables 
+ * permettant de "téléporter" la caméra sur la salle correspondante.
+ * * FLUX DE DONNÉES / TRAVAIL :
+ * 1. Déclenchement : Une fonction de `main.js` ou d'un Contrôleur appelle 
+ * une méthode de `ui.js` (ex: lors d'un clic sur la carte ou d'une saisie textuelle).
+ * 2. Lecture : `ui.js` lit les propriétés des objets Leaflet fournis ou 
+ * interroge le `state` global.
+ * 3. Rendu : Il modifie directement les éléments de la page web (via 
+ * document.getElementById, innerHTML, value).
+ * 4. Interaction : Pour les éléments générés à la volée (comme les résultats 
+ * de recherche), il attache de nouveaux écouteurs d'événements qui 
+ * rappelleront les Contrôleurs ou `main.js` lors d'un clic utilisateur.
+ **/
+
 import { state } from '../state.js';
 import { map, setFloor, filterMapElements } from '../map.js';
 import * as NodeCtrl from '../controllers/nodeController.js';
