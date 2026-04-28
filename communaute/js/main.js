@@ -342,13 +342,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // GESTION DES OPTIONS D'ITINÉRAIRE
     // ==========================================
-    const btnWalk = document.querySelector('.fa-person-walking').parentElement;
-    const btnWheelchair = document.querySelector('.fa-wheelchair').parentElement;
-    const btnOutdoor = document.querySelector('.fa-cloud-sun').parentElement;
-    const btnIndoor = document.querySelector('.fa-house').parentElement;
+    // On récupére les boutons dans la section ".route-options"
+    const pmrGroupBtns = document.querySelectorAll('.route-options:nth-of-type(1) .toggle-btn');
+    const envGroupBtns = document.querySelectorAll('.route-options:nth-of-type(3) .toggle-btn');
 
-    btnWalk.addEventListener('click', () => { btnWalk.classList.add('active'); btnWheelchair.classList.remove('active'); state.routePrefPmr = false; });
-    btnWheelchair.addEventListener('click', () => { btnWheelchair.classList.add('active'); btnWalk.classList.remove('active'); state.routePrefPmr = true; });
-    btnOutdoor.addEventListener('click', () => { btnOutdoor.classList.add('active'); btnIndoor.classList.remove('active'); state.routePrefEnvironment = 'outdoor'; });
-    btnIndoor.addEventListener('click', () => { btnIndoor.classList.add('active'); btnOutdoor.classList.remove('active'); state.routePrefEnvironment = 'indoor'; });
+    // Bouton "Marche"
+    pmrGroupBtns[0].addEventListener('click', () => {
+        pmrGroupBtns[0].classList.add('active');
+        pmrGroupBtns[1].classList.remove('active');
+        state.routePrefPmr = false;
+    });
+
+    // Bouton "Fauteuil (PMR)"
+    pmrGroupBtns[1].addEventListener('click', () => {
+        pmrGroupBtns[1].classList.add('active');
+        pmrGroupBtns[0].classList.remove('active');
+        state.routePrefPmr = true;
+    });
+
+    // Bouton "Extérieur"
+    envGroupBtns[0].addEventListener('click', () => {
+        envGroupBtns[0].classList.add('active');
+        envGroupBtns[1].classList.remove('active');
+        state.routePrefEnvironment = 'outdoor';
+    });
+
+    // Bouton "Intérieur"
+    envGroupBtns[1].addEventListener('click', () => {
+        envGroupBtns[1].classList.add('active');
+        envGroupBtns[0].classList.remove('active');
+        state.routePrefEnvironment = 'indoor';
+    });
 });
