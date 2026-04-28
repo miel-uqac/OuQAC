@@ -16,9 +16,9 @@ Le projet se divise en deux parties distinctes : une **interface communauté (Mo
 
 OùQAC est une **Progressive Web App (PWA)** fonctionnant entièrement côté client. **Il n'y a aucune installation requise.**
 
-👉 **[Ouvrir le Panel Communauté (Application Utilisateur)](https://miel-uqac.github.io/OuQAC/communaute/)**
+👉 **[Ouvrir l'Application](https://miel-uqac.github.io/OuQAC/)**
 
-*Astuce : Sur iOS/Android, ouvrez le lien dans Safari/Chrome et choisissez "Ajouter à l'écran d'accueil" pour profiter d'une expérience plein écran native.*
+*Astuce : Sur iOS/Android, ouvrez le panel communauté dans Safari/Chrome et choisissez "Ajouter à l'écran d'accueil" pour profiter d'une expérience plein écran native.*
 
 ---
 
