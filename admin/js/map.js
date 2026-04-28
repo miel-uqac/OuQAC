@@ -100,7 +100,7 @@ export function filterMapElements(floorId) {
 }
 
 // ==========================================
-// OUTIL DE CALIBRAGE MULTI-PLANS (À MODIFIER APRÈS)
+// OUTIL DE CALIBRAGE MULTI-PLANS
 // ==========================================
 
 let currentCalibPlanId = null;

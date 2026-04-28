@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResultsSection = document.getElementById('search-results');
     const dynamicResultsList = document.getElementById('dynamic-results-list');
 
-    let currentSearchTarget = 'start'; 
+    let currentSearchTarget = 'end'; 
     state.startNode = null;
     state.endNode = null;
 
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         routeOverlay.style.transform = 'translateY(0)';
     };
 
-    searchTrigger.addEventListener('click', () => openSearchOverlay('start'));
+    searchTrigger.addEventListener('click', () => openSearchOverlay('end'));
     routeStartInput.addEventListener('click', () => openSearchOverlay('start'));
     routeEndInput.addEventListener('click', () => openSearchOverlay('end'));
     
