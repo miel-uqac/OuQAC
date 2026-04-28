@@ -104,38 +104,90 @@ export function filterMapElements(floorId) {
 // ==========================================
 
 let currentCalibPlanId = null;
+let isCalibrationActive = false; // État du mode édition
+
+// Marqueurs déplaçables
+let mTopLeft = L.marker([0,0], { draggable: true });
+let mTopRight = L.marker([0,0], { draggable: true });
+let mBottomLeft = L.marker([0,0], { draggable: true });
 
 // UI de calibrage
 const coordsBox = L.control({ position: 'bottomright' });
 coordsBox.onAdd = function() {
-    let div = L.DomUtil.create('div', 'info-coords');
-    div.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    div.style.color = 'white';
-    div.style.padding = '15px';
-    div.style.borderRadius = '8px';
-    div.style.fontFamily = 'monospace';
-    div.style.fontSize = '12px';
-    div.style.minWidth = '250px';
+    let container = L.DomUtil.create('div', 'info-coords');
+    container.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    container.style.color = 'white';
+    container.style.padding = '15px';
+    container.style.borderRadius = '8px';
+    container.style.fontFamily = 'monospace';
+    container.style.fontSize = '12px';
+    container.style.minWidth = '200px';
 
-    // Création du select pour choisir le plan
-    let selectHtml = `<select id="calib-select" style="width:100%; margin-bottom:10px; padding:5px;">`;
-    CONFIG.PLANS.forEach(p => {
-        selectHtml += `<option value="${p.id}">${p.name}</option>`;
-    });
-    selectHtml += `</select>`;
+    // Fonction interne pour redessiner le contenu selon l'état
+    function renderUI() {
+        if (!isCalibrationActive) {
+            // Mode fermé
+            container.innerHTML = `<button id="btn-toggle-calib" style="width:100%; padding:8px; cursor:pointer; font-weight:bold; border-radius:4px; border:none;">Calibrer les plans</button>`;
+        } else {
+            // Mode ouvert
+            let selectHtml = `<select id="calib-select" style="width:100%; margin-bottom:10px; padding:5px; border-radius:4px;">`;
+            CONFIG.PLANS.forEach(p => {
+                selectHtml += `<option value="${p.id}" ${p.id === currentCalibPlanId ? 'selected' : ''}>${p.name}</option>`;
+            });
+            selectHtml += `</select>`;
 
-    div.innerHTML = selectHtml + '<div id="calib-output" style="white-space: pre-wrap;">Chargement...</div>';
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <strong style="font-size:14px;">Mode Calibrage</strong>
+                    <button id="btn-toggle-calib" style="padding:4px 8px; cursor:pointer; background:#e74c3c; color:white; border:none; border-radius:4px;">Fermer</button>
+                </div>
+                ${selectHtml}
+                <div id="calib-output" style="white-space: pre-wrap; margin-top:10px; color:#2ecc71;">Chargement...</div>
+            `;
+        }
+
+        // Attache les événements après avoir recréé le HTML
+        container.querySelector('#btn-toggle-calib').onclick = () => {
+            isCalibrationActive = !isCalibrationActive;
+            toggleCalibrationMode();
+            renderUI();
+        };
+
+        if (isCalibrationActive) {
+            container.querySelector('#calib-select').onchange = (e) => loadCalibrationPlan(e.target.value);
+            if(currentCalibPlanId) updateCalibration();
+        }
+    }
+
+    // Empêche le clic sur la box d'interagir avec la carte Leaflet
+    L.DomEvent.disableClickPropagation(container);
     
-    // Empêche le clic sur le menu déroulant d'interagir avec la carte Leaflet
-    L.DomEvent.disableClickPropagation(div);
-    return div;
+    // Premier affichage
+    renderUI(); 
+    return container;
 };
 coordsBox.addTo(map);
 
-// Marqueurs déplaçables
-let mTopLeft = L.marker([0,0], { draggable: true }).addTo(map);
-let mTopRight = L.marker([0,0], { draggable: true }).addTo(map);
-let mBottomLeft = L.marker([0,0], { draggable: true }).addTo(map);
+// Fonction pour activer/désactiver visuellement les marqueurs
+function toggleCalibrationMode() {
+    if (isCalibrationActive) {
+        // Ajout à la carte
+        mTopLeft.addTo(map);
+        mTopRight.addTo(map);
+        mBottomLeft.addTo(map);
+        // Charge le premier plan si rien n'est sélectionné
+        if (!currentCalibPlanId && CONFIG.PLANS.length > 0) {
+            loadCalibrationPlan(CONFIG.PLANS[0].id);
+        } else {
+            loadCalibrationPlan(currentCalibPlanId);
+        }
+    } else {
+        // Retrait de la carte
+        mTopLeft.remove();
+        mTopRight.remove();
+        mBottomLeft.remove();
+    }
+}
 
 // Charger les marqueurs sur un plan spécifique
 function loadCalibrationPlan(planId) {
@@ -143,7 +195,7 @@ function loadCalibrationPlan(planId) {
     const plan = CONFIG.PLANS.find(p => p.id === planId);
     if (!plan) return;
 
-    // Force la carte à aller sur le bon étage pour voir l'image qu'on calibre
+    // Force la carte à aller sur le bon étage
     setFloor(plan.floor);
     
     // Synchronise l'interface déroulante principale
@@ -155,12 +207,12 @@ function loadCalibrationPlan(planId) {
     mTopRight.setLatLng(plan.coords.topRight);
     mBottomLeft.setLatLng(plan.coords.bottomLeft);
     
-    updateCalibration();
+    if (isCalibrationActive) updateCalibration();
 }
 
 // Mettre à jour l'image et le texte lors du glissement
 function updateCalibration() {
-    if (!currentCalibPlanId) return;
+    if (!currentCalibPlanId || !isCalibrationActive) return;
 
     let tl = mTopLeft.getLatLng();
     let tr = mTopRight.getLatLng();
@@ -169,23 +221,17 @@ function updateCalibration() {
     // Déplace le plan ciblé
     allOverlays[currentCalibPlanId].reposition(tl, tr, bl);
 
-    // Affiche le code exact à copier-coller dans config.js
-    document.getElementById('calib-output').innerHTML = 
+    // Affiche le code exact à copier-coller
+    const outputNode = document.getElementById('calib-output');
+    if (outputNode) {
+        outputNode.innerHTML = 
 `topLeft: [${tl.lat.toFixed(6)}, ${tl.lng.toFixed(6)}],
 topRight: [${tr.lat.toFixed(6)}, ${tr.lng.toFixed(6)}],
 bottomLeft: [${bl.lat.toFixed(6)}, ${bl.lng.toFixed(6)}]`;
+    }
 }
 
-// Événements
-document.getElementById('calib-select').addEventListener('change', (e) => {
-    loadCalibrationPlan(e.target.value);
-});
-
+// Événements de déplacement
 mTopLeft.on('drag', updateCalibration);
 mTopRight.on('drag', updateCalibration);
 mBottomLeft.on('drag', updateCalibration);
-
-// Lancement automatique sur le premier plan de la liste
-if (CONFIG.PLANS.length > 0) {
-    loadCalibrationPlan(CONFIG.PLANS[0].id);
-}
