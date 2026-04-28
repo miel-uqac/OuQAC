@@ -250,11 +250,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Clic sur un lieu courant
     document.querySelectorAll('#common-places .location-item').forEach(item => {
         item.addEventListener('click', (e) => {
-            const name = e.target.textContent;
-            const node = state.nodes.find(n => n.userData.name.toLowerCase() === name.toLowerCase());
-            if (node) selectLocation(node);
+            // On récupère le nom en enlevant les espaces parasites avant/après
+            const name = e.target.textContent.trim();
+            
+            // On cherche le nœud
+            const node = state.nodes.find(n => 
+                n.userData.name && 
+                n.userData.name.trim().toLowerCase() === name.toLowerCase()
+            );
+            
+            // On lance la sélection
+            if (node) {
+                selectLocation(node);
+            } 
         });
     });
 

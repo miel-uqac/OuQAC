@@ -146,7 +146,7 @@ function loadCalibrationPlan(planId) {
     // Force la carte à aller sur le bon étage pour voir l'image qu'on calibre
     setFloor(plan.floor);
     
-    // Optionnel : Synchronise l'interface déroulante principale si elle existe
+    // Synchronise l'interface déroulante principale
     const selLayer = document.getElementById('sel-layer');
     if (selLayer) selLayer.value = plan.floor;
 
