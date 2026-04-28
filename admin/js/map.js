@@ -65,6 +65,9 @@ CONFIG.PLANS.forEach(plan => {
     );
 });
 
+// On affiche le 1er étage dès le chargement de la page
+setFloor("0");
+
 // Fonction pour changer l'étage
 export function setFloor(floorId) {
     state.currentFloor = floorId;
