@@ -5,85 +5,41 @@
  * RÔLE : Initialisation et gestion du moteur cartographique (Leaflet)
  * ====================================================================
  * * DESCRIPTION :
- * Ce fichier est responsable de tout ce qui touche directement à l'instance 
- * de la carte Leaflet. Il initialise la vue, gère le fond de carte (OSM) 
- * et s'occupe de la superposition des plans de l'université. Il intègre 
- * également un outil de calibrage visuel pour positionner ces plans.
+ * Utilise la boîte à outils `shared` pour créer la carte, puis lui 
+ * greffe le comportement propre à l'admin : outil de calibrage 
+ * multi-plans et filtrage visuel en mode édition.
  * * FONCTIONS PRINCIPALES :
- * - Initialisation : Création de la constante `map` avec les options de 
- * restrictions de zone et de zoom issues de config.js.
- * - Pré-chargement : Génération et stockage en mémoire de tous les calques 
- * d'images (overlays) pour éviter les temps de chargement lors des 
- * changements d'étages.
- * - setFloor(floorId) : Bascule l'affichage des images de fond. Retire 
- * tous les plans actifs et n'affiche que ceux liés au nouvel étage.
- * - filterMapElements(floorId) : Parcourt le state.js pour afficher ou 
- * masquer les nœuds et les chemins vectoriels selon l'étage actif.
- * - Outil de calibrage (Multi-plans) : Interface UI en bas à droite et 
- * marqueurs déplaçables permettant d'ajuster visuellement les coins 
- * (Haut-Gauche, Haut-Droit, Bas-Gauche) des plans et de générer 
- * automatiquement les coordonnées précises à copier dans config.js.
+ * - setFloor(floorId) : Met à jour le `state` et délègue l'affichage.
+ * - filterMapElements(floorId) : Affiche TOUS les éléments de l'étage.
+ * - Outil de calibrage (Multi-plans) : Widget rétractable permettant 
+ * de déplacer les SVG en direct pour copier les coordonnées.
  * * FLUX DE DONNÉES / TRAVAIL :
- * 1. Au chargement, le fichier lit config.js pour instancier la carte et 
- * préparer les calques d'images en arrière-plan.
- * 2. Lors d'un changement d'étage déclenché par l'utilisateur (intercepté 
- * par main.js), setFloor() et filterMapElements() sont appelés.
- * 3. Ces fonctions lisent l'état global (state.js) pour masquer ce qui 
- * n'est plus pertinent et injecter (addTo) les nouveaux éléments visuels 
- * dans l'instance Leaflet, mettant ainsi la carte à jour.
- **/
+ * 1. Initialise la map via les fonctions partagées.
+ * 2. Gère les clics d'édition avec Leaflet.
+ * ====================================================================
+ */
 
 import { CONFIG } from './config.js';
 import { state } from './state.js';
+import { createMapInstance, createOverlays, updateFloorOverlays } from '../../shared/js/map.js';
 
 // ==========================================
 // GESTION DE LA MAP
 // ==========================================
 
-// Initialisation de la carte avec fusion des options et des limites
-export const map = L.map('map', {
-    ...CONFIG.MAP_OPTS,        // On récupère zoomSnap, minZoom, maxBoundsViscosity...
-    maxBounds: CONFIG.MAP_BOUNDS // On applique la restriction de zone
-}).setView(CONFIG.UQAC_COORDS, 17);
-
-// Fond de carte OSM
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxNativeZoom: 19,
-    maxZoom: 22,
-    attribution: '© OpenStreetMap'
-}).addTo(map);
-
-// Pré-chargement de tous les calques d'images en mémoire
-const allOverlays = {};
-CONFIG.PLANS.forEach(plan => {
-    allOverlays[plan.id] = L.imageOverlay.rotated(
-        plan.url,
-        L.latLng(plan.coords.topLeft),
-        L.latLng(plan.coords.topRight),
-        L.latLng(plan.coords.bottomLeft),
-        { opacity: 1, interactive: false, zIndex: 100 }
-    );
-});
+export const map = createMapInstance(CONFIG.MAP_OPTS, CONFIG.MAP_BOUNDS, CONFIG.UQAC_COORDS);
+const allOverlays = createOverlays(CONFIG.PLANS);
 
 // On affiche le 1er étage dès le chargement de la page
 setFloor("0");
 
-// Fonction pour changer l'étage
+// Fonctions de changement d'étage
 export function setFloor(floorId) {
     state.currentFloor = floorId;
-    
-    // Retire d'abord toutes les images de la carte
-    Object.values(allOverlays).forEach(overlay => {
-        if (map.hasLayer(overlay)) map.removeLayer(overlay);
-    });
-
-    // Ajoute uniquement les images correspondantes au nouvel étage
-    CONFIG.PLANS.filter(p => p.floor === floorId).forEach(plan => {
-        allOverlays[plan.id].addTo(map);
-    });
+    updateFloorOverlays(map, allOverlays, CONFIG.PLANS, floorId);
 }
 
-// Fonction pour filtrer les nœuds/chemins (inchangée)
+// Fonction pour filtrer les nœuds/chemins (Spécifique Admin)
 export function filterMapElements(floorId) {
     state.nodes.forEach(node => {
         if (node.userData.floor === floorId) {
@@ -103,7 +59,7 @@ export function filterMapElements(floorId) {
 }
 
 // ==========================================
-// OUTIL DE CALIBRAGE MULTI-PLANS
+// OUTIL DE CALIBRAGE MULTI-PLANS (RÉTRACTABLE)
 // ==========================================
 
 let currentCalibPlanId = null;
@@ -129,10 +85,8 @@ coordsBox.onAdd = function() {
     // Fonction interne pour redessiner le contenu selon l'état
     function renderUI() {
         if (!isCalibrationActive) {
-            // Mode fermé
-            container.innerHTML = `<button id="btn-toggle-calib" style="width:100%; padding:8px; cursor:pointer; font-weight:bold; border-radius:4px; border:none;">Calibrer les plans</button>`;
+            container.innerHTML = `<button id="btn-toggle-calib" style="width:100%; padding:8px; cursor:pointer; font-weight:bold; border-radius:4px; border:none;">🛠️ Calibrer les plans</button>`;
         } else {
-            // Mode ouvert
             let selectHtml = `<select id="calib-select" style="width:100%; margin-bottom:10px; padding:5px; border-radius:4px;">`;
             CONFIG.PLANS.forEach(p => {
                 selectHtml += `<option value="${p.id}" ${p.id === currentCalibPlanId ? 'selected' : ''}>${p.name}</option>`;
@@ -141,7 +95,7 @@ coordsBox.onAdd = function() {
 
             container.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <strong style="font-size:14px;">Mode Calibrage</strong>
+                    <strong style="font-size:14px;">🛠️ Mode Calibrage</strong>
                     <button id="btn-toggle-calib" style="padding:4px 8px; cursor:pointer; background:#e74c3c; color:white; border:none; border-radius:4px;">Fermer</button>
                 </div>
                 ${selectHtml}
@@ -164,8 +118,6 @@ coordsBox.onAdd = function() {
 
     // Empêche le clic sur la box d'interagir avec la carte Leaflet
     L.DomEvent.disableClickPropagation(container);
-    
-    // Premier affichage
     renderUI(); 
     return container;
 };
@@ -179,11 +131,8 @@ function toggleCalibrationMode() {
         mTopRight.addTo(map);
         mBottomLeft.addTo(map);
         // Charge le premier plan si rien n'est sélectionné
-        if (!currentCalibPlanId && CONFIG.PLANS.length > 0) {
-            loadCalibrationPlan(CONFIG.PLANS[0].id);
-        } else {
-            loadCalibrationPlan(currentCalibPlanId);
-        }
+        if (!currentCalibPlanId && CONFIG.PLANS.length > 0) loadCalibrationPlan(CONFIG.PLANS[0].id);
+        else loadCalibrationPlan(currentCalibPlanId);
     } else {
         // Retrait de la carte
         mTopLeft.remove();
@@ -228,9 +177,9 @@ function updateCalibration() {
     const outputNode = document.getElementById('calib-output');
     if (outputNode) {
         outputNode.innerHTML = 
-`topLeft: [${tl.lat.toFixed(6)}, ${tl.lng.toFixed(6)}],
-topRight: [${tr.lat.toFixed(6)}, ${tr.lng.toFixed(6)}],
-bottomLeft: [${bl.lat.toFixed(6)}, ${bl.lng.toFixed(6)}]`;
+            `topLeft: [${tl.lat.toFixed(6)}, ${tl.lng.toFixed(6)}],
+            topRight: [${tr.lat.toFixed(6)}, ${tr.lng.toFixed(6)}],
+            bottomLeft: [${bl.lat.toFixed(6)}, ${bl.lng.toFixed(6)}]`;
     }
 }
 
