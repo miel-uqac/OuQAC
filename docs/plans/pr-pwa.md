@@ -8,9 +8,9 @@ Correspond à la tâche PWA de la proposition de projet, dans sa version minimal
 
 - `communaute/manifest.webmanifest` (nouveau) : nom `OùQAC`, `display: standalone`, couleur du panel, icônes. Chemins relatifs (`./`), donc compatibles avec le sous-chemin `/OuQAC/` de GitHub Pages.
 - `communaute/icons/` (nouveau) : icônes SVG sources et PNG 192/512, dont une icône « maskable » pour Android.
-- `communaute/sw.js` (nouveau) : le service worker. Il précache 35 fichiers (page, CSS, JS, `graph.json`, les 10 plans SVG, Leaflet, Font Awesome) et purge les anciennes versions du cache.
+- `communaute/sw.js` (nouveau) : le service worker. Il précache 36 fichiers (page, CSS, JS, `graph.json`, les 10 plans SVG, Leaflet, Font Awesome) et purge les anciennes versions du cache.
 - `communaute/js/pwa.js` (nouveau) : enregistre le service worker, sans dépendre de `main.js`.
-- `communaute/index.html` : lien vers le manifest, `theme-color`, `apple-touch-icon` pour iOS, chargement de `pwa.js`.
+- `communaute/index.html` : lien vers le manifest, `theme-color`, `mobile-web-app-capable`, icône d'onglet (`rel="icon"`, qui supprime le 404 sur `/favicon.ico`), `apple-touch-icon` pour iOS, chargement de `pwa.js`.
 - `tests/pwa.test.js` (nouveau) : 7 tests avec le lanceur intégré de Node.
 - Documentation : `docs/pwa.md`, spécification et plan dans `docs/`, section « Mode hors ligne » dans le README.
 
@@ -41,7 +41,7 @@ Le détail est dans [`docs/pwa.md`](https://github.com/miel-uqac/OuQAC/blob/feat
    Attendu : 7 tests réussis.
 2. Dans Chrome : `python3 -m http.server 8000`, ouvrir `http://localhost:8000/communaute/`, puis l'onglet *Application* des outils de développement.
    - *Service workers* : `sw.js` « activated and is running », portée `/communaute/`.
-   - *Cache storage* : cache `ouqac-v1` de 35 entrées.
+   - *Cache storage* : cache `ouqac-v1` de 36 entrées.
    - *Manifest* : nom et icônes affichés.
 3. Hors ligne : arrêter le serveur (ou cocher *Offline*), recharger la page. La carte et les plans s'affichent, la recherche « P2-3 » trouve la salle et l'itinéraire P1-1 → P2-3 se calcule.
 4. `http://localhost:8000/admin/` : dans la console, `navigator.serviceWorker.controller` vaut `null`.

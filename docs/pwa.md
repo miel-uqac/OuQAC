@@ -18,7 +18,7 @@ Spécification : [specs/2026-11-07-pwa-design.md](specs/2026-11-07-pwa-design.md
 | `communaute/icons/*.png` | Icônes générées depuis les SVG (192 px, 512 px, 512 px maskable). |
 | `communaute/sw.js` | Le service worker : précache, nettoyage, réponses aux requêtes. |
 | `communaute/js/pwa.js` | Enregistre le service worker. |
-| `communaute/index.html` | Balises `<link rel="manifest">`, `theme-color`, `apple-touch-icon`, chargement de `pwa.js`. |
+| `communaute/index.html` | Balises `<link rel="manifest">`, `theme-color`, `mobile-web-app-capable` (version standard de `apple-mobile-web-app-capable`, gardée pour iOS), icône d'onglet `rel="icon"` (sans elle, le navigateur demande `/favicon.ico` à la racine et obtient une 404), `apple-touch-icon`, chargement de `pwa.js`. |
 | `tests/pwa.test.js` | Tests automatiques du manifest et de la liste de précache. |
 
 ## 2. Le manifest
@@ -88,7 +88,7 @@ pwa.js : register('sw.js')
 
 1. **Enregistrement** (`js/pwa.js`). Après l'événement `load`, pour ne pas ralentir le premier affichage de la carte, `navigator.serviceWorker.register('sw.js')` demande au navigateur de télécharger et d'installer le service worker. Si le navigateur ne connaît pas les service workers, rien ne se passe et l'application fonctionne en ligne comme avant. `pwa.js` est un script séparé de `main.js` : une erreur dans l'un n'empêche pas l'autre de fonctionner.
 
-2. **`install`**. Le service worker ouvre le cache `ouqac-v1` et y range les 35 fichiers de `PRECACHE_URLS` avec `cache.addAll`. Cette opération est **tout ou rien** : si un seul fichier échoue (404, faute de frappe), l'installation échoue et la version précédente reste en place. On n'a jamais une application à moitié disponible hors ligne.
+2. **`install`**. Le service worker ouvre le cache `ouqac-v1` et y range les 36 fichiers de `PRECACHE_URLS` avec `cache.addAll`. Cette opération est **tout ou rien** : si un seul fichier échoue (404, faute de frappe), l'installation échoue et la version précédente reste en place. On n'a jamais une application à moitié disponible hors ligne.
 
    ```js
    event.waitUntil(
@@ -155,7 +155,7 @@ if ((sameOrigin && url.pathname.includes('/plans/')) || CDN_HOSTS.includes(url.h
 4. Remplacer `const CACHE_VERSION = 'ouqac-v1';` par `'ouqac-v2'`.
 5. Lancer `node --test tests/pwa.test.js`. Si l'étape 3 a été oubliée, le test « chaque plan déclaré dans shared/js/config.js est précaché » échoue et nomme le plan manquant.
 
-Vérifié dans le navigateur : après passage de `ouqac-v1` à `ouqac-v2`, il ne reste que le cache `ouqac-v2` (35 entrées) ; le retour à `ouqac-v1` purge `ouqac-v2`.
+Vérifié dans le navigateur : après passage de `ouqac-v1` à `ouqac-v2`, il ne reste que le cache `ouqac-v2` ; le retour à `ouqac-v1` purge `ouqac-v2`.
 
 ## 6. Tester et déboguer
 
@@ -180,12 +180,12 @@ Le test lit `sw.js` et l'exécute dans un bac à sable `node:vm` avec un faux `s
 
 - **Manifest** : nom, icônes, et absence d'avertissement d'installabilité.
 - **Service workers** : `sw.js` doit être « activated and is running », avec la portée `/communaute/`. Pendant le développement, cocher **Update on reload** : le service worker est réinstallé à chaque rechargement, ce qui évite de travailler sur une version en cache. Le bouton **Unregister** le désinstalle.
-- **Cache storage** : le cache `ouqac-v1` et ses 35 entrées. Clic droit, *Delete*, pour le vider.
+- **Cache storage** : le cache `ouqac-v1` et ses 36 entrées. Clic droit, *Delete*, pour le vider.
 - **Mode hors ligne** : cocher *Offline* dans l'onglet *Network* (ou *Service workers*), ou simplement arrêter le serveur local, puis recharger `communaute/`.
 
 Vérifications faites lors de l'implémentation (serveur `python3 -m http.server`, Chrome) :
 
-1. Premier chargement : service worker `activated`, portée `/communaute/`, page contrôlée dès la première visite, cache `ouqac-v1` de 35 entrées, manifest servi (200), aucune erreur dans la console.
+1. Premier chargement : service worker `activated`, portée `/communaute/`, page contrôlée dès la première visite, cache `ouqac-v1` de 36 entrées, manifest servi (200), aucune erreur venant de l'application dans la console. (Un message « A listener indicated an asynchronous response... » peut apparaître : il vient d'une extension du navigateur, pas d'OùQAC.)
 2. Serveur local arrêté puis page rechargée : la page, Leaflet, les icônes Font Awesome et les plans de l'étage 1 s'affichent. La recherche « P2-3 » trouve la salle (donc `graph.json` vient du cache). L'itinéraire P1-1 → P2-3 se calcule et s'affiche.
 3. `admin/` n'est pas contrôlé.
 4. Changement de `CACHE_VERSION` : l'ancien cache est purgé.
