@@ -21,6 +21,9 @@
  * Elle filtre la liste globale des nœuds (state.nodes) selon le texte saisi 
  * et le type sélectionné, puis génère une liste de résultats cliquables 
  * permettant de "téléporter" la caméra sur la salle correspondante.
+ * - renderValidationReport(report, onIssueClick) & hideValidationReport() :
+ * Affichent / masquent le rapport du validateur de graphe. Chaque problème
+ * lié à un nœud ou un chemin devient cliquable (onIssueClick).
  * * FLUX DE DONNÉES / TRAVAIL :
  * 1. Déclenchement : Une fonction de `main.js` ou d'un Contrôleur appelle 
  * une méthode de `ui.js` (ex: lors d'un clic sur la carte ou d'une saisie textuelle).
@@ -171,4 +174,51 @@ export function updateRoomList() {
 
         container.appendChild(item);
     });
+}
+
+// ==========================================
+// RAPPORT DE VALIDATION DU GRAPHE
+// ==========================================
+
+// Affiche le rapport renvoyé par validateGraph() dans le panneau dédié.
+// onIssueClick(issue) est appelé quand on clique sur un problème localisable.
+export function renderValidationReport(report, onIssueClick) {
+    const panel = document.getElementById('panel-validation');
+    const summary = document.getElementById('validation-summary');
+    const list = document.getElementById('validation-list');
+
+    // Résumé coloré : vert si aucun problème, orange si seulement des avertissements, rouge sinon
+    if (report.issues.length === 0) {
+        summary.textContent = 'Graphe valide : aucun problème détecté.';
+        summary.className = 'validation-ok';
+    } else {
+        summary.textContent = `${report.errorCount} erreur(s), ${report.warningCount} avertissement(s)`;
+        summary.className = report.valid ? 'validation-warning' : 'validation-error';
+    }
+
+    list.innerHTML = '';
+    report.issues.forEach(issue => {
+        const item = document.createElement('div');
+        item.className = `validation-item validation-item-${issue.severity}`;
+
+        // textContent (et non innerHTML) : les noms de salles viennent des données
+        const label = document.createElement('b');
+        label.textContent = issue.severity === 'error' ? 'Erreur' : 'Avertissement';
+        item.appendChild(label);
+        item.appendChild(document.createTextNode(` : ${issue.message}`));
+
+        // Seuls les problèmes qui citent un nœud ou un chemin sont cliquables
+        if (issue.nodeIds.length > 0 || issue.pathIds.length > 0) {
+            item.classList.add('validation-item-clickable');
+            item.title = 'Afficher sur la carte';
+            item.addEventListener('click', () => onIssueClick(issue));
+        }
+        list.appendChild(item);
+    });
+
+    panel.classList.remove('hidden');
+}
+
+export function hideValidationReport() {
+    document.getElementById('panel-validation').classList.add('hidden');
 }

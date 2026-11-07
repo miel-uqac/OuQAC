@@ -60,6 +60,22 @@ body, html {
 .btn-action { flex: 1; padding: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; background-color: var(--btn-color); }
 #btn-save { --btn-color: #2196F3; }
 #btn-import { --btn-color: #FF9800; }
+#btn-validate-graph { --btn-color: #4CAF50; }
+
+/* --- Rapport de validation du graphe --- */
+#panel-validation { max-height: 40vh; overflow-y: auto; padding: 10px 15px; border-top: 1px solid #ddd; background: #fafafa; }
+#validation-header { display: flex; justify-content: space-between; align-items: center; }
+#validation-header h3 { margin: 0; font-size: 1rem; }
+#btn-close-validation { border: none; background: none; font-size: 1.3rem; cursor: pointer; }
+#validation-summary { margin: 8px 0; padding: 6px; border-radius: 4px; font-weight: bold; }
+.validation-ok { background: #e8f5e9; color: #2e7d32; }
+.validation-warning { background: #fff3e0; color: #e65100; }
+.validation-error { background: #ffebee; color: #c62828; }
+.validation-item { padding: 6px; border-left: 4px solid; margin-bottom: 4px; font-size: 0.85rem; background: white; }
+.validation-item-error { border-color: #f44336; }
+.validation-item-warning { border-color: #FF9800; }
+.validation-item-clickable { cursor: pointer; }
+.validation-item-clickable:hover { background: #f3f3f3; }
 .btn-action:hover { background-color: color-mix(in srgb, var(--btn-color), black 10%); }
 
 /*------------------------*/

@@ -110,9 +110,19 @@
                 </div>
             </div>
 
+            <div id="panel-validation" class="hidden">
+                <div id="validation-header">
+                    <h3>Validation du graphe</h3>
+                    <button id="btn-close-validation" title="Fermer le rapport">×</button>
+                </div>
+                <div id="validation-summary"></div>
+                <div id="validation-list"></div>
+            </div>
+
             <div id="actions">
                 <button class="btn-action" id="btn-save">Sauvegarder</button>
                 <button class="btn-action" id="btn-import">Importer</button>
+                <button class="btn-action" id="btn-validate-graph">Valider le graphe</button>
                 <input type="file" id="import-file" style="display:none" accept=".json" onchange="importGraph(event)">
             </div>
         </div>

@@ -39,7 +39,8 @@ import { CONFIG } from '../config.js';
 // ==========================================
 // FONCTION UTILITAIRE
 // ==========================================
-function generateGraphData() {
+// Exportée : réutilisée par validationController.js pour valider le graphe courant
+export function generateGraphData() {
     return {
         metadata: {
             name: "OùQAC - Map Data",

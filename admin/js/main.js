@@ -35,6 +35,7 @@ import { state, removeNodeFromState } from './state.js';
 import * as NodeCtrl from './controllers/nodeController.js';
 import * as PathCtrl from './controllers/pathController.js';
 import * as IOCtrl from './controllers/ioController.js';
+import * as ValidationCtrl from './controllers/validationController.js';
 import * as UI from './views/ui.js';
 
 // ==========================================
@@ -185,6 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-save').onclick = IOCtrl.exportGraph;
     document.getElementById('btn-import').onclick = () => document.getElementById('import-file').click();
     document.getElementById('import-file').onchange = IOCtrl.importGraph;
+
+    // Validation du graphe
+    document.getElementById('btn-validate-graph').onclick = ValidationCtrl.runValidation;
+    document.getElementById('btn-close-validation').onclick = UI.hideValidationReport;
 
     // Initialisation
     // On essaie de charger les données du cache
