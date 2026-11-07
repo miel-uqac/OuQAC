@@ -17,8 +17,10 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import vm from 'node:vm';
+import { SHARED_CONFIG } from '../shared/js/config.js';
 
 // Dossier du panel communauté : les chemins du manifest et du service
 // worker sont relatifs à ce dossier
@@ -63,4 +65,57 @@ test('le manifest fournit une icône 192, une icône 512 et une icône maskable'
     assert.ok(sizes.includes('192x192'));
     assert.ok(sizes.includes('512x512'));
     assert.ok(manifest.icons.some(icon => icon.purpose === 'maskable'));
+});
+
+// ==========================================
+// PRÉCACHE DU SERVICE WORKER
+// ==========================================
+
+// Exécute sw.js dans un bac à sable avec un faux "self" (le service worker
+// n'existe pas dans Node) et renvoie la liste PRECACHE_URLS.
+// L'expression finale "PRECACHE_URLS" est la valeur renvoyée par le script.
+function loadPrecacheUrls() {
+    const code = readFileSync(resolve(COMMUNAUTE, 'sw.js'), 'utf8');
+    const fakeSelf = { addEventListener() {}, location: { origin: 'http://localhost' } };
+    return vm.runInNewContext(`${code}\nPRECACHE_URLS`, { self: fakeSelf });
+}
+
+test('chaque fichier local du précache existe', () => {
+    const localUrls = loadPrecacheUrls().filter(url => !url.startsWith('https://'));
+    for (const url of localUrls) {
+        // "./" désigne le dossier : le serveur renvoie alors son index.html
+        const file = url === './' ? resolve(COMMUNAUTE, 'index.html') : resolve(COMMUNAUTE, url);
+        assert.ok(existsSync(file), `fichier du précache introuvable : ${url}`);
+    }
+});
+
+test('chaque plan déclaré dans shared/js/config.js est précaché', () => {
+    // Les URL des plans sont relatives au panel communauté, comme le précache
+    const urls = loadPrecacheUrls();
+    for (const plan of SHARED_CONFIG.PLANS) {
+        assert.ok(urls.includes(plan.url), `plan absent du précache : ${plan.url}`);
+    }
+});
+
+test('chaque ressource CDN de la page est précachée', () => {
+    // Si l'équipe change la version de Leaflet dans index.html sans mettre à
+    // jour sw.js, la nouvelle version ne serait pas disponible hors ligne
+    const html = readFileSync(resolve(COMMUNAUTE, 'index.html'), 'utf8');
+    const cdnUrls = [...html.matchAll(/(?:href|src)="(https:\/\/[^"]+)"/g)].map(match => match[1]);
+    const urls = loadPrecacheUrls();
+    assert.ok(cdnUrls.length > 0);
+    for (const url of cdnUrls) {
+        assert.ok(urls.includes(url), `ressource CDN absente du précache : ${url}`);
+    }
+});
+
+test('chaque fichier JavaScript du panel communauté est précaché', () => {
+    // Un nouveau contrôleur oublié dans le précache casserait les imports hors ligne
+    const files = readdirSync(resolve(COMMUNAUTE, 'js'), { recursive: true })
+        .filter(file => file.endsWith('.js'))
+        .map(file => `js/${file.split('\\').join('/')}`);
+    const urls = loadPrecacheUrls();
+    for (const file of files) {
+        assert.ok(urls.includes(file), `fichier JS absent du précache : ${file}`);
+    }
 });
