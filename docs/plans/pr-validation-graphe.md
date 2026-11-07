@@ -39,5 +39,3 @@ Le sélecteur d'étage du panel admin est décalé d'un cran (valeurs `"0"` à `
    - Attendu : « 2 erreur(s), 0 avertissement(s) » (V1-1010 et V1-1260).
    - Cliquer sur une erreur : la carte passe à l'étage, se centre sur la salle et la sélectionne.
    - Créer un nœud dans le vide puis revalider : une erreur « nœud isolé » apparaît en tête.
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)

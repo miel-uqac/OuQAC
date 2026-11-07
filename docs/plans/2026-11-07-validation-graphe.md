@@ -14,7 +14,7 @@
 
 - Travailler sur la branche `feat/validation-graphe` (issue de `projet-libre-8web101`). **Aucun commit, push ni fusion sur `main`.** Vérifier avec `git branch --show-current` avant chaque commit.
 - Identité git du dépôt : `Malo Besson <146385319+MaleauBSN@users.noreply.github.com>` (déjà configurée en local).
-- Messages de commit en français, préfixés (`feat:`, `test:`, `docs:`, `fix:`), terminés par la ligne `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Messages de commit en français, préfixés (`feat:`, `test:`, `docs:`, `fix:`), sans ligne `Co-Authored-By` : les commits sont uniquement au nom de Malo.
 - Chaque nouveau fichier JS commence par un en-tête de commentaires au format des fichiers existants (APPLICATION, FICHIER, RÔLE, DESCRIPTION, FONCTIONS PRINCIPALES, FLUX DE DONNÉES / TRAVAIL).
 - Commentaires et messages affichés en français ; les commentaires expliquent le « pourquoi ».
 - Aucune dépendance npm, aucun `package.json`.
@@ -318,9 +318,7 @@ git add shared/js/graphValidator.js tests/graphValidator.test.js
 git commit -m "feat: ajoute le squelette du validateur de graphe
 
 Crée shared/js/graphValidator.js (point d'entrée validateGraph, format
-du rapport, tri erreurs/avertissements) et ses premiers tests Node.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+du rapport, tri erreurs/avertissements) et ses premiers tests Node."
 ```
 
 ---
@@ -540,9 +538,7 @@ git add shared/js/graphValidator.js tests/graphValidator.test.js
 git commit -m "feat: détecte les chemins cassés et les morceaux de graphe déconnectés
 
 Règles E1 à E5 : chemin vers un nœud inexistant, boucle, doublon, nœud
-isolé et composantes connexes séparées du réseau principal (BFS).
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+isolé et composantes connexes séparées du réseau principal (BFS)."
 ```
 
 ---
@@ -663,9 +659,7 @@ git add shared/js/graphValidator.js tests/graphValidator.test.js
 git commit -m "feat: vérifie les liaisons d'étage et l'accessibilité PMR
 
 Règles E6 à E8 : changement d'étage hors escalier/ascenseur, escalier
-marqué PMR, salle injoignable quand on ne garde que les chemins PMR.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+marqué PMR, salle injoignable quand on ne garde que les chemins PMR."
 ```
 
 ---
@@ -891,9 +885,7 @@ git add shared/js/graphValidator.js tests/graphValidator.test.js
 git commit -m "feat: ajoute les avertissements du validateur
 
 Règles W1 à W5 : salle sans nom, nom en double, distance invalide,
-escalier/ascenseur sans liaison d'étage, données mal formées.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+escalier/ascenseur sans liaison d'étage, données mal formées."
 ```
 
 ---
@@ -953,9 +945,7 @@ git commit -m "test: valide le graph.json actuel du dépôt
 
 Aucune erreur de structure. Le validateur révèle deux salles
 injoignables en mode PMR (V1-1010, V1-1260), accessibles seulement
-par escalier : défaut de données à corriger dans le panel admin.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+par escalier : défaut de données à corriger dans le panel admin."
 ```
 
 ---
@@ -1224,9 +1214,7 @@ git commit -m "feat: intègre la validation du graphe au panel admin
 
 Bouton « Valider le graphe » et panneau de rapport. Un clic sur un
 problème bascule sur l'étage, centre la carte et sélectionne le nœud
-ou le chemin concerné.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+ou le chemin concerné."
 ```
 
 ---
@@ -1378,9 +1366,7 @@ git commit -m "docs: documente le validateur de graphe
 
 Explique chaque règle (quoi, pourquoi, comment corriger), les notions
 de graphe utilisées, les tests et l'ajout d'une règle. Mentionne la
-fonctionnalité et la commande de test dans le README.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+fonctionnalité et la commande de test dans le README."
 ```
 
 ---
@@ -1406,11 +1392,7 @@ gh pr create --repo miel-uqac/OuQAC --base projet-libre-8web101 --head feat/vali
   --body-file docs/plans/pr-validation-graphe.md
 ```
 
-Le fichier `docs/plans/pr-validation-graphe.md` est rédigé à cette étape (résumé, règles, constat PMR, comment tester, lien vers `docs/validation-graphe.md`), relu par Malo, et se termine par :
-
-```
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-```
+Le fichier `docs/plans/pr-validation-graphe.md` est rédigé à cette étape (résumé, règles, constat PMR, comment tester, lien vers `docs/validation-graphe.md`) et relu par Malo.
 
 Vérifier que la base de la PR est bien `projet-libre-8web101` et non `main`.
 
