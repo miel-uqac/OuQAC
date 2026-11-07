@@ -91,7 +91,9 @@ export function validateGraph(data) {
         if (node.id !== undefined && !nodesById.has(node.id)) nodesById.set(node.id, node);
     });
 
-    // RÈGLES (ajoutées au fil des tâches suivantes)
+    // RÈGLES
+    const validPaths = checkPaths(paths, nodesById, issues);
+    const unreachable = checkConnectivity(nodes, validPaths, issues);
 
     return buildReport(issues);
 }
@@ -100,9 +102,116 @@ export function validateGraph(data) {
 // RÈGLES
 // ==========================================
 
+// E1, E2, E3 : références cassées, boucles, doublons.
+// Renvoie la liste des chemins "valides" (extrémités existantes et différentes),
+// seuls utilisés pour les calculs de connexité.
+function checkPaths(paths, nodesById, issues) {
+    const validPaths = [];
+    const pathsByPair = new Map();
+
+    paths.forEach(path => {
+        const missing = [path.startNode, path.endNode].filter(id => !nodesById.has(id));
+        if (missing.length > 0) {
+            issues.push(makeIssue('error', 'CHEMIN_NOEUD_INCONNU',
+                `Le chemin ${path.id} pointe vers un nœud inexistant (${missing.join(', ')}).`,
+                [path.startNode, path.endNode].filter(id => nodesById.has(id)), [path.id]));
+            return;
+        }
+        if (path.startNode === path.endNode) {
+            issues.push(makeIssue('error', 'CHEMIN_BOUCLE',
+                `Le chemin ${path.id} relie le nœud ${describeNode(nodesById.get(path.startNode))} à lui-même.`,
+                [path.startNode], [path.id]));
+            return;
+        }
+        validPaths.push(path);
+
+        // Clé indépendante du sens : A-B et B-A sont la même paire
+        const key = [path.startNode, path.endNode].sort().join('|');
+        if (!pathsByPair.has(key)) pathsByPair.set(key, []);
+        pathsByPair.get(key).push(path);
+    });
+
+    pathsByPair.forEach(group => {
+        if (group.length < 2) return;
+        const a = nodesById.get(group[0].startNode);
+        const b = nodesById.get(group[0].endNode);
+        issues.push(makeIssue('error', 'CHEMIN_DOUBLON',
+            `${group.length} chemins relient ${describeNode(a)} et ${describeNode(b)}.`,
+            [a.id, b.id], group.map(p => p.id)));
+    });
+
+    return validPaths;
+}
+
+// E4, E5 : nœuds isolés et morceaux de graphe déconnectés.
+// Renvoie l'ensemble des ids déjà signalés (pour ne pas les re-signaler en E8).
+function checkConnectivity(nodes, validPaths, issues) {
+    const unreachable = new Set();
+    const connected = new Set();
+    validPaths.forEach(p => { connected.add(p.startNode); connected.add(p.endNode); });
+
+    // E4 : aucun chemin valide ne touche ce nœud
+    nodes.forEach(node => {
+        if (!connected.has(node.id)) {
+            unreachable.add(node.id);
+            issues.push(makeIssue('error', 'NOEUD_ISOLE',
+                `Le nœud ${describeNode(node)} n'est relié à aucun chemin.`, [node.id]));
+        }
+    });
+
+    // E5 : la plus grande composante est le réseau principal, les autres sont signalées
+    const components = findComponents([...connected], validPaths);
+    components.slice(1).forEach(component => {
+        component.forEach(id => unreachable.add(id));
+        issues.push(makeIssue('error', 'GRAPHE_MORCELE',
+            `${component.length} nœud(s) forment un groupe coupé du reste du réseau.`, component));
+    });
+
+    return unreachable;
+}
+
 // ==========================================
 // OUTILS
 // ==========================================
+
+/**
+ * Composantes connexes par parcours en largeur (BFS).
+ * @param {Array} nodeIds - ids des nœuds à répartir
+ * @param {Array} paths - chemins valides à suivre (non orientés)
+ * @returns {Array<Array>} composantes, de la plus grande à la plus petite
+ */
+function findComponents(nodeIds, paths) {
+    // Liste d'adjacence : id -> voisins
+    const neighbors = new Map(nodeIds.map(id => [id, []]));
+    paths.forEach(p => {
+        if (neighbors.has(p.startNode) && neighbors.has(p.endNode)) {
+            neighbors.get(p.startNode).push(p.endNode);
+            neighbors.get(p.endNode).push(p.startNode);
+        }
+    });
+
+    const visited = new Set();
+    const components = [];
+    nodeIds.forEach(startId => {
+        if (visited.has(startId)) return;
+        const component = [];
+        const queue = [startId];
+        visited.add(startId);
+        while (queue.length > 0) {
+            const id = queue.shift();
+            component.push(id);
+            neighbors.get(id).forEach(next => {
+                if (!visited.has(next)) {
+                    visited.add(next);
+                    queue.push(next);
+                }
+            });
+        }
+        components.push(component);
+    });
+
+    return components.sort((a, b) => b.length - a.length);
+}
 
 // Nom lisible d'un nœud pour les messages : « P1-4 » (étage 1)
 function describeNode(node) {

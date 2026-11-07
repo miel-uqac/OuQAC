@@ -90,3 +90,59 @@ test('des données inexploitables donnent une seule erreur, sans exception', () 
 test('un graphe vide est valide', () => {
     assert.equal(validateGraph({ nodes: [], paths: [] }).valid, true);
 });
+
+// ==========================================
+// ERREURS
+// ==========================================
+
+test('E1 CHEMIN_NOEUD_INCONNU : chemin vers un nœud supprimé', () => {
+    const g = baseGraph();
+    g.paths.push(path('pX', 'C1', 'FANTOME'));
+    const issue = validateGraph(g).issues.find(i => i.code === 'CHEMIN_NOEUD_INCONNU');
+    assert.ok(issue);
+    assert.deepEqual(issue.pathIds, ['pX']);
+    assert.deepEqual(issue.nodeIds, ['C1']);
+});
+
+test('E2 CHEMIN_BOUCLE : chemin d\'un nœud vers lui-même', () => {
+    const g = baseGraph();
+    g.paths.push(path('pX', 'C1', 'C1'));
+    assert.ok(codes(validateGraph(g)).includes('CHEMIN_BOUCLE'));
+});
+
+test('E3 CHEMIN_DOUBLON : deux chemins entre les mêmes nœuds, dans les deux sens', () => {
+    const g = baseGraph();
+    g.paths.push(path('pX', 'C1', 'S1'));
+    const issue = validateGraph(g).issues.find(i => i.code === 'CHEMIN_DOUBLON');
+    assert.ok(issue);
+    assert.deepEqual(issue.pathIds.sort(), ['p1', 'pX']);
+});
+
+test('E4 NOEUD_ISOLE : nœud sans chemin', () => {
+    const g = baseGraph();
+    g.nodes.push(node('X'));
+    const issue = validateGraph(g).issues.find(i => i.code === 'NOEUD_ISOLE');
+    assert.deepEqual(issue.nodeIds, ['X']);
+});
+
+test('E4 NOEUD_ISOLE : un nœud relié seulement par une boucle reste isolé', () => {
+    const g = baseGraph();
+    g.nodes.push(node('X'));
+    g.paths.push(path('pX', 'X', 'X'));
+    assert.ok(codes(validateGraph(g)).includes('NOEUD_ISOLE'));
+});
+
+test('E5 GRAPHE_MORCELE : groupe de nœuds coupé du réseau principal', () => {
+    const g = baseGraph();
+    g.nodes.push(node('X'), node('Y'));
+    g.paths.push(path('pX', 'X', 'Y'));
+    const issues = validateGraph(g).issues.filter(i => i.code === 'GRAPHE_MORCELE');
+    assert.equal(issues.length, 1);
+    assert.deepEqual(issues[0].nodeIds.sort(), ['X', 'Y']);
+});
+
+test('E5 : un nœud isolé n\'est pas signalé une seconde fois comme morceau', () => {
+    const g = baseGraph();
+    g.nodes.push(node('X'));
+    assert.ok(!codes(validateGraph(g)).includes('GRAPHE_MORCELE'));
+});
