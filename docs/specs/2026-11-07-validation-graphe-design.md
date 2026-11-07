@@ -3,7 +3,7 @@
 - **Auteur :** Malo Besson
 - **Date :** 2026-11-07
 - **Branche :** `feat/validation-graphe` (issue de `projet-libre-8web101`)
-- **Statut :** conception validée, en attente de relecture
+- **Statut :** implémentée
 
 ## 1. Contexte et objectif
 
@@ -120,7 +120,7 @@ Le validateur ne lève jamais d'exception sur des données mal formées : une en
 
 - Fichier `tests/graphValidator.test.js`, exécuté avec le lanceur intégré de Node : `node --test tests/`. Aucune dépendance à installer.
 - Pour chaque règle : un petit graphe construit dans le test qui la déclenche, et un graphe proche qui ne la déclenche pas.
-- Un test sur le vrai `graph/graph.json` : il ne doit contenir aucune erreur (vérifié à la main le 2026-11-07 : 48 nœuds, 50 chemins, graphe connexe, pas de nœud isolé).
+- Un test sur le vrai `graph/graph.json` : il ne doit contenir aucune erreur de structure (E1 à E7). Le premier passage du validateur (2026-11-07) a révélé deux salles injoignables en mode PMR, `V1-1010` et `V1-1260` ; le test fige cette liste en attendant la correction des données.
 - Un test de robustesse : `validateGraph(null)`, `validateGraph({})` et des champs manquants ne lèvent pas d'exception.
 - Vérification manuelle dans le navigateur : ouvrir le panel admin, valider le graphe actuel, puis créer volontairement un nœud isolé et une liaison d'escalier PMR, et vérifier qu'ils sont signalés et que le clic recentre la carte.
 
