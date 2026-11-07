@@ -94,6 +94,8 @@ export function validateGraph(data) {
     // RÈGLES
     const validPaths = checkPaths(paths, nodesById, issues);
     const unreachable = checkConnectivity(nodes, validPaths, issues);
+    checkFloors(validPaths, nodesById, issues);
+    checkPmr(nodes, validPaths, unreachable, issues);
 
     return buildReport(issues);
 }
@@ -168,6 +170,43 @@ function checkConnectivity(nodes, validPaths, issues) {
     });
 
     return unreachable;
+}
+
+// E6, E7 : liaisons entre étages
+function checkFloors(validPaths, nodesById, issues) {
+    validPaths.forEach(path => {
+        const a = nodesById.get(path.startNode);
+        const b = nodesById.get(path.endNode);
+        if (a.floor === b.floor) return;
+
+        // E6 : on ne change d'étage que par un escalier ou un ascenseur
+        if (!VERTICAL_TYPES.includes(a.type) || !VERTICAL_TYPES.includes(b.type)) {
+            issues.push(makeIssue('error', 'ETAGE_SANS_ESCALIER',
+                `Le chemin ${path.id} change d'étage entre ${describeNode(a)} et ${describeNode(b)} sans passer par un escalier ou un ascenseur.`,
+                [a.id, b.id], [path.id]));
+        }
+        // E7 : un escalier n'est jamais accessible en fauteuil.
+        // Seul isPmr === false exclut un chemin en mode PMR (cf. routeController.js).
+        if ((a.type === 'escalier' || b.type === 'escalier') && path.isPmr !== false) {
+            issues.push(makeIssue('error', 'ESCALIER_PMR',
+                `La liaison d'escalier ${path.id} entre ${describeNode(a)} et ${describeNode(b)} est marquée accessible PMR.`,
+                [a.id, b.id], [path.id]));
+        }
+    });
+}
+
+// E8 : salles injoignables quand on ne garde que les chemins PMR
+function checkPmr(nodes, validPaths, unreachable, issues) {
+    const pmrPaths = validPaths.filter(p => p.isPmr !== false);
+    const components = findComponents(nodes.map(n => n.id), pmrPaths);
+    const mainComponent = new Set(components[0] || []);
+
+    nodes.forEach(node => {
+        if (!ROOM_TYPES.includes(node.type)) return;
+        if (unreachable.has(node.id) || mainComponent.has(node.id)) return;
+        issues.push(makeIssue('error', 'SALLE_INACCESSIBLE_PMR',
+            `La salle ${describeNode(node)} est injoignable en mode PMR.`, [node.id]));
+    });
 }
 
 // ==========================================

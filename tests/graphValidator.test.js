@@ -146,3 +146,35 @@ test('E5 : un nœud isolé n\'est pas signalé une seconde fois comme morceau', 
     g.nodes.push(node('X'));
     assert.ok(!codes(validateGraph(g)).includes('GRAPHE_MORCELE'));
 });
+
+test('E6 ETAGE_SANS_ESCALIER : couloir relié à un autre étage', () => {
+    const g = baseGraph();
+    g.paths.push(path('pX', 'C1', 'C2'));
+    const issue = validateGraph(g).issues.find(i => i.code === 'ETAGE_SANS_ESCALIER');
+    assert.deepEqual(issue.pathIds, ['pX']);
+});
+
+test('E7 ESCALIER_PMR : liaison d\'escalier entre étages marquée PMR', () => {
+    const g = baseGraph();
+    g.paths.find(p => p.id === 'p4').isPmr = true;
+    const issue = validateGraph(g).issues.find(i => i.code === 'ESCALIER_PMR');
+    assert.deepEqual(issue.pathIds, ['p4']);
+});
+
+test('E7 : un escalier relié à un couloir du même étage peut rester PMR', () => {
+    // p2 (C1 - E1) est PMR dans le graphe de référence, qui est valide
+    assert.ok(!codes(validateGraph(baseGraph())).includes('ESCALIER_PMR'));
+});
+
+test('E8 SALLE_INACCESSIBLE_PMR : salle joignable seulement par un chemin non PMR', () => {
+    const g = baseGraph();
+    g.paths.find(p => p.id === 'p8').isPmr = false;   // C2 - S2
+    const issue = validateGraph(g).issues.find(i => i.code === 'SALLE_INACCESSIBLE_PMR');
+    assert.deepEqual(issue.nodeIds, ['S2']);
+});
+
+test('E8 : une salle déjà isolée n\'est pas re-signalée en PMR', () => {
+    const g = baseGraph();
+    g.nodes.push(node('X', { type: 'salle' }));
+    assert.ok(!codes(validateGraph(g)).includes('SALLE_INACCESSIBLE_PMR'));
+});
