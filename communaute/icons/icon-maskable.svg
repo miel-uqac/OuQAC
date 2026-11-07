@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+    <!-- Fond plein : Android découpe lui-même la forme (cercle, goutte...) -->
+    <rect width="512" height="512" fill="#6b8915"/>
+    <!-- Même épingle, réduite à 75 % autour du centre (256, 256) -->
+    <g transform="translate(256 256) scale(0.75) translate(-256 -248)">
+        <path d="M256 424 C214 360 144 290 144 216 A112 112 0 1 1 368 216 C368 290 298 360 256 424 Z" fill="#ffffff"/>
+        <circle cx="256" cy="216" r="44" fill="#6b8915"/>
+    </g>
+</svg>
