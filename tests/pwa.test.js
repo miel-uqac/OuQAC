@@ -10,7 +10,8 @@
  * précache du service worker existe : avec cache.addAll, un seul fichier
  * manquant fait échouer toute l'installation, et l'application ne
  * fonctionnerait plus hors ligne, sans erreur visible pour l'utilisateur.
- * * LANCEMENT (depuis la racine du dépôt, Node 18 ou plus) :
+ * * LANCEMENT (depuis la racine du dépôt, Node 20.11 ou plus, pour
+ * import.meta.dirname et readdirSync récursif) :
  *   node --test tests/pwa.test.js
  * Aucune dépendance à installer.
  **/
