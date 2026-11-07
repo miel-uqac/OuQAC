@@ -245,3 +245,27 @@ test('les erreurs sont listées avant les avertissements', () => {
     const report = validateGraph(g);
     assert.deepEqual(report.issues.map(i => i.severity), ['error', 'warning']);
 });
+
+// ==========================================
+// DONNÉES RÉELLES
+// ==========================================
+
+// Le graph.json actuel contient deux salles injoignables en mode PMR
+// (V1-1010 et V1-1260 : on n'y accède que par des escaliers). C'est un vrai
+// défaut des données, découvert par ce validateur le 2026-11-07, à corriger
+// dans le panel admin. Ce test vérifie donc l'absence d'erreurs de structure
+// (E1 à E7) et fige la liste des salles PMR connues pour repérer toute régression.
+test('le graph.json du dépôt n\'a pas d\'erreur de structure', () => {
+    const url = new URL('../graph/graph.json', import.meta.url);
+    const data = JSON.parse(readFileSync(url, 'utf8'));
+    const errors = validateGraph(data).issues.filter(i => i.severity === 'error');
+
+    const structural = errors.filter(i => i.code !== 'SALLE_INACCESSIBLE_PMR');
+    assert.deepEqual(structural, []);
+
+    const pmrRooms = errors
+        .filter(i => i.code === 'SALLE_INACCESSIBLE_PMR')
+        .map(i => data.nodes.find(n => n.id === i.nodeIds[0]).name)
+        .sort();
+    assert.deepEqual(pmrRooms, ['V1-1010', 'V1-1260']);
+});
