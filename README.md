@@ -91,6 +91,13 @@ Pour faire tourner un petit serveur local très facilement, nous utilisons Pytho
    *(Note : sur certains systèmes, la commande peut être `python3 -m http.server`)*
 5. **Ouvrir l'application :** Lancez votre navigateur et allez à l'adresse `http://localhost:8000`. Vous pourrez y voir le site et naviguer vers `/communaute/` ou `/admin/`.
 
+### 3. Mode hors ligne (PWA)
+Le panel communauté fonctionne hors ligne grâce à un service worker (`communaute/sw.js`) qui garde en cache la page, le graphe et les plans. Après avoir **modifié un plan SVG** ou **ajouté/renommé un fichier** du panel, incrémentez `CACHE_VERSION` dans `communaute/sw.js` et mettez à jour `PRECACHE_URLS`, puis vérifiez :
+```bash
+node --test tests/pwa.test.js
+```
+Pendant le développement, cochez « Update on reload » dans l'onglet *Application > Service workers* des outils de développement. Détails : [docs/pwa.md](docs/pwa.md).
+
 📖 **Avant de plonger dans le code :** Pour bien comprendre la structure des fichiers, le rôle de chaque dossier et la logique globale, **[consultez la page Architecture de notre Wiki](../../wiki/Architecture-d'OùQAC)**.
 
 ---

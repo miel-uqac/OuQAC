@@ -3,7 +3,7 @@
 - **Auteur :** Malo Besson
 - **Date :** 2026-11-07
 - **Branche :** `feat/pwa` (issue de `projet-libre-8web101`)
-- **Statut :** validée, à implémenter
+- **Statut :** implémentée
 - **Échéance :** 2026-11-20
 
 ## 1. Contexte et objectif
@@ -33,7 +33,7 @@ Avec le professeur, la priorité a été donnée à une application fonctionnell
 | Fichier | Action | Rôle |
 |---|---|---|
 | `communaute/manifest.webmanifest` | Créer | Identité de l'application installée (nom, icônes, couleurs, mode d'affichage). |
-| `communaute/icons/icon.svg` | Créer | Source vectorielle de l'icône : épingle de carte blanche sur carré vert `#6b8915`. |
+| `communaute/icons/icon.svg`, `icon-maskable.svg` | Créer | Sources vectorielles des icônes : épingle de carte blanche sur carré vert `#6b8915` (la version maskable a un fond plein et une épingle réduite). |
 | `communaute/icons/icon-192.png`, `icon-512.png` | Créer | Icônes standard exigées par Chrome pour l'installation. |
 | `communaute/icons/icon-maskable-512.png` | Créer | Icône « maskable » : le motif tient dans la zone de sécurité centrale (80 %), Android peut découper l'icône en cercle ou en goutte sans rogner l'épingle. |
 | `communaute/sw.js` | Créer | Service worker : précache, nettoyage des anciennes versions, stratégies de cache. |
