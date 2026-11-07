@@ -178,3 +178,70 @@ test('E8 : une salle déjà isolée n\'est pas re-signalée en PMR', () => {
     g.nodes.push(node('X', { type: 'salle' }));
     assert.ok(!codes(validateGraph(g)).includes('SALLE_INACCESSIBLE_PMR'));
 });
+
+// ==========================================
+// AVERTISSEMENTS
+// ==========================================
+
+test('W1 SALLE_SANS_NOM : salle au nom vide ou fait d\'espaces', () => {
+    const g = baseGraph();
+    g.nodes.find(n => n.id === 'S1').name = '   ';
+    const report = validateGraph(g);
+    assert.ok(codes(report).includes('SALLE_SANS_NOM'));
+    assert.equal(report.valid, true); // un avertissement ne rend pas le graphe invalide
+});
+
+test('W1 : un couloir sans nom est normal', () => {
+    const g = baseGraph();
+    g.nodes.find(n => n.id === 'C1').name = '';
+    assert.ok(!codes(validateGraph(g)).includes('SALLE_SANS_NOM'));
+});
+
+test('W2 NOM_DOUBLON : deux nœuds portent le même nom', () => {
+    const g = baseGraph();
+    g.nodes.find(n => n.id === 'S2').name = 'S1 ';
+    const issue = validateGraph(g).issues.find(i => i.code === 'NOM_DOUBLON');
+    assert.deepEqual(issue.nodeIds.sort(), ['S1', 'S2']);
+});
+
+test('W3 DISTANCE_INVALIDE : distance vide, texte, nulle ou négative', () => {
+    for (const distance of ['', 'abc', '0', -3, null, undefined]) {
+        const g = baseGraph();
+        g.paths.find(p => p.id === 'p1').distance = distance;
+        assert.ok(codes(validateGraph(g)).includes('DISTANCE_INVALIDE'), `distance ${distance}`);
+    }
+});
+
+test('W3 : une distance numérique en texte est acceptée', () => {
+    const g = baseGraph();
+    g.paths.find(p => p.id === 'p1').distance = '2.95';
+    assert.ok(!codes(validateGraph(g)).includes('DISTANCE_INVALIDE'));
+});
+
+test('W4 LIAISON_ETAGE_MANQUANTE : ascenseur sans liaison vers un autre étage', () => {
+    const g = baseGraph();
+    g.nodes.push(node('A3', { type: 'ascenseur' }));
+    g.paths.push(path('pX', 'C1', 'A3'));
+    const issue = validateGraph(g).issues.find(i => i.code === 'LIAISON_ETAGE_MANQUANTE');
+    assert.deepEqual(issue.nodeIds, ['A3']);
+});
+
+test('W5 DONNEE_INVALIDE : type inconnu, étage vide, coordonnées et PMR invalides, id en double', () => {
+    const g = baseGraph();
+    g.nodes.find(n => n.id === 'C1').type = 'cafeteria';
+    g.nodes.find(n => n.id === 'C2').floor = '';
+    g.nodes.find(n => n.id === 'S1').lat = 'abc';
+    g.paths.find(p => p.id === 'p1').isPmr = 'oui';
+    g.paths.find(p => p.id === 'p2').id = 'p1';
+    const issues = validateGraph(g).issues.filter(i => i.code === 'DONNEE_INVALIDE');
+    assert.equal(issues.length, 5);
+    assert.ok(issues.every(i => i.severity === 'warning'));
+});
+
+test('les erreurs sont listées avant les avertissements', () => {
+    const g = baseGraph();
+    g.nodes.find(n => n.id === 'S1').name = '';     // avertissement
+    g.nodes.push(node('X'));                        // erreur (isolé)
+    const report = validateGraph(g);
+    assert.deepEqual(report.issues.map(i => i.severity), ['error', 'warning']);
+});

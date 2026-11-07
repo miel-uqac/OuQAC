@@ -92,10 +92,14 @@ export function validateGraph(data) {
     });
 
     // RÈGLES
+    checkData(nodes, paths, issues);
     const validPaths = checkPaths(paths, nodesById, issues);
     const unreachable = checkConnectivity(nodes, validPaths, issues);
     checkFloors(validPaths, nodesById, issues);
     checkPmr(nodes, validPaths, unreachable, issues);
+    checkNames(nodes, issues);
+    checkDistances(paths, issues);
+    checkVerticalLinks(nodes, validPaths, nodesById, issues);
 
     return buildReport(issues);
 }
@@ -103,6 +107,47 @@ export function validateGraph(data) {
 // ==========================================
 // RÈGLES
 // ==========================================
+
+// W5 : champs manquants, types inconnus, ids en double
+function checkData(nodes, paths, issues) {
+    const seenNodeIds = new Set();
+    nodes.forEach(node => {
+        const label = describeNode(node);
+        if (node.id === undefined || node.id === null || node.id === '') {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Un nœud n'a pas d'identifiant (${label}).`));
+        } else if (seenNodeIds.has(node.id)) {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `L'identifiant ${node.id} est utilisé par plusieurs nœuds.`, [node.id]));
+        } else {
+            seenNodeIds.add(node.id);
+        }
+        if (!NODE_TYPES.includes(node.type)) {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} a un type inconnu : "${node.type}".`, [node.id]));
+        }
+        if (typeof node.floor !== 'string' || node.floor.trim() === '') {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} n'a pas d'étage.`, [node.id]));
+        }
+        if (!Number.isFinite(node.lat) || !Number.isFinite(node.lng)) {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} a des coordonnées invalides.`, [node.id]));
+        }
+    });
+
+    const seenPathIds = new Set();
+    paths.forEach(path => {
+        if (path.id === undefined || path.id === null || path.id === '') {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', 'Un chemin n\'a pas d\'identifiant.'));
+        } else if (seenPathIds.has(path.id)) {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `L'identifiant ${path.id} est utilisé par plusieurs chemins.`, [], [path.id]));
+        } else {
+            seenPathIds.add(path.id);
+        }
+        if (!PATH_TYPES.includes(path.type)) {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le chemin ${path.id} a un type inconnu : "${path.type}".`, [], [path.id]));
+        }
+        if (typeof path.isPmr !== 'boolean') {
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le chemin ${path.id} n'indique pas s'il est accessible PMR.`, [], [path.id]));
+        }
+    });
+}
 
 // E1, E2, E3 : références cassées, boucles, doublons.
 // Renvoie la liste des chemins "valides" (extrémités existantes et différentes),
@@ -206,6 +251,61 @@ function checkPmr(nodes, validPaths, unreachable, issues) {
         if (unreachable.has(node.id) || mainComponent.has(node.id)) return;
         issues.push(makeIssue('error', 'SALLE_INACCESSIBLE_PMR',
             `La salle ${describeNode(node)} est injoignable en mode PMR.`, [node.id]));
+    });
+}
+
+// W1, W2 : salles sans nom et noms en double
+function checkNames(nodes, issues) {
+    const nodesByName = new Map();
+    nodes.forEach(node => {
+        const name = typeof node.name === 'string' ? node.name.trim() : '';
+        if (name === '') {
+            if (ROOM_TYPES.includes(node.type)) {
+                issues.push(makeIssue('warning', 'SALLE_SANS_NOM',
+                    `Une salle n'a pas de nom (${describeNode(node)}).`, [node.id]));
+            }
+            return;
+        }
+        if (!nodesByName.has(name)) nodesByName.set(name, []);
+        nodesByName.get(name).push(node.id);
+    });
+
+    nodesByName.forEach((ids, name) => {
+        if (ids.length > 1) {
+            issues.push(makeIssue('warning', 'NOM_DOUBLON',
+                `${ids.length} nœuds portent le nom « ${name} ».`, ids));
+        }
+    });
+}
+
+// W3 : distances non numériques ou non positives
+function checkDistances(paths, issues) {
+    paths.forEach(path => {
+        const distance = Number(path.distance);
+        if (path.distance === '' || path.distance === null || !Number.isFinite(distance) || distance <= 0) {
+            issues.push(makeIssue('warning', 'DISTANCE_INVALIDE',
+                `Le chemin ${path.id} a une distance invalide : "${path.distance}".`, [], [path.id]));
+        }
+    });
+}
+
+// W4 : escaliers et ascenseurs sans liaison vers un autre étage
+function checkVerticalLinks(nodes, validPaths, nodesById, issues) {
+    const linkedToOtherFloor = new Set();
+    validPaths.forEach(path => {
+        const a = nodesById.get(path.startNode);
+        const b = nodesById.get(path.endNode);
+        if (a.floor !== b.floor) {
+            linkedToOtherFloor.add(a.id);
+            linkedToOtherFloor.add(b.id);
+        }
+    });
+
+    nodes.forEach(node => {
+        if (VERTICAL_TYPES.includes(node.type) && !linkedToOtherFloor.has(node.id)) {
+            issues.push(makeIssue('warning', 'LIAISON_ETAGE_MANQUANTE',
+                `Le nœud ${describeNode(node)} (${node.type}) n'est relié à aucun autre étage.`, [node.id]));
+        }
     });
 }
 
