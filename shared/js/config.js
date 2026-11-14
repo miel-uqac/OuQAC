@@ -11,6 +11,7 @@
  * - Coordonnées de base et Limites géographiques.
  * - Palettes de couleurs (Nœuds et Chemins).
  * - Registre universel des plans de l'université.
+ * - Catégories des lieux courants (PLACE_CATEGORIES).
  * ====================================================================
  */
 
@@ -33,6 +34,17 @@ export const SHARED_CONFIG = {
         "indoor": "#3498db",  // Bleu
         "outdoor": "#2ecc71"  // Vert
     },
+
+    // Catégories des lieux courants (champ "category" des nœuds, voir docs/lieux-courants.md)
+    PLACE_CATEGORIES: [
+        { id: "restauration", label: "Restauration" },
+        { id: "etudes", label: "Études" },
+        { id: "services", label: "Services" },
+        { id: "vie-etudiante", label: "Vie étudiante" },
+        { id: "sport", label: "Sport" },
+        { id: "securite", label: "Sécurité" },
+        { id: "autre", label: "Autre" }
+    ],
 
     // Plans des bâtiments par étages
     PLANS: [
