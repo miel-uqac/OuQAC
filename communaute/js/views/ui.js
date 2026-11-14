@@ -13,6 +13,9 @@
  * - renderSearchResults(filteredNodes, container, selectCallback) : Génère et 
  * injecte dynamiquement la liste cliquable des salles correspondant à la 
  * recherche de l'utilisateur.
+ * - renderCommonPlaces(places, container, selectCallback) : Génère la liste
+ * "Lieux courants" à partir des nœuds marqués dans l'admin (un vrai bouton
+ * par lieu, avec sa catégorie), ou un message si aucun lieu n'est marqué.
  * - updateNavigationCard(step, index, totalSteps) : Met à jour le bandeau 
  * supérieur de guidage GPS. Elle analyse intelligemment le texte de l'étape 
  * ("gauche", "ascenseur", "sortir") pour afficher automatiquement la bonne 
@@ -33,6 +36,8 @@
  * pour créer une expérience utilisateur fluide sans recharger la page.
  **/
 
+import { CONFIG } from '../config.js';
+
 // Rendu des résultats de recherche
 export function renderSearchResults(filteredNodes, container, selectCallback) {
     container.innerHTML = '';
@@ -47,6 +52,40 @@ export function renderSearchResults(filteredNodes, container, selectCallback) {
             container.appendChild(div);
         });
     }
+}
+
+// Rendu de la liste des lieux courants (nœuds marqués "featured" dans l'admin)
+export function renderCommonPlaces(places, container, selectCallback) {
+    container.innerHTML = '';
+
+    // Aucun lieu marqué : un message plutôt qu'une liste vide (ou des boutons inopérants)
+    if (places.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'location-empty';
+        empty.textContent = 'Aucun lieu courant pour le moment.';
+        container.appendChild(empty);
+        return;
+    }
+
+    places.forEach(place => {
+        // Un vrai <button> : atteignable au clavier et annoncé comme bouton par les lecteurs d'écran
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'location-item place-button';
+        button.textContent = place.name;
+
+        // Libellé de la catégorie, s'il est connu (ex. " · Restauration")
+        const category = CONFIG.PLACE_CATEGORIES.find(c => c.id === place.category);
+        if (category) {
+            const label = document.createElement('small');
+            label.className = 'place-category';
+            label.textContent = ` · ${category.label}`;
+            button.appendChild(label);
+        }
+
+        button.addEventListener('click', () => selectCallback(place));
+        container.appendChild(button);
+    });
 }
 
 // Mise à jour de la carte GPS (Instructions en haut de l'écran)
