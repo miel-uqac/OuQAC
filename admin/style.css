@@ -52,6 +52,7 @@ body, html {
 .form-group { margin-bottom: 10px; }
 .form-group label { display: block; font-size: 0.85rem; color: #666; }
 .form-group input, .form-group select { width: 100%; padding: 5px; box-sizing: border-box; }
+.form-group input[type="checkbox"] { width: auto; }
 .btn-delete { --btn-color: #f44336; width:100% }
 .btn-validate { --btn-color: #4CAF50; width:100%; margin-top:5px; }
 

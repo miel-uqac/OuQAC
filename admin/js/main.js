@@ -36,6 +36,7 @@ import * as NodeCtrl from './controllers/nodeController.js';
 import * as PathCtrl from './controllers/pathController.js';
 import * as IOCtrl from './controllers/ioController.js';
 import * as UI from './views/ui.js';
+import { CONFIG } from './config.js';
 
 // ==========================================
 // GESTION GLOBALE
@@ -88,6 +89,9 @@ map.on('click', function(e) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Menu des catégories de lieux courants (avant tout chargement de nœud)
+    UI.fillCategoryOptions(CONFIG.PLACE_CATEGORIES);
+
     // Boutons modes
     const btns = document.querySelectorAll('.btn-mode');
     btns[0].onclick = () => changeMode('view', btns[0]);
@@ -120,6 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Changement type noeud -> preview couleur
     document.getElementById('node-type').addEventListener('change', () => {
         if(state.selectedNode) NodeCtrl.refreshNodeStyle(state.selectedNode, true); // true = keep selected border
+    });
+
+    // SAUVEGARDE AUTO : Champs de lieu courant (case, catégorie, mots-clés)
+    ['node-featured', 'node-category'].forEach(id => {
+        document.getElementById(id).addEventListener('change', () => NodeCtrl.updateCurrentNode());
+    });
+    document.getElementById('node-keywords').addEventListener('input', () => {
+        NodeCtrl.updateCurrentNode();
     });
 
     // SAUVEGARDE AUTO + VISUEL : Déplacement manuel via input coordonnée

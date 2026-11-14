@@ -39,6 +39,7 @@ import { CONFIG } from '../config.js';
 import * as UI from '../views/ui.js';
 import * as PathCtrl from './pathController.js';
 import * as IOCtrl from './ioController.js';
+import { getPlaceFields, parseKeywords } from '../../../shared/js/places.js';
 
 // ==========================================
 // GESTION DES NOEUDS
@@ -65,7 +66,8 @@ export function createNode(lat, lng, existingData = null) {
     }).addTo(map);
 
     // Stockage des données personnalisées dans l'objet marker
-    marker.userData = { id, name, type, floor };
+    // Les champs de lieu courant (featured, category, keywords) sont repris s'ils existent
+    marker.userData = { id, name, type, floor, ...getPlaceFields(existingData) };
 
     // --- Events ---
     // Clic sur le marker pour l'éditer / Pour créer un chemin
@@ -159,6 +161,9 @@ export function updateCurrentNode() {
         // 1. Mise à jour des données du Marker
         state.selectedNode.userData.name = document.getElementById('node-name').value;
         state.selectedNode.userData.type = document.getElementById('node-type').value;
+        state.selectedNode.userData.featured = document.getElementById('node-featured').checked;
+        state.selectedNode.userData.category = document.getElementById('node-category').value;
+        state.selectedNode.userData.keywords = parseKeywords(document.getElementById('node-keywords').value);
         
         // 2. Mise à jour visuelle (Couleur sur la map)
         refreshNodeStyle(state.selectedNode, true);

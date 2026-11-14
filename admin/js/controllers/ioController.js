@@ -35,6 +35,7 @@ import * as NodeCtrl from './nodeController.js';
 import * as PathCtrl from './pathController.js';
 import * as UI from '../views/ui.js';
 import { CONFIG } from '../config.js';
+import { getPlaceFields } from '../../../shared/js/places.js';
 
 // ==========================================
 // FONCTION UTILITAIRE
@@ -53,7 +54,9 @@ function generateGraphData() {
             type: n.userData.type,
             floor: n.userData.floor,
             lat: n.getLatLng().lat,
-            lng: n.getLatLng().lng
+            lng: n.getLatLng().lng,
+            // Champs de lieu courant, écrits seulement s'ils ont une valeur utile
+            ...getPlaceFields(n.userData)
         })),
         paths: state.paths.map(p => ({
             id: p.userData.id,
