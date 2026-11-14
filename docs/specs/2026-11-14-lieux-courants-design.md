@@ -3,7 +3,7 @@
 - **Auteur :** Malo Besson
 - **Date :** 2026-11-14
 - **Branche :** `feat/lieux-courants` (issue de `projet-libre-8web101`)
-- **Statut :** conception validée (option A), en attente de relecture
+- **Statut :** implémentée (voir `docs/lieux-courants.md`)
 
 ## 1. Contexte et problème
 
@@ -64,17 +64,17 @@ Liste fixe, déclarée une seule fois dans `shared/js/config.js` (`PLACE_CATEGOR
 
 | Fichier | Action | Rôle |
 |---|---|---|
-| `shared/js/places.js` | Créer | Logique pure (sans DOM ni Leaflet) : `normalizeText(text)`, `getCommonPlaces(nodes)`, `matchesSearch(node, query)`. Testable avec Node. |
+| `shared/js/places.js` | Créer | Logique pure (sans DOM ni Leaflet) : `normalizeText(text)`, `getCommonPlaces(nodes)`, `matchesSearch(node, query)`, et pour l'admin `parseKeywords(text)`, `formatKeywords(keywords)`, `getPlaceFields(data)`. Testable avec Node. |
 | `tests/places.test.js` | Créer | Tests unitaires de `places.js`. |
 | `shared/js/config.js` | Modifier | Ajouter `PLACE_CATEGORIES`. |
-| `communaute/index.html` | Modifier | Retirer les 14 `<div class="location-item">` écrits en dur ; garder un conteneur vide `#common-places-list`. |
+| `communaute/index.html` | Modifier | Retirer les 13 `<div class="location-item">` écrits en dur ; garder un conteneur vide `#common-places-list`. |
 | `communaute/js/main.js` | Modifier | Générer la liste des lieux courants au chargement du graphe ; utiliser `matchesSearch` dans la recherche. |
 | `communaute/js/views/ui.js` | Modifier | `renderCommonPlaces(places, container, selectCallback)` : un vrai `<button>` par lieu, avec la catégorie ; message si la liste est vide. |
 | `communaute/style.css` | Modifier | Style des boutons de lieux (même apparence que `.location-item`). |
 | `admin/index.html` | Modifier | Dans « Édition Nœud » : case « Lieu courant », menu « Catégorie », champ « Mots-clés (séparés par des virgules) ». |
 | `admin/js/controllers/nodeController.js` | Modifier | Conserver `featured`, `category`, `keywords` dans `userData` à la création/import ; les mettre à jour depuis le formulaire. |
 | `admin/js/controllers/ioController.js` | Modifier | Exporter ces champs (seulement s'ils ont une valeur utile). |
-| `admin/js/views/ui.js` | Modifier | Remplir et vider les nouveaux champs du formulaire. |
+| `admin/js/views/ui.js` | Modifier | Remplir et vider les nouveaux champs du formulaire ; `fillCategoryOptions(categories)` construit le menu des catégories. |
 | `admin/js/main.js` | Modifier | Sauvegarde automatique à chaque modification des nouveaux champs (comme le nom et le type). |
 
 Le panel communauté conserve déjà tout l'objet du nœud dans `marker.userData` (`communaute/js/controllers/nodeController.js`) : les nouveaux champs y arrivent sans modification.
@@ -84,6 +84,8 @@ Le panel communauté conserve déjà tout l'objet du nœud dans `marker.userData
 - `normalizeText(text)` : minuscules, sans accents, espaces en trop retirés. `"  Cafétéria "` → `"cafeteria"`. Rend la recherche tolérante (« bibliotheque » trouve « Bibliothèque »).
 - `getCommonPlaces(nodes)` : reçoit des objets nœuds (`userData`), garde ceux qui ont `featured === true` et un nom non vide, les trie par nom (ordre alphabétique français). Renvoie un nouveau tableau.
 - `matchesSearch(node, query)` : `true` si la requête normalisée est contenue dans le nom normalisé, ou dans un des mots-clés normalisés. Requête vide → `false`.
+- `parseKeywords(text)` / `formatKeywords(keywords)` : conversion entre le champ texte de l'admin (« manger, café ») et le tableau stocké.
+- `getPlaceFields(data)` : ne renvoie que les champs utiles (`featured: true`, catégorie non vide, mots-clés non vides), utilisé à l'export et à la création des nœuds.
 
 ### Recherche dans le panel communauté
 
@@ -111,6 +113,6 @@ Un nœud est proposé s'il correspond à la requête (`matchesSearch`) **et** s'
 
 ## 8. Documentation
 
-- `docs/lieux-courants.md` : comment marquer un lieu dans l'admin, format JSON, catégories, liste des 14 lieux anciennement écrits en dur, à saisir par l'équipe.
+- `docs/lieux-courants.md` : comment marquer un lieu dans l'admin, format JSON, catégories, liste des 13 lieux anciennement écrits en dur, à saisir par l'équipe.
 - Description de PR détaillée, sans attribution automatique.
 - Page Wiki après accord de Malo.
