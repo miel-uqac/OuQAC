@@ -322,6 +322,28 @@ html, body {
     border-bottom: none;
 }
 
+/* Lieux courants : de vrais boutons, avec l'apparence des lignes de liste */
+.place-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    font-family: inherit;
+}
+
+.place-category {
+    font-weight: normal;
+    color: #888;
+}
+
+.location-empty {
+    padding: 15px 0;
+    margin: 0;
+    color: #888;
+}
+
 /* --- Overlay d'Itinéraire --- */
 .route-header {
     display: flex;

@@ -17,6 +17,8 @@
  * raccourcis cliquables.
  * - clearNodeForm() & clearPathForm() : Vident et réinitialisent les champs 
  * des panneaux d'édition lorsqu'un élément est désélectionné.
+ * - fillCategoryOptions(categories) : Construit le menu des catégories de lieux
+ * courants à partir de la configuration partagée (PLACE_CATEGORIES).
  * - updateRoomList() : Gère le moteur de recherche de la barre latérale. 
  * Elle filtre la liste globale des nœuds (state.nodes) selon le texte saisi 
  * et le type sélectionné, puis génère une liste de résultats cliquables 
@@ -38,6 +40,7 @@ import { map, setFloor, filterMapElements } from '../map.js';
 import * as NodeCtrl from '../controllers/nodeController.js';
 import * as PathCtrl from '../controllers/pathController.js';
 import { changeMode } from '../main.js';
+import { formatKeywords } from '../../../shared/js/places.js';
 
 // ==========================================
 // GESTION INTERFACE
@@ -49,6 +52,10 @@ export function fillNodeForm(node) {
     document.getElementById('node-id').value = node.userData.id;
     document.getElementById('node-name').value = node.userData.name;
     document.getElementById('node-type').value = node.userData.type;
+    // Champs de lieu courant (facultatifs : absents sur la plupart des nœuds)
+    document.getElementById('node-featured').checked = node.userData.featured === true;
+    document.getElementById('node-category').value = node.userData.category || '';
+    document.getElementById('node-keywords').value = formatKeywords(node.userData.keywords);
     const pos = node.getLatLng();
     document.getElementById('node-coords').value = `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
 
@@ -103,7 +110,29 @@ export function clearNodeForm() {
     document.getElementById('node-id').value = "";
     document.getElementById('node-name').value = "";
     document.getElementById('node-type').value = "salle";
+    document.getElementById('node-featured').checked = false;
+    document.getElementById('node-category').value = "";
+    document.getElementById('node-keywords').value = "";
     document.getElementById('node-coords').value = "";
+}
+
+// Remplit le menu des catégories de lieux à partir de la configuration partagée
+// (une seule liste pour l'admin et le panel communauté)
+export function fillCategoryOptions(categories) {
+    const select = document.getElementById('node-category');
+    select.innerHTML = '';
+
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = 'Aucune';
+    select.appendChild(none);
+
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.id;
+        option.textContent = category.label;
+        select.appendChild(option);
+    });
 }
 
 // Mise à jour des inputs du formulaire Chemin

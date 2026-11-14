@@ -16,8 +16,10 @@
  * à l'utilisateur de fermer les panneaux avec le bouton physique "Retour" de 
  * son téléphone.
  * - Moteur de recherche local : Écoute les frappes dans la barre de recherche, 
- * filtre le `state.nodes` en direct et demande à `UI.renderSearchResults` 
- * d'afficher les résultats.
+ * filtre le `state.nodes` en direct (nom ou mots-clés, via `matchesSearch` de 
+ * shared/js/places.js) et demande à `UI.renderSearchResults` d'afficher les résultats.
+ * - Lieux courants : Une fois le graphe chargé, construit la liste à partir des 
+ * nœuds marqués dans l'admin (`getCommonPlaces`) et la confie à `UI.renderCommonPlaces`.
  * - Mode Navigation (GPS) : Lors du clic sur "C'est parti", appelle `RouteCtrl` 
  * pour calculer le chemin (A*) et générer les étapes textuelles. Il active 
  * ensuite une interface simplifiée (Carte de navigation en haut de l'écran) 
@@ -42,10 +44,12 @@ import { loadGraphData } from './controllers/dataController.js';
 import * as RouteCtrl from './controllers/routeController.js';
 import * as UI from './views/ui.js';
 import { state } from './state.js';
+import { getCommonPlaces, matchesSearch } from '../../shared/js/places.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Chargement automatique des données du campus
-    loadGraphData();
+    // (on garde la promesse pour construire les lieux courants une fois le graphe chargé)
+    const graphLoaded = loadGraphData();
 
     // ==========================================
     // GESTION DU MENU DES ÉTAGES
@@ -96,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const commonPlacesSection = document.getElementById('common-places');
     const searchResultsSection = document.getElementById('search-results');
     const dynamicResultsList = document.getElementById('dynamic-results-list');
+    const commonPlacesList = document.getElementById('common-places-list');
 
     let currentSearchTarget = 'end'; 
     state.startNode = null;
@@ -245,27 +250,21 @@ document.addEventListener('DOMContentLoaded', () => {
             commonPlacesSection.classList.add('hidden');
             searchResultsSection.classList.remove('hidden');
             
-            const filtered = state.nodes.filter(n => n.userData.name.toLowerCase().includes(val) && n.userData.type === 'salle');
+            // Salles et lieux courants dont le nom ou un mot-clé contient la requête (sans tenir compte des accents)
+            const filtered = state.nodes.filter(n =>
+                (n.userData.type === 'salle' || n.userData.featured === true) && matchesSearch(n.userData, val)
+            );
             UI.renderSearchResults(filtered, dynamicResultsList, selectLocation);
         }
     });
 
-    // Clic sur un lieu courant
-    document.querySelectorAll('#common-places .location-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            // On récupère le nom en enlevant les espaces parasites avant/après
-            const name = e.target.textContent.trim();
-            
-            // On cherche le nœud
-            const node = state.nodes.find(n => 
-                n.userData.name && 
-                n.userData.name.trim().toLowerCase() === name.toLowerCase()
-            );
-            
-            // On lance la sélection
-            if (node) {
-                selectLocation(node);
-            } 
+    // Lieux courants : générés à partir des nœuds marqués "Lieu courant" dans l'admin,
+    // une fois le graphe chargé (loadGraphData est asynchrone)
+    graphLoaded.then(() => {
+        const places = getCommonPlaces(state.nodes.map(n => n.userData));
+        UI.renderCommonPlaces(places, commonPlacesList, (place) => {
+            const node = state.nodes.find(n => n.userData.id === place.id);
+            if (node) selectLocation(node);
         });
     });
 
