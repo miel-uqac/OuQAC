@@ -20,6 +20,8 @@
  * shared/js/places.js) et demande à `UI.renderSearchResults` d'afficher les résultats.
  * - Lieux courants : Une fois le graphe chargé, construit la liste à partir des 
  * nœuds marqués dans l'admin (`getCommonPlaces`) et la confie à `UI.renderCommonPlaces`.
+ * - Liens de destination : Une fois le graphe chargé, lit ?depuis= et ?vers= dans 
+ * l'adresse (shared/js/links.js) et pré-remplit l'itinéraire.
  * - Mode Navigation (GPS) : Lors du clic sur "C'est parti", appelle `RouteCtrl` 
  * pour calculer le chemin (A*) et générer les étapes textuelles. Il active 
  * ensuite une interface simplifiée (Carte de navigation en haut de l'écran) 
@@ -45,6 +47,7 @@ import * as RouteCtrl from './controllers/routeController.js';
 import * as UI from './views/ui.js';
 import { state } from './state.js';
 import { getCommonPlaces, matchesSearch, isSearchable } from '../../shared/js/places.js';
+import { parseDestinationParams, findNodeByName } from '../../shared/js/links.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Chargement automatique des données du campus
@@ -265,7 +268,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const node = state.nodes.find(n => n.userData.id === place.id);
             if (node) selectLocation(node);
         });
+
+        applyDestinationLink();
     });
+
+    // Lien de destination : communaute/?depuis=Entrée%20Est&vers=P1-4000
+    // On remplit d'abord le départ puis la destination, pour que la carte
+    // finisse centrée sur la destination. Voir docs/liens-destination.md.
+    const applyDestinationLink = () => {
+        const link = parseDestinationParams(window.location.search);
+        const nodesData = state.nodes.map(n => n.userData);
+        const missing = [];
+
+        [['depuis', 'start'], ['vers', 'end']].forEach(([param, target]) => {
+            const name = link[param];
+            if (!name) return;
+            const data = findNodeByName(nodesData, name);
+            const node = data && state.nodes.find(n => n.userData.id === data.id);
+            if (!node) {
+                missing.push(name);
+                return;
+            }
+            currentSearchTarget = target;
+            selectLocation(node);
+        });
+
+        if (missing.length > 0) UI.showMessage(`Lieu introuvable : ${missing.join(', ')}`);
+    };
 
     UI.setupSwipeToClose(searchOverlay, () => minimizeSearchOverlay());
     UI.setupSwipeToClose(routeOverlay, () => minimizeRouteOverlay());
