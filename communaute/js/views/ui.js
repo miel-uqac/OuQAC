@@ -26,6 +26,8 @@
  * - setupSwipeToClose(overlayElement, minimizeCallback) : Implémente la physique 
  * tactile native (Touch Events). Elle permet à l'utilisateur de fermer les panneaux 
  * superposés (overlays) d'un simple glissement de doigt vers le bas (swipe-down).
+ * - showMessage(text) : Affiche un bandeau temporaire (6 s), par exemple quand
+ * un lien ?vers= désigne un lieu introuvable.
  * * FLUX DE DONNÉES / TRAVAIL :
  * 1. Écoute passive : Ce module ne décide de rien. Il attend d'être appelé 
  * par `main.js` (suite à un clic) ou par la boucle de navigation.
@@ -103,8 +105,8 @@ export function updateNavigationCard(step, index, totalSteps) {
 
     if (stepText.includes("départ")) { iconClass = "fa-location-dot"; title = "Départ"; }
     else if (stepText.includes("arrivée")) { iconClass = "fa-flag-checkered"; title = "Arrivée"; }
-    else if (stepText.includes("ascenseur")) { iconClass = "fa-elevator"; title = "Changement d'étage"; }
-    else if (stepText.includes("escalier")) { iconClass = "fa-stairs"; title = "Changement d'étage"; }
+    else if (stepText.includes("ascenseur")) { iconClass = "fa-elevator"; title = "Changement de niveau"; }
+    else if (stepText.includes("escalier")) { iconClass = "fa-stairs"; title = "Changement de niveau"; }
     else if (stepText.includes("gauche")) { iconClass = "fa-arrow-turn-down fa-rotate-90"; title = "Tourner à gauche"; }
     else if (stepText.includes("droite")) { iconClass = "fa-arrow-turn-up fa-rotate-90"; title = "Tourner à droite"; }
     else if (stepText.includes("sortir") || stepText.includes("entrer")) { iconClass = "fa-door-open"; title = "Porte"; }
@@ -146,6 +148,16 @@ export function toggleNavigationMode(isActive) {
 }
 
 // Ajout de la mécanique de Swipe sur les menus
+// Bandeau de message temporaire (role="status" : lu par les lecteurs d'écran)
+let messageTimer = null;
+export function showMessage(text) {
+    const box = document.getElementById('app-message');
+    box.textContent = text;
+    box.classList.remove('hidden');
+    clearTimeout(messageTimer);
+    messageTimer = setTimeout(() => box.classList.add('hidden'), 6000);
+}
+
 export function setupSwipeToClose(overlayElement, minimizeCallback) {
     let startY = 0, currentY = 0, isDragging = false;
 

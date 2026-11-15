@@ -57,7 +57,7 @@ Pour ajouter une catégorie : ajouter une ligne `{ id: "...", label: "..." }` da
 
 ## Recherche
 
-Dans le panel communauté, la recherche propose les **salles** et les **lieux courants** dont le **nom ou un mot-clé** contient le texte saisi. Elle ignore les majuscules et les accents (« bibliotheque » trouve « Bibliothèque »). Les autres nœuds (couloirs, escaliers) ne sont pas proposés.
+Dans le panel communauté, la recherche propose les **salles**, les **toilettes** et les **lieux courants** dont le **nom ou un mot-clé** contient le texte saisi (règle `isSearchable` de `shared/js/places.js`). Elle ignore les majuscules et les accents (« bibliotheque » trouve « Bibliothèque »). Les autres nœuds (couloirs, escaliers) ne sont pas proposés.
 
 ## Lieux à saisir
 
