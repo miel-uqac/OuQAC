@@ -37,6 +37,7 @@ OùQAC est une **Progressive Web App (PWA)** fonctionnant entièrement côté cl
 * **Propriétés Dynamiques :** Définition des règles pour chaque chemin (distance, intérieur/extérieur, PMR).
 * **Gestion des étages :** Outil visuel pour lier des nœuds entre différents étages (via des marqueurs spécifiques).
 * **Import/Export JSON :** Sauvegarde et chargement de la topologie du campus en un clic.
+* **Validation du graphe :** Détection des nœuds isolés, morceaux déconnectés, liaisons d'étage incorrectes et salles injoignables en mode PMR, avec navigation directe vers l'élément fautif ([documentation](docs/validation-graphe.md)).
 
 ---
 
@@ -90,6 +91,12 @@ Pour faire tourner un petit serveur local très facilement, nous utilisons Pytho
    ```
    *(Note : sur certains systèmes, la commande peut être `python3 -m http.server`)*
 5. **Ouvrir l'application :** Lancez votre navigateur et allez à l'adresse `http://localhost:8000`. Vous pourrez y voir le site et naviguer vers `/communaute/` ou `/admin/`.
+
+### 3. Lancer les tests
+Les tests du validateur de graphe utilisent le lanceur intégré à Node.js (version 18 ou plus, aucune installation de paquet) :
+```bash
+node --test tests/graphValidator.test.js
+```
 
 📖 **Avant de plonger dans le code :** Pour bien comprendre la structure des fichiers, le rôle de chaque dossier et la logique globale, **[consultez la page Architecture de notre Wiki](../../wiki/Architecture-d'OùQAC)**.
 
