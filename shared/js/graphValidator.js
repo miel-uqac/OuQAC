@@ -124,7 +124,7 @@ function checkData(nodes, paths, issues) {
             issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} a un type inconnu : "${node.type}".`, [node.id]));
         }
         if (typeof node.floor !== 'string' || node.floor.trim() === '') {
-            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} n'a pas d'étage.`, [node.id]));
+            issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} n'a pas de niveau.`, [node.id]));
         }
         if (!Number.isFinite(node.lat) || !Number.isFinite(node.lng)) {
             issues.push(makeIssue('warning', 'DONNEE_INVALIDE', `Le nœud ${label} a des coordonnées invalides.`, [node.id]));
@@ -227,7 +227,7 @@ function checkFloors(validPaths, nodesById, issues) {
         // E6 : on ne change d'étage que par un escalier ou un ascenseur
         if (!VERTICAL_TYPES.includes(a.type) || !VERTICAL_TYPES.includes(b.type)) {
             issues.push(makeIssue('error', 'ETAGE_SANS_ESCALIER',
-                `Le chemin ${path.id} change d'étage entre ${describeNode(a)} et ${describeNode(b)} sans passer par un escalier ou un ascenseur.`,
+                `Le chemin ${path.id} change de niveau entre ${describeNode(a)} et ${describeNode(b)} sans passer par un escalier ou un ascenseur.`,
                 [a.id, b.id], [path.id]));
         }
         // E7 : un escalier n'est jamais accessible en fauteuil.
@@ -304,7 +304,7 @@ function checkVerticalLinks(nodes, validPaths, nodesById, issues) {
     nodes.forEach(node => {
         if (VERTICAL_TYPES.includes(node.type) && !linkedToOtherFloor.has(node.id)) {
             issues.push(makeIssue('warning', 'LIAISON_ETAGE_MANQUANTE',
-                `Le nœud ${describeNode(node)} (${node.type}) n'est relié à aucun autre étage.`, [node.id]));
+                `Le nœud ${describeNode(node)} (${node.type}) n'est relié à aucun autre niveau.`, [node.id]));
         }
     });
 }
@@ -352,11 +352,11 @@ function findComponents(nodeIds, paths) {
     return components.sort((a, b) => b.length - a.length);
 }
 
-// Nom lisible d'un nœud pour les messages : « P1-4 » (étage 1)
+// Nom lisible d'un nœud pour les messages : « P1-4 » (niveau 1)
 function describeNode(node) {
     if (!node) return 'inconnu';
     const name = typeof node.name === 'string' && node.name.trim() !== '' ? node.name.trim() : node.id;
-    return `« ${name} » (étage ${node.floor ?? '?'})`;
+    return `« ${name} » (niveau ${node.floor ?? '?'})`;
 }
 
 function makeIssue(severity, code, message, nodeIds = [], pathIds = []) {
