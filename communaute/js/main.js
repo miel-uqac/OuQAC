@@ -44,7 +44,7 @@ import { loadGraphData } from './controllers/dataController.js';
 import * as RouteCtrl from './controllers/routeController.js';
 import * as UI from './views/ui.js';
 import { state } from './state.js';
-import { getCommonPlaces, matchesSearch } from '../../shared/js/places.js';
+import { getCommonPlaces, matchesSearch, isSearchable } from '../../shared/js/places.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Chargement automatique des données du campus
@@ -250,10 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
             commonPlacesSection.classList.add('hidden');
             searchResultsSection.classList.remove('hidden');
             
-            // Salles et lieux courants dont le nom ou un mot-clé contient la requête (sans tenir compte des accents)
-            const filtered = state.nodes.filter(n =>
-                (n.userData.type === 'salle' || n.userData.featured === true) && matchesSearch(n.userData, val)
-            );
+            // Salles, toilettes et lieux courants dont le nom ou un mot-clé contient la requête
+            // (sans tenir compte des accents)
+            const filtered = state.nodes.filter(n => isSearchable(n.userData) && matchesSearch(n.userData, val));
             UI.renderSearchResults(filtered, dynamicResultsList, selectLocation);
         }
     });

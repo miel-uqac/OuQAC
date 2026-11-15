@@ -15,7 +15,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-    normalizeText, getCommonPlaces, matchesSearch,
+    normalizeText, getCommonPlaces, matchesSearch, isSearchable,
     parseKeywords, formatKeywords, getPlaceFields
 } from '../shared/js/places.js';
 
@@ -94,4 +94,17 @@ test('getPlaceFields copie les mots-clés au lieu de partager le tableau', () =>
     const fields = getPlaceFields({ keywords });
     keywords.push('café');
     assert.deepEqual(fields.keywords, ['manger']);
+});
+
+test('isSearchable accepte les salles, les toilettes et les lieux courants', () => {
+    assert.equal(isSearchable(node('P1-4')), true);
+    assert.equal(isSearchable(node('WC P1', { type: 'wc' })), true);
+    assert.equal(isSearchable(node('Entrée Est', { type: 'couloir', featured: true })), true);
+});
+
+test('isSearchable refuse les couloirs, escaliers et ascenseurs ordinaires', () => {
+    for (const type of ['couloir', 'escalier', 'ascenseur']) {
+        assert.equal(isSearchable(node('X', { type })), false, type);
+    }
+    assert.equal(isSearchable(null), false);
 });

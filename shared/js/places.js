@@ -17,6 +17,8 @@
  * pour comparer "Bibliothèque" et "bibliotheque".
  * - getCommonPlaces(nodes) : Les nœuds marqués featured, triés par nom.
  * - matchesSearch(node, query) : La requête est-elle dans le nom ou un mot-clé ?
+ * - isSearchable(node) : Le nœud peut-il être proposé par la recherche ?
+ * (salles, toilettes et lieux courants ; pas les couloirs ni les escaliers)
  * - parseKeywords(text) & formatKeywords(keywords) : Conversion entre le champ
  * texte de l'admin ("manger, café") et le tableau stocké dans graph.json.
  * - getPlaceFields(data) : Ne garde que les champs de lieu utiles, pour que
@@ -55,6 +57,15 @@ export function matchesSearch(node, query) {
     if (q === '' || !node) return false;
     if (normalizeText(node.name).includes(q)) return true;
     return Array.isArray(node.keywords) && node.keywords.some(keyword => normalizeText(keyword).includes(q));
+}
+
+// Types de nœuds que l'on peut chercher comme destination
+const SEARCHABLE_TYPES = ['salle', 'wc'];
+
+// Vrai pour une destination possible : salle, toilettes, ou tout nœud marqué lieu courant
+export function isSearchable(node) {
+    if (!node) return false;
+    return SEARCHABLE_TYPES.includes(node.type) || node.featured === true;
 }
 
 // "manger, café ,, repas" -> ["manger", "café", "repas"]
