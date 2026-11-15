@@ -204,7 +204,7 @@ export function generateItinerarySteps(route) {
         if (current.userData.floor !== next.userData.floor) {
             const transport = (current.userData.type === 'ascenseur' || next.userData.type === 'ascenseur') ? "l'ascenseur" : "les escaliers";
             steps.push({
-                text: `Prendre ${transport} jusqu'à l'étage ${next.userData.floor}`,
+                text: `Prendre ${transport} jusqu'au niveau ${next.userData.floor}`,
                 node: current,
                 pathIndex: i,
                 angle: currentAngle
@@ -240,7 +240,7 @@ export function generateItinerarySteps(route) {
                 else if (diff > 150 || diff < -150) turnInstruction = "Faire demi-tour";
 
                 if (turnInstruction) {
-                    const locationContext = current.userData.name ? ` au niveau de ${current.userData.name}` : '';
+                    const locationContext = current.userData.name ? ` près de ${current.userData.name}` : '';
                     steps.push({
                         text: `${turnInstruction}${locationContext}`,
                         node: current,
@@ -254,7 +254,7 @@ export function generateItinerarySteps(route) {
         // Point de repère
         if (i + 1 !== nodes.length - 1 && next.userData.name && next.userData.type !== 'couloir') {
             const lastStep = steps.length > 0 ? steps[steps.length - 1].text : "";
-            if (!lastStep.includes(`au niveau de ${next.userData.name}`)) {
+            if (!lastStep.includes(`près de ${next.userData.name}`)) {
                 steps.push({
                     text: `Avancer jusqu'à ${next.userData.name}`,
                     node: current,

@@ -85,7 +85,7 @@ export function fillNodeForm(node) {
 
             const item = document.createElement('div');
             item.className = 'room-item';
-            item.innerHTML = `➔ Vers <b>${otherName}</b> <br><small>Étage ${otherFloor} (${p.userData.type})</small>`;
+            item.innerHTML = `➔ Vers <b>${otherName}</b> <br><small>Niveau ${otherFloor} (${p.userData.type})</small>`;
             item.style.border = "1px solid #ddd";
             item.style.marginBottom = "5px";
             item.style.borderRadius = "4px";
@@ -185,7 +185,7 @@ export function updateRoomList() {
         const item = document.createElement('div');
         item.className = 'room-item';
         // Affichage de l'étage pour plus de clarté dans la liste
-        item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type} - Étage ${nodeFloor})</small>`;
+        item.innerHTML = `<b>${node.userData.name}</b> <small>(${node.userData.type} - Niveau ${nodeFloor})</small>`;
         
         item.addEventListener('click', () => {
             // Redirection vers le nœud

@@ -103,8 +103,8 @@ export function updateNavigationCard(step, index, totalSteps) {
 
     if (stepText.includes("départ")) { iconClass = "fa-location-dot"; title = "Départ"; }
     else if (stepText.includes("arrivée")) { iconClass = "fa-flag-checkered"; title = "Arrivée"; }
-    else if (stepText.includes("ascenseur")) { iconClass = "fa-elevator"; title = "Changement d'étage"; }
-    else if (stepText.includes("escalier")) { iconClass = "fa-stairs"; title = "Changement d'étage"; }
+    else if (stepText.includes("ascenseur")) { iconClass = "fa-elevator"; title = "Changement de niveau"; }
+    else if (stepText.includes("escalier")) { iconClass = "fa-stairs"; title = "Changement de niveau"; }
     else if (stepText.includes("gauche")) { iconClass = "fa-arrow-turn-down fa-rotate-90"; title = "Tourner à gauche"; }
     else if (stepText.includes("droite")) { iconClass = "fa-arrow-turn-up fa-rotate-90"; title = "Tourner à droite"; }
     else if (stepText.includes("sortir") || stepText.includes("entrer")) { iconClass = "fa-door-open"; title = "Porte"; }
